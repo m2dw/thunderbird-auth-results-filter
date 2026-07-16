@@ -1,0 +1,445 @@
+{
+  "tab_basic":                { "message": "Basic",            "description": "Basic settings tab label" },
+  "tab_advanced":             { "message": "Advanced",         "description": "Advanced settings tab label" },
+  "tab_custom_formulas":      { "message": "Custom Formulas",  "description": "Custom Formulas tab label" },
+  "tab_diagnostics":          { "message": "Diagnostics",      "description": "Diagnostics tab label" },
+
+  "page_title": { "message": "Auth Results Filter", "description": "Options page heading" },
+  "manifest_description": {
+    "message": "Filter incoming mail using Authentication-Results headers.",
+    "description": "Add-on description shown by Thunderbird"
+  },
+
+  "section_protection_status":      { "message": "Protection Status",             "description": "Section heading" },
+  "section_trusted_servers":        { "message": "Trusted Authentication Servers", "description": "Section heading" },
+  "section_suggested_servers":      { "message": "Suggested Servers",             "description": "Section heading" },
+  "section_mail_handling":          { "message": "Mail Handling",                  "description": "Section heading" },
+  "section_recent_activity":        { "message": "Recent Activity",                "description": "Section heading" },
+  "section_score_settings":         { "message": "Score Settings",                 "description": "Section heading" },
+  "section_sender_rules":           { "message": "Sender Domain Rules",            "description": "Section heading" },
+  "section_manual_whitelist":       { "message": "Manual Whitelist",               "description": "Section heading" },
+  "section_address_book_whitelist": { "message": "Address Book Whitelist",         "description": "Section heading" },
+  "section_diagnostics":            { "message": "Diagnostics",                    "description": "Section heading (Advanced tab)" },
+  "section_decision_log":           { "message": "Decision Log",                   "description": "Section heading" },
+
+  "status_no_trusted_servers": {
+    "message": "No trusted authentication servers configured. DMARC, SPF, and DKIM scoring is disabled until you add a trusted server above.",
+    "description": "Warning shown in Basic tab when no trusted servers are set up"
+  },
+  "firstrun_callout": {
+    "message": "First setup step: add the authentication server name (authserv-id) used by your incoming mail server. Until you add one, DMARC/SPF/DKIM results are not used for scoring. Setup hints can suggest names, but you must verify and add the correct one yourself.",
+    "description": "First-run callout shown when no trusted servers are configured, explaining what to do next"
+  },
+  "status_protection_active": {
+    "message": "Protection active — $count$ trusted server$plural$ configured.",
+    "description": "Shown in Basic tab when at least one trusted server is configured",
+    "placeholders": {
+      "count":  { "content": "$1", "example": "3" },
+      "plural": { "content": "$2", "example": "s" }
+    }
+  },
+  "status_recent_no_trusted_ar": {
+    "message": "Recent messages had no scoring from trusted authentication results. Verify that your trusted server names match the Authentication-Results headers in your mail.",
+    "description": "Hint shown when recent log entries have no trusted AR results"
+  },
+
+  "activity_no_messages": { "message": "No messages assessed yet.", "description": "Empty state for Recent Activity section" },
+  "activity_counts": {
+    "message": "$total$ message$plural$ assessed — $normal$ normal, $review$ review, $highrisk$ high-risk.",
+    "description": "Summary counts in Recent Activity section",
+    "placeholders": {
+      "total":    { "content": "$1", "example": "42" },
+      "plural":   { "content": "$2", "example": "s" },
+      "normal":   { "content": "$3", "example": "38" },
+      "review":   { "content": "$4", "example": "3" },
+      "highrisk": { "content": "$5", "example": "1" }
+    }
+  },
+  "activity_most_recent": { "message": "Most recent:", "description": "Heading above last 5 entries in Recent Activity" },
+
+  "setup_hints_summary":         { "message": "Setup hints from account domains",            "description": "Summary element for setup assistant <details>" },
+  "setup_use_dns":               { "message": "Use DNS lookup for MX setup hints",          "description": "Checkbox label for DNS lookup option" },
+  "setup_dns_resolver_label":    { "message": "DNS resolver:",                               "description": "Label for DNS resolver select" },
+  "setup_no_accounts":           { "message": "No account email domains found.",             "description": "Shown when no accounts are available in setup assistant" },
+  "setup_unable_load_accounts":  { "message": "Unable to load account information.",         "description": "Error when account list cannot be fetched" },
+  "setup_no_mx_records":         { "message": "No MX records found.",                        "description": "Shown when DNS MX lookup returns no records" },
+
+  "no_trusted_msg":       { "message": "No trusted domains configured.",            "description": "Shown when trusted domain list is empty" },
+  "trust_exact_match_label": {
+    "message": "$host$ (exact match)",
+    "description": "Label for an exact-host trusted entry",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "trust_domain_label": {
+    "message": "$domain$ (and subdomains)",
+    "description": "Label for a registrable-domain trusted entry",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "trust_promote_btn": {
+    "message": "Trust domain ($domain$ and subdomains)",
+    "description": "Button to promote an exact entry to domain trust",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+
+  "candidates_section_desc": {
+    "message": "Authentication server names identified by the setup assistant that you have not yet trusted. These are not active — add the correct name to Trusted Authentication Servers above to enable scoring.",
+    "description": "Description paragraph for the Suggested Servers section"
+  },
+  "candidates_none": { "message": "No untrusted candidates seen yet.", "description": "Empty state for Suggested Servers section" },
+  "candidate_trust_domain": {
+    "message": "Trust $domain$ and all subdomains",
+    "description": "Checkbox label for trusting a registrable domain and its subdomains",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "candidate_exact_match": {
+    "message": "$host$ (exact match)",
+    "description": "Checkbox label for an exact-host candidate",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+
+  "review_folder_no_accounts":       { "message": "No accounts found.",       "description": "Shown when the account list is empty for review folder selection" },
+  "review_folder_unable_load":       { "message": "Unable to load accounts.", "description": "Error when account list cannot be fetched for review folder selection" },
+  "review_folder_select_placeholder": { "message": "Select a folder…",        "description": "Default option in review folder select dropdown" },
+
+  "setting_move_to_review":     { "message": "Move suspicious mail to the review folder",                             "description": "Checkbox label for move-to-review setting" },
+  "setting_move_junk":          { "message": "Move high-risk mail directly to the Junk folder",                       "description": "Checkbox label for move-to-junk setting" },
+  "setting_notify":             { "message": "Notify for messages that pass assessment (score at or below threshold)", "description": "Checkbox label for notify-after-assessment setting" },
+  "setting_notify_caveat":      { "message": "If Thunderbird's built-in new-mail notification is also enabled, you may see duplicate notifications. Disable Thunderbird's notification if you want only the add-on's post-filter notification.", "description": "Explanatory note shown below the notify-after-assessment checkbox" },
+  "setting_enable_diagnostics": { "message": "Enable Diagnostics tab",                                                "description": "Checkbox label for diagnostics mode setting" },
+  "setting_enable_address_book":{ "message": "Enable address book whitelist mitigation",                              "description": "Checkbox label for address-book whitelist" },
+
+  "score_col_result":          { "message": "Result",   "description": "Column header in auth score table" },
+  "score_col_signal":          { "message": "Signal",   "description": "Column header in Layer 2/3 score table" },
+  "score_col_rule":            { "message": "Rule",     "description": "Column header in Layer 4 score table" },
+  "score_col_score":           { "message": "Score",    "description": "Column header in score tables" },
+  "score_col_default":         { "message": "Default",  "description": "Column header in score tables" },
+  "score_mitigation_badge":    { "message": "mitigation","description": "Badge shown on mitigation rules in score settings" },
+  "score_layer3_cap_warning": {
+    "message": "Warning: the Layer 3 cap is at or above the Review threshold (50). Layer 3 heuristics alone could push a message into Review — this is outside the intended low-pass design.",
+    "description": "Warning shown when Layer 3 cap is too high"
+  },
+
+  "btn_add":              { "message": "Add",                         "description": "Button label" },
+  "btn_remove":           { "message": "Remove",                      "description": "Button label" },
+  "btn_use":              { "message": "Use",                         "description": "Use a setup suggestion" },
+  "btn_clear_log":        { "message": "Clear log",                   "description": "Button to clear the decision log" },
+  "btn_export_logs":      { "message": "Export logs",                 "description": "Button to export the decision log as JSON" },
+  "btn_exporting":        { "message": "Exporting…",                  "description": "Button label while export is in progress" },
+  "btn_reset_all_scores": { "message": "Reset all scores to defaults","description": "Button to reset all score groups" },
+  "btn_reset_layer2":     { "message": "Reset Layer 2 to defaults",   "description": "Button to reset Layer 2 scores" },
+  "btn_reset_layer3":     { "message": "Reset Layer 3 to defaults",   "description": "Button to reset Layer 3 scores" },
+  "btn_reset_layer4":     { "message": "Reset Layer 4 to defaults",   "description": "Button to reset Layer 4 scores" },
+  "btn_move_to_inbox":    { "message": "Move to Inbox",               "description": "Review action button in popup" },
+  "btn_whitelist_sender": { "message": "Whitelist Sender",            "description": "Review action button in popup" },
+  "btn_already_whitelisted": { "message": "Already Whitelisted",      "description": "Disabled state of whitelist button when sender is already listed" },
+  "btn_open_options":     { "message": "Open Options / Logs",         "description": "Button in popup to open the options page" },
+  "btn_confirm":          { "message": "Confirm",                     "description": "Confirmation button" },
+  "btn_cancel":           { "message": "Cancel",                      "description": "Cancel button" },
+  "btn_show_older": {
+    "message": "Show $count$ older entries",
+    "description": "Button to load older log entries",
+    "placeholders": { "count": { "content": "$1", "example": "50" } }
+  },
+
+  "whitelist_none":          { "message": "No whitelist entries configured.",                                                         "description": "Empty state for Manual Whitelist section" },
+  "whitelist_email_invalid": { "message": "Enter a valid email address (e.g. user@example.com).",                                    "description": "Validation error for whitelist add form" },
+  "whitelist_already_exists":{ "message": "This address is already in the whitelist.",                                               "description": "Error when address is already whitelisted" },
+  "whitelist_full": {
+    "message": "Whitelist is full (max $max$ entries). Remove an entry before adding a new one.",
+    "description": "Error when whitelist is at capacity",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
+  "whitelist_ab_permission_note": {
+    "message": "Enabling this feature will request access to your Thunderbird address books.",
+    "description": "Note shown when address book whitelist is about to be enabled"
+  },
+
+  "metrics_alignment_summary": { "message": "Alignment metrics", "description": "Summary element for alignment metrics <details>" },
+  "metrics_heuristic_summary": { "message": "Heuristic metrics", "description": "Summary element for heuristic metrics <details>" },
+
+  "log_count_all": {
+    "message": "Stored entries: $total$ / 1000",
+    "description": "Decision log entry count (all visible)",
+    "placeholders": { "total": { "content": "$1", "example": "42" } }
+  },
+  "log_count_showing": {
+    "message": "Stored entries: $total$ / 1000 — showing $showing$ most recent",
+    "description": "Decision log entry count when not all are shown",
+    "placeholders": {
+      "total":   { "content": "$1", "example": "1000" },
+      "showing": { "content": "$2", "example": "50" }
+    }
+  },
+  "log_no_reasons":       { "message": "No reason details available.",  "description": "Shown for log entries without scoreReasons" },
+  "log_no_reasons_label": { "message": "No reasons",                    "description": "<summary> text when a log entry has zero reasons" },
+  "log_reasons_one": {
+    "message": "$count$ reason",
+    "description": "Singular reason count",
+    "placeholders": { "count": { "content": "$1", "example": "1" } }
+  },
+  "log_reasons_many": {
+    "message": "$count$ reasons",
+    "description": "Plural reason count",
+    "placeholders": { "count": { "content": "$1", "example": "5" } }
+  },
+
+  "popup_no_message": {
+    "message": "No message is currently displayed.",
+    "description": "Shown in popup when no message is open"
+  },
+  "popup_no_entry": {
+    "message": "No score details found for this message. The add-on scores messages when they arrive; this message may have been received before the add-on was installed, or its Message-ID could not be matched.",
+    "description": "Shown in popup when no log entry matches the displayed message"
+  },
+  "popup_score": {
+    "message": "Score: $score$",
+    "description": "Score badge in popup",
+    "placeholders": { "score": { "content": "$1", "example": "75" } }
+  },
+  "popup_score_details":  { "message": "Score details",     "description": "<summary> label for score details collapsible" },
+  "popup_all_reasons":    { "message": "All score reasons", "description": "Heading above full reason list in popup" },
+  "popup_inbox_not_found":{ "message": "Inbox folder not found.",           "description": "Error when inbox cannot be found" },
+  "popup_moved_to_inbox": { "message": "Moved to Inbox.",                   "description": "Success message after moving to inbox" },
+  "popup_move_failed":    { "message": "Move failed. Please try again.",    "description": "Error message when move fails" },
+  "popup_whitelist_confirm": {
+    "message": "Add \"$address$\" to the manual whitelist? Future messages from this address will receive a score reduction.",
+    "description": "Confirmation text before adding to whitelist",
+    "placeholders": { "address": { "content": "$1", "example": "user@example.com" } }
+  },
+  "popup_whitelist_added": {
+    "message": "\"$address$\" added to the manual whitelist.",
+    "description": "Success message after whitelist add",
+    "placeholders": { "address": { "content": "$1", "example": "user@example.com" } }
+  },
+  "popup_whitelist_full": {
+    "message": "Whitelist is full (max $max$ entries). Remove an entry before adding a new one.",
+    "description": "Error when whitelist is full in popup",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
+  "popup_whitelist_save_failed":     { "message": "Failed to save whitelist entry. Please try again.", "description": "Generic whitelist save error" },
+  "popup_no_sender_address":         { "message": "Sender address could not be determined.",           "description": "Whitelist button tooltip when sender is unknown" },
+  "popup_already_whitelisted_title": { "message": "This sender is already in the manual whitelist.",  "description": "Whitelist button tooltip when sender is already listed" },
+  "popup_error": {
+    "message": "Error loading score details: $error$",
+    "description": "Error displayed when popup init throws",
+    "placeholders": { "error": { "content": "$1", "example": "NetworkError" } }
+  },
+
+  "action_classified_normal":   { "message": "Left in inbox",               "description": "Action label for classified-normal" },
+  "action_classified_review":   { "message": "Scored review (no action)",   "description": "Action label for classified-review" },
+  "action_classified_high_risk":{ "message": "Scored high-risk (no action)","description": "Action label for classified-high-risk" },
+  "action_moved_review":        { "message": "Moved to review folder",       "description": "Action label for moved-review" },
+  "action_moved_junk":          { "message": "Moved to Junk",                "description": "Action label for moved-junk or moved-junk-mark-failed" },
+  "action_move_review_failed":  { "message": "Move to review failed",        "description": "Action label for move-review-failed" },
+  "action_move_junk_failed":    { "message": "Move to Junk failed",          "description": "Action label for move-junk-failed" },
+  "action_no_review_folder":    { "message": "No review folder configured",  "description": "Action label for no-review-folder-configured" },
+
+  "section_custom_formulas": { "message": "Custom Scoring Formulas (Layer 5)", "description": "Section heading for custom formula management (Custom Formulas tab)" },
+  "section_key_reference": { "message": "Score Reason Key Reference", "description": "Section heading for the key reference table in the Custom Formulas tab" },
+  "key_reference_intro": {
+    "message": "Keys you can pass to has() and scoreOf() in formula expressions. Click an insert button to add the snippet at the cursor in the formula editor. Hover a key for a short description.",
+    "description": "Introductory paragraph above the key reference table"
+  },
+  "key_reference_layer_auth":      { "message": "L1 Auth (auth.*)",             "description": "Key reference group heading for Layer 1 authentication result keys" },
+  "key_reference_layer_identity":  { "message": "L2 Identity (identity.*)",     "description": "Key reference group heading for Layer 2 identity alignment keys" },
+  "key_reference_layer_heuristic": { "message": "L3 Heuristic (heuristic.*)",   "description": "Key reference group heading for Layer 3 heuristic keys" },
+  "key_reference_layer_composite": { "message": "L4 Composite (composite.*)",   "description": "Key reference group heading for Layer 4 composite rule keys" },
+  "key_reference_layer_l5":        { "message": "L5 / Whitelist",               "description": "Key reference group heading for Layer 5 whitelist and sender rule keys" },
+  "key_reference_col_title":       { "message": "Title",                        "description": "Column header in the key reference table" },
+  "key_reference_col_key":         { "message": "Key",                          "description": "Column header in the key reference table" },
+  "key_reference_col_default":     { "message": "Default",                      "description": "Column header in the key reference table" },
+  "key_reference_btn_insert_has": {
+    "message": "has()",
+    "description": "Button to insert has(\"key\") snippet for a score reason key"
+  },
+  "key_reference_btn_insert_scoreof": {
+    "message": "scoreOf()",
+    "description": "Button to insert scoreOf(\"key\") snippet for a score reason key"
+  },
+  "custom_formula_intro": {
+    "message": "Advanced feature for power users. Custom formulas are evaluated as Layer 5, after L1–L4 scoring has completed, and can observe or adjust the final message score.",
+    "description": "Introductory note above custom formula list"
+  },
+  "custom_formula_safety": {
+    "message": "Formulas are local-only and never sent externally. Use observe mode to test a formula without changing scoring. Add mode adds the clamped result (−100 to +100) to the message score. Regex matching via match() is available in observe mode only. Errors in individual formulas are caught and ignored per message.",
+    "description": "Safety copy for custom formula section"
+  },
+  "custom_formula_none":       { "message": "No custom formulas configured.",  "description": "Empty state for custom formula list" },
+  "custom_formula_add_title":  { "message": "Add formula",                     "description": "Heading shown when adding a new formula" },
+  "custom_formula_edit_title": { "message": "Edit formula",                    "description": "Heading shown when editing an existing formula" },
+  "custom_formula_field_id":   { "message": "ID",                              "description": "Label for formula ID input" },
+  "custom_formula_field_name": { "message": "Name",                            "description": "Label for formula name input" },
+  "custom_formula_field_expression": { "message": "Expression",                "description": "Label for formula expression textarea" },
+  "custom_formula_field_mode": { "message": "Mode",                            "description": "Label for formula mode selector" },
+  "custom_formula_id_hint": {
+    "message": "Stable identifier used in score keys (custom.formula.<id>). Letters, digits, hyphens, and underscores only. Cannot be changed after saving.",
+    "description": "Hint text below formula ID input"
+  },
+  "custom_formula_mode_hint": {
+    "message": "observe: evaluate and record but do not change score. add: add result to score. disabled: skip formula entirely.",
+    "description": "Hint text below formula mode selector"
+  },
+  "custom_formula_count_all": {
+    "message": "Formulas: $count$ / 20",
+    "description": "Shows how many custom formulas are stored",
+    "placeholders": { "count": { "content": "$1", "example": "3" } }
+  },
+  "btn_add_formula":    { "message": "Add formula", "description": "Button to open the add-formula form" },
+  "btn_edit_formula":   { "message": "Edit",        "description": "Button to open the edit-formula form for a formula row" },
+  "btn_delete_formula": { "message": "Delete",      "description": "Button to delete a formula" },
+  "btn_save_formula":   { "message": "Save",        "description": "Button to save the formula form" },
+  "custom_formula_error_id_required":         { "message": "ID is required.",                                                                   "description": "Validation error for empty formula ID" },
+  "custom_formula_error_id_too_long": {
+    "message": "ID is too long (max $max$ characters).",
+    "description": "Validation error when formula ID exceeds length limit",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
+  "custom_formula_error_id_invalid":          { "message": "ID must contain only letters, digits, hyphens, and underscores.",  "description": "Validation error for invalid formula ID characters" },
+  "custom_formula_error_id_duplicate":        { "message": "A formula with this ID already exists.",                           "description": "Validation error for duplicate formula ID" },
+  "custom_formula_error_name_too_long": {
+    "message": "Name is too long (max $max$ characters).",
+    "description": "Validation error when formula name exceeds length limit",
+    "placeholders": { "max": { "content": "$1", "example": "200" } }
+  },
+  "custom_formula_error_expression_required": { "message": "Expression is required.",                                          "description": "Validation error for empty formula expression" },
+  "custom_formula_error_expression_too_long": {
+    "message": "Expression is too long (max $max$ characters).",
+    "description": "Validation error when expression exceeds length limit",
+    "placeholders": { "max": { "content": "$1", "example": "1000" } }
+  },
+  "custom_formula_error_parse": {
+    "message": "Parse error: $error$",
+    "description": "Validation error when formula expression fails to parse",
+    "placeholders": { "error": { "content": "$1", "example": "Unexpected token" } }
+  },
+  "custom_formula_error_invalid_mode":  { "message": "Invalid mode.",                   "description": "Internal validation error for formula mode" },
+  "custom_formula_error_match_in_add_mode": { "message": "match() is only available in observe mode. Switch to observe or remove the match() call.", "description": "Validation error when match() is used in add-mode formula" },
+  "custom_formula_diag_summary":        { "message": "L5 formula diagnostics",          "description": "Summary element for formula diagnostics <details> in log" },
+  "custom_formula_list_full": {
+    "message": "Formula limit reached ($max$). Remove a formula before adding a new one.",
+    "description": "Error when the formula list is at capacity",
+    "placeholders": { "max": { "content": "$1", "example": "20" } }
+  },
+  "custom_formula_template_label":   { "message": "Template",              "description": "Label for the template picker row in the formula form" },
+  "custom_formula_template_choose":  { "message": "— choose a template —", "description": "Default empty option in the template picker select" },
+  "btn_insert_template":             { "message": "Insert",                "description": "Button to insert the selected template into the formula form" },
+  "custom_formula_tpl_boost_rule":   { "message": "Boost when a rule fired",          "description": "Template name: boost when an existing L4 rule fired" },
+  "custom_formula_tpl_deep_subdomain": { "message": "Deep random subdomain",          "description": "Template name: deep random-looking subdomain experiment" },
+  "custom_formula_tpl_msgid_mismatch": { "message": "Message-ID mismatch",            "description": "Template name: Message-ID mismatch experiment" },
+  "custom_formula_tpl_dkim_mitigate":  { "message": "Mitigate on DKIM aligned",       "description": "Template name: mitigate when DKIM is aligned" },
+  "custom_formula_expr_placeholder": { "message": "has(\"composite.authAlignedRandomDomain\") ? 30 : 0", "description": "Placeholder shown in the expression textarea when empty" },
+  "custom_formula_help_summary":     { "message": "L5 formula reference",             "description": "Summary label for the collapsible formula help panel" },
+  "custom_formula_help_expression_only": {
+    "message": "A formula is a single expression — not a JavaScript program. Statements such as if, let, for, and return are not supported.",
+    "description": "Help panel bullet: formulas are expressions not statements"
+  },
+  "custom_formula_help_ternary": {
+    "message": "Use ternary expressions for conditional logic: condition ? 40 : 0",
+    "description": "Help panel bullet: use ternary for branching"
+  },
+  "custom_formula_help_readonly": {
+    "message": "Context fields (from, auth, alignment, headers, etc.) are read-only. You cannot assign values to them.",
+    "description": "Help panel bullet: context fields are read-only"
+  },
+  "custom_formula_help_returns":     { "message": "Formulas return a number; non-numeric results are ignored.", "description": "Help panel bullet: formulas return a number" },
+  "custom_formula_help_observe":     { "message": "observe mode records the result but does not change the message score. Use observe to test a formula safely before switching to add mode.", "description": "Help panel bullet: observe mode" },
+  "custom_formula_help_add":         { "message": "add mode adds the clamped result (−100 to +100) to the message score.", "description": "Help panel bullet: add mode" },
+  "custom_formula_help_clamped":     { "message": "Output is clamped to [−100, +100] before being applied.", "description": "Help panel bullet: clamping" },
+  "custom_formula_help_errors":      { "message": "Errors in a formula are caught per message and shown in the diagnostics column; a bad formula does not block others.", "description": "Help panel bullet: error handling" },
+  "custom_formula_help_no_regex":    { "message": "Regex matching via match() is not supported in add mode (v1). Use observe mode to experiment with match().", "description": "Help panel bullet: no regex in add mode" },
+  "custom_formula_help_fields_title":{ "message": "Available fields and functions",   "description": "Heading above the fields/functions reference in the formula help panel" },
+
+  "formula_chips_label":                { "message": "Insert field / function:",                                                                                                              "description": "Header above formula insertion chips" },
+  "formula_chip_insert_title":          { "message": "Insert at cursor",                                                                                                                      "description": "Tooltip for formula chip buttons" },
+  "formula_chips_group_functions":      { "message": "Functions",                                                                                                                             "description": "Label for the Functions chip group" },
+  "formula_chips_group_from":           { "message": "From",                                                                                                                                  "description": "Label for the From fields chip group" },
+  "formula_chips_group_alignment":      { "message": "Alignment",                                                                                                                             "description": "Label for the Alignment fields chip group" },
+  "formula_chips_group_message_id":     { "message": "Message-ID",                                                                                                                            "description": "Label for the Message-ID fields chip group" },
+  "formula_chips_group_headers":        { "message": "Headers",                                                                                                                               "description": "Label for the Headers fields chip group" },
+  "formula_chips_group_general":        { "message": "General",                                                                                                                               "description": "Label for the General fields chip group" },
+  "formula_chips_ref_note":             { "message": "These are the supported fields and functions for the v1 formula DSL. Click a chip to insert it at the cursor position.",                "description": "Reference note below formula insertion chips" },
+
+  "dns_error_invalid_resolver": { "message": "DNS resolver address is missing or invalid.", "description": "DNS error for invalid_resolver code" },
+  "dns_error_timeout":          { "message": "DNS lookup timed out.",                        "description": "DNS error for timeout code" },
+  "dns_error_network":          { "message": "DNS lookup failed (network error).",           "description": "DNS error for network_error code" },
+  "dns_error_http":             { "message": "DNS lookup failed (server error).",            "description": "DNS error for http_error code" },
+  "dns_error_dns":              { "message": "DNS server returned an error.",                "description": "DNS error for dns_error code" },
+  "dns_error_generic":          { "message": "DNS lookup failed.",                           "description": "Generic DNS error fallback" },
+
+  "rule_authserv_untrusted_title":   { "message": "Untrusted authserv-id",                                                                   "description": "Rule registry title" },
+  "rule_authserv_untrusted_summary": { "message": "Authentication-Results header is from a domain you have not trusted.",                    "description": "Rule registry summary" },
+  "rule_sender_rule_title":          { "message": "Sender domain rule",                                                                      "description": "Rule registry title" },
+  "rule_sender_rule_summary":        { "message": "A user-defined sender-domain rule matched this message.",                                 "description": "Rule registry summary" },
+  "rule_whitelist_manual_title":     { "message": "Manual whitelist",                                                                        "description": "Rule registry title" },
+  "rule_whitelist_manual_summary":   { "message": "Sender address is on your manual whitelist.",                                             "description": "Rule registry summary" },
+  "rule_whitelist_addressBook_title":  { "message": "Address book contact",                                                                  "description": "Rule registry title" },
+  "rule_whitelist_addressBook_summary":{ "message": "Sender is in your Thunderbird address book.",                                           "description": "Rule registry summary" },
+
+  "rule_identity_spfMailFromMismatch_title":          { "message": "SPF MAIL FROM differs from From",                                        "description": "Rule registry title" },
+  "rule_identity_spfMailFromMismatch_summary":        { "message": "SPF passed for a different domain than the visible From address.",        "description": "Rule registry summary" },
+  "rule_identity_dkimDomainMismatch_title":           { "message": "DKIM signing domain differs from From",                                  "description": "Rule registry title" },
+  "rule_identity_dkimDomainMismatch_summary":         { "message": "All passing DKIM signatures are from a domain unrelated to the From address.", "description": "Rule registry summary" },
+  "rule_identity_dmarcNoneWithThirdPartyAuth_title":  { "message": "DMARC none with only third-party auth",                                  "description": "Rule registry title" },
+  "rule_identity_dmarcNoneWithThirdPartyAuth_summary":{ "message": "No DMARC policy and all passing SPF/DKIM are from unrelated domains.",   "description": "Rule registry summary" },
+
+  "rule_heuristic_randomFromDomainLabel_title":   { "message": "Random-looking From domain label",                                               "description": "Rule registry title" },
+  "rule_heuristic_randomFromDomainLabel_summary": { "message": "A label in the From domain looks machine-generated (high entropy, low vowels).", "description": "Rule registry summary" },
+  "rule_heuristic_randomFromLocalPart_title":     { "message": "Random-looking From local part",                                                  "description": "Rule registry title" },
+  "rule_heuristic_randomFromLocalPart_summary":   { "message": "The local part (before @) of the From address looks machine-generated.",         "description": "Rule registry summary" },
+
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_title":   { "message": "SPF aligned, DKIM unaligned, random local part",             "description": "Rule registry title" },
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_summary": { "message": "SPF is aligned but DKIM is unaligned and the local part looks random.", "description": "Rule registry summary" },
+  "rule_composite_authAlignedRandomDomain_title":              { "message": "Auth-aligned sender with random-looking domain",              "description": "Rule registry title" },
+  "rule_composite_authAlignedRandomDomain_summary":            { "message": "Authentication is aligned but the From domain itself looks machine-generated.", "description": "Rule registry summary" },
+  "rule_composite_thirdPartyAuthRandomLocal_title":            { "message": "Third-party auth pass with random local part, no alignment",  "description": "Rule registry title" },
+  "rule_composite_thirdPartyAuthRandomLocal_summary":          { "message": "Only third-party authentication passed and the local part looks random, with no alignment.", "description": "Rule registry summary" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_title":   { "message": "Message-ID domain mismatch with unaligned authentication",   "description": "Rule registry title" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_summary": { "message": "The Message-ID domain differs from the From domain and auth is not aligned.", "description": "Rule registry summary" },
+  "rule_composite_messageIdUnregistrableMismatch_title":       { "message": "Message-ID domain is unregistrable or mismatches From",      "description": "Rule registry title" },
+  "rule_composite_messageIdUnregistrableMismatch_summary":     { "message": "The Message-ID domain is unregistrable (TLD-only) or has no valid registrable domain.", "description": "Rule registry summary" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_title":  { "message": "From/Sender mismatch with unaligned authentication",         "description": "Rule registry title" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_summary":{ "message": "The From and Sender headers point to different domains and auth is not aligned.", "description": "Rule registry summary" },
+  "rule_composite_deepRandomFromSubdomain_title":              { "message": "Deep random-looking From subdomain",                         "description": "Rule registry title" },
+  "rule_composite_deepRandomFromSubdomain_summary":            { "message": "The From address uses a deep subdomain with a random-looking label.", "description": "Rule registry summary" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_title":  { "message": "Delegated newsletter: DKIM-aligned, route-consistent",      "description": "Rule registry title" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_summary":{ "message": "DKIM is aligned and the delivery route is consistent with a legitimate ESP.", "description": "Rule registry summary" },
+  "rule_composite_spfPassDkimFailRandomLocal_title":           { "message": "SPF pass, DKIM fail, random local part",                    "description": "Rule registry title" },
+  "rule_composite_spfPassDkimFailRandomLocal_summary":         { "message": "SPF passes but DKIM fails and the local part looks random.", "description": "Rule registry summary" },
+  "rule_composite_dkimAlignedLexicalMitigation_title":        { "message": "DKIM-aligned lexical false-positive mitigation",            "description": "Rule registry title" },
+  "rule_composite_dkimAlignedLexicalMitigation_summary":      { "message": "DKIM is aligned; reduces the heuristic penalty for random-looking names.", "description": "Rule registry summary" },
+  "rule_composite_ownDomainAuthFail_title":                    { "message": "Own account domain with failed authentication",             "description": "Rule registry title" },
+  "rule_composite_ownDomainAuthFail_summary":                  { "message": "Message claims to come from one of your account domains but authentication failed.", "description": "Rule registry summary" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_title":   { "message": "Unparseable From with infrastructure mismatch",     "description": "Rule registry title" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_summary": { "message": "The From header could not be parsed as a valid address and infrastructure signals differ.", "description": "Rule registry summary" },
+  "rule_composite_geoTokenCompoundDomain_title":               { "message": "Geo/token compound registrable domain",                     "description": "Rule registry title" },
+  "rule_composite_geoTokenCompoundDomain_summary":             { "message": "The registrable domain is a hyphen-compound containing a known spam geo/token and auth is unaligned.", "description": "Rule registry summary" },
+  "rule_composite_deepServiceWordSubdomain_title":             { "message": "Deep service-word subdomain",                               "description": "Rule registry title" },
+  "rule_composite_deepServiceWordSubdomain_summary":           { "message": "A deep subdomain contains a service-like word (e.g. mail-01) associated with disposable-domain spam.", "description": "Rule registry summary" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_title":   { "message": "DMARC fail mitigated: DKIM aligned and list headers present","description": "Rule registry title" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_summary": { "message": "DMARC failed but DKIM is aligned and List headers are present — likely a mailing list.", "description": "Rule registry summary" },
+  "rule_composite_dkimFailWithAlignedPass_title":              { "message": "DKIM fail with aligned DKIM pass",                          "description": "Rule registry title" },
+  "rule_composite_dkimFailWithAlignedPass_summary":            { "message": "At least one DKIM signature failed but another aligned signature passed.", "description": "Rule registry summary" },
+
+  "notification_single_account": {
+    "message": "$account$: 1 new message",
+    "description": "Notification title for a single new message; $account$ is the receiving account email address",
+    "placeholders": { "account": { "content": "$1", "example": "user@example.com" } }
+  },
+  "notification_single_fallback": {
+    "message": "$name$: 1 new message",
+    "description": "Notification title for a single new message when account email is unavailable; $name$ is the account display name or folder name",
+    "placeholders": { "name": { "content": "$1", "example": "Work" } }
+  },
+  "notification_multi_title":   { "message": "New Messages",              "description": "Notification title when multiple new messages are coalesced into one notification" },
+  "notification_multi_body": {
+    "message": "There are $count$ new messages.",
+    "description": "First line of the notification body for multiple new messages",
+    "placeholders": { "count": { "content": "$1", "example": "3" } }
+  },
+  "notification_more_messages": {
+    "message": "+$count$ more messages",
+    "description": "Line appended to the notification body showing how many additional messages are queued",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "notification_no_subject":    { "message": "(no subject)",              "description": "Fallback shown in the notification body when the message subject is empty" }
+}

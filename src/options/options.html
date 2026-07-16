@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>__MSG_page_title__</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main>
+    <h1>__MSG_page_title__</h1>
+
+    <div class="tab-bar" role="tablist">
+      <button class="tab-btn" data-tab="basic" role="tab" aria-controls="tab-panel-basic">__MSG_tab_basic__</button>
+      <button class="tab-btn" data-tab="advanced" role="tab" aria-controls="tab-panel-advanced">__MSG_tab_advanced__</button>
+      <button class="tab-btn" data-tab="customformulas" role="tab" aria-controls="tab-panel-customformulas">__MSG_tab_custom_formulas__</button>
+      <button class="tab-btn" data-tab="diagnostics" role="tab" aria-controls="tab-panel-diagnostics" id="diagnostics-tab-btn">__MSG_tab_diagnostics__</button>
+    </div>
+
+    <!-- Tab: Basic -->
+    <div id="tab-panel-basic" class="tab-panel" role="tabpanel">
+
+      <section id="protection-status">
+        <h2>__MSG_section_protection_status__</h2>
+        <div id="protection-status-content">
+          <!-- Rendered by options.js -->
+        </div>
+      </section>
+
+      <section id="trusted-domains">
+        <h2>__MSG_section_trusted_servers__</h2>
+        <p>
+          Your incoming mail server stamps each message with an
+          <code>Authentication-Results</code> header that identifies itself by a
+          server name (the <em>authserv-id</em>). Add that name here so this
+          add-on knows which authentication results to use for scoring. Results
+          from servers not on this list are ignored.
+        </p>
+        <p id="no-trusted-msg">__MSG_no_trusted_msg__</p>
+        <ul id="trusted-domain-list"></ul>
+        <details id="setup-assistant" class="setup-assistant">
+          <summary>__MSG_setup_hints_summary__</summary>
+          <p class="setup-assistant-desc">
+            These are suggested server names derived from your account email
+            domains. They are <strong>hints only</strong>, not trusted entries.
+            Click <strong>Use</strong> to copy a suggestion to the form below,
+            verify it matches your provider's actual server name, then click
+            <strong>Add</strong>.
+          </p>
+          <p class="setup-assistant-guidance">
+            To confirm the correct server name, check your mail provider's
+            documentation or inspect a recent message's
+            <code>Authentication-Results</code> header.
+          </p>
+          <div class="setup-dns-settings">
+            <label>
+              <input type="checkbox" id="setup-hint-dns-enabled">
+              __MSG_setup_use_dns__
+            </label>
+            <p class="setup-dns-note">
+              MX lookup sends account email domains to the configured DNS resolver.
+              DNS lookup is used only to generate setup hints.
+              Trusted entries are not added automatically — you must explicitly add them.
+            </p>
+            <div id="setup-dns-resolver-row" class="setup-dns-resolver-row">
+              <label>
+                DNS resolver:
+                <select id="setup-hint-dns-resolver">
+                  <option value="8.8.8.8">8.8.8.8 (Google Public DNS)</option>
+                  <option value="8.8.4.4">8.8.4.4 (Google Public DNS)</option>
+                  <option value="1.1.1.1">1.1.1.1 (Cloudflare)</option>
+                  <option value="1.0.0.1">1.0.0.1 (Cloudflare)</option>
+                  <option value="cloudflare-dns.com">cloudflare-dns.com (Cloudflare)</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div id="setup-suggestion-list"></div>
+        </details>
+
+        <form id="add-trusted-form" class="add-trusted-form">
+          <div class="add-trusted-row">
+            <input type="text" id="add-trusted-value" placeholder="e.g. mail.example.com" autocomplete="off" spellcheck="false">
+            <select id="add-trusted-matchtype">
+              <option value="exact">Exact host</option>
+              <option value="domain">Registrable domain</option>
+            </select>
+            <button type="submit">__MSG_btn_add__</button>
+          </div>
+          <p class="add-trusted-hint" id="add-trusted-hint">Trusts only this specific host. Subdomains are not trusted.</p>
+          <p class="add-trusted-error" id="add-trusted-error" hidden></p>
+        </form>
+      </section>
+
+      <section id="candidates">
+        <h2>__MSG_section_suggested_servers__</h2>
+        <p>__MSG_candidates_section_desc__</p>
+        <div id="candidate-list"></div>
+      </section>
+
+      <section id="settings">
+        <h2>__MSG_section_mail_handling__</h2>
+        <label>
+          <input type="checkbox" id="move-to-review">
+          __MSG_setting_move_to_review__
+        </label>
+        <div id="review-folder-accounts">
+          <!-- Per-account review folder selects rendered by options.js -->
+        </div>
+        <label>
+          <input type="checkbox" id="move-high-risk-to-junk">
+          __MSG_setting_move_junk__
+        </label>
+        <label>
+          <input type="checkbox" id="notify-after-assessment">
+          __MSG_setting_notify__
+        </label>
+        <p class="setting-note" id="notify-caveat">__MSG_setting_notify_caveat__</p>
+        <div id="notification-options">
+          <label>
+            Notify only if score is at or below:
+            <input type="number" id="notification-max-score" min="0" max="99" step="1">
+          </label>
+          <label>
+            Minimum interval between notifications (ms):
+            <input type="number" id="notification-min-interval" min="0" max="60000" step="500">
+          </label>
+        </div>
+      </section>
+
+      <section id="activity-summary">
+        <h2>__MSG_section_recent_activity__</h2>
+        <div id="activity-summary-content">
+          <!-- Rendered by options.js -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Tab: Advanced -->
+    <div id="tab-panel-advanced" class="tab-panel" role="tabpanel">
+
+      <section id="score-settings">
+        <h2>__MSG_section_score_settings__</h2>
+        <p class="score-note">
+          Score thresholds are fixed: 0–49 normal, 50–99 review, 100+ high risk.
+          The inputs below control how much each signal adds to or subtracts from
+          a message's total score. Authentication scoring (Layer 1) only uses
+          results from the trusted server names you configure in the Basic tab;
+          results from unrecognised servers are ignored.
+        </p>
+
+        <details class="score-section" open>
+          <summary class="score-section-summary">Email authentication results (Layer 1)</summary>
+          <p class="score-section-desc">DMARC, SPF, and DKIM result scores. Only results from your trusted authentication servers (Basic tab) are used.</p>
+          <div id="auth-score-inputs">
+            <!-- Auth method score inputs rendered by options.js -->
+          </div>
+        </details>
+
+        <details class="score-section">
+          <summary class="score-section-summary">Sender identity alignment (Layer 2)</summary>
+          <p class="score-section-desc">Scores for mismatches between the visible From address and the authenticated identity. These are evidence signals; their combined default (25) stays well below the Review threshold (50).</p>
+          <div id="layer2-score-inputs">
+            <!-- Layer 2 identity alignment score inputs rendered by options.js -->
+          </div>
+          <button type="button" id="reset-layer2-scores" class="reset-section-btn">__MSG_btn_reset_layer2__</button>
+        </details>
+
+        <details class="score-section">
+          <summary class="score-section-summary">Address pattern heuristics (Layer 3)</summary>
+          <p class="score-section-desc">Weak signals based on whether the From address looks machine-generated. These are evidence for Layer 4 rules. <strong>Keep these values low</strong> — the cap limits total Layer 3 contribution so it cannot push a message into Review on its own.</p>
+          <div id="heuristic-score-inputs">
+            <!-- Layer 3 heuristic score inputs rendered by options.js -->
+          </div>
+          <p id="layer3-cap-warning" class="score-warn" hidden>Warning: the Layer 3 cap is at or above the Review threshold (50). Layer 3 heuristics alone could push a message into Review — this is outside the intended low-pass design.</p>
+          <button type="button" id="reset-layer3-scores" class="reset-section-btn">__MSG_btn_reset_layer3__</button>
+        </details>
+
+        <details class="score-section">
+          <summary class="score-section-summary">Combined signal rules (Layer 4)</summary>
+          <p class="score-section-desc">Rules that fire only when multiple independent signals converge. These are the primary Review/Junk drivers. Mitigation rules (negative scores) reduce false positives for known-good delivery patterns.</p>
+          <div id="composite-score-inputs">
+            <!-- Layer 4 composite rule score inputs rendered by options.js -->
+          </div>
+          <button type="button" id="reset-layer4-scores" class="reset-section-btn">__MSG_btn_reset_layer4__</button>
+        </details>
+
+        <button type="button" id="reset-auth-scores">__MSG_btn_reset_all_scores__</button>
+      </section>
+
+      <section id="sender-rules">
+        <h2>__MSG_section_sender_rules__</h2>
+        <p>Add score adjustments for specific sender domains. Positive values increase suspicion; negative values reduce it.</p>
+        <table>
+          <thead><tr><th>Domain</th><th>Match</th><th>Score</th><th></th></tr></thead>
+          <tbody id="sender-rule-body"></tbody>
+        </table>
+      </section>
+
+      <section id="manual-whitelist">
+        <h2>__MSG_section_manual_whitelist__</h2>
+        <p>
+          Whitelist entries reduce this add-on's spam score for matching senders.
+          They do <strong>not</strong> authenticate the message or prove it is
+          genuine — they lower the score to reduce false positives for senders
+          you recognise.
+        </p>
+        <div class="whitelist-mitigation-row">
+          <label>
+            Score reduction when a sender matches:
+            <input type="number" id="whitelist-mitigation-score" min="-100" max="0" step="1" value="-50">
+          </label>
+          <p class="score-note">Range: 0 to −100. Default: −50. Use −100 to keep whitelisted senders below the Review threshold.</p>
+        </div>
+        <p id="no-whitelist-msg">__MSG_whitelist_none__</p>
+        <table id="whitelist-table">
+          <thead><tr><th>Address</th><th>Match</th><th></th></tr></thead>
+          <tbody id="whitelist-body"></tbody>
+        </table>
+        <form id="add-whitelist-form" class="add-whitelist-form">
+          <div class="add-whitelist-row">
+            <input type="text" id="add-whitelist-address" placeholder="e.g. user@example.com" autocomplete="off" spellcheck="false">
+            <button type="submit">__MSG_btn_add__</button>
+          </div>
+          <p class="add-whitelist-error" id="add-whitelist-error" hidden></p>
+        </form>
+      </section>
+
+      <section id="address-book-whitelist">
+        <h2>__MSG_section_address_book_whitelist__</h2>
+        <p>
+          When enabled, senders found in your Thunderbird address books receive a
+          score reduction. This does <strong>not</strong> authenticate the message
+          — it lowers the score to reduce false positives for known contacts.
+        </p>
+        <label>
+          <input type="checkbox" id="address-book-whitelist-enabled">
+          __MSG_setting_enable_address_book__
+        </label>
+        <p class="score-note" id="address-book-permission-note" hidden>
+          Enabling this feature will request access to your Thunderbird address books.
+        </p>
+        <div id="address-book-whitelist-options">
+          <div class="whitelist-mitigation-row">
+            <label>
+              Score reduction when sender is in your address books:
+              <input type="number" id="address-book-mitigation-score" min="-100" max="0" step="1" value="-50">
+            </label>
+            <p class="score-note">Range: 0 to −100. Default: −50.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="diagnostics-access">
+        <h2>__MSG_section_diagnostics__</h2>
+        <p class="score-note">
+          Diagnostics mode shows a detailed decision log with raw scores, score
+          reasons, heuristic metrics, and export tools. This is intended for
+          troubleshooting and tuning — not needed for day-to-day use.
+        </p>
+        <label>
+          <input type="checkbox" id="diagnostics-mode-enabled">
+          __MSG_setting_enable_diagnostics__
+        </label>
+      </section>
+
+    </div>
+
+    <!-- Tab: Custom Formulas -->
+    <div id="tab-panel-customformulas" class="tab-panel" role="tabpanel">
+
+      <section id="custom-formulas">
+        <h2>__MSG_section_custom_formulas__</h2>
+        <p class="score-note">__MSG_custom_formula_intro__</p>
+        <p class="score-note formula-safety-note">__MSG_custom_formula_safety__</p>
+        <p id="custom-formula-count" class="formula-count" hidden></p>
+        <div id="custom-formula-list"></div>
+
+        <div id="custom-formula-form-wrap" hidden>
+          <h3 id="custom-formula-form-title"></h3>
+          <form id="custom-formula-form" class="formula-form">
+            <div class="formula-field-row">
+              <label for="formula-id">__MSG_custom_formula_field_id__</label>
+              <input type="text" id="formula-id" autocomplete="off" spellcheck="false" maxlength="100">
+              <p class="formula-field-hint">__MSG_custom_formula_id_hint__</p>
+            </div>
+            <div class="formula-field-row">
+              <label for="formula-name">__MSG_custom_formula_field_name__</label>
+              <input type="text" id="formula-name" autocomplete="off" spellcheck="false" maxlength="200">
+            </div>
+            <div class="formula-field-row">
+              <label for="formula-mode">__MSG_custom_formula_field_mode__</label>
+              <select id="formula-mode">
+                <option value="observe">observe</option>
+                <option value="add">add</option>
+                <option value="disabled">disabled</option>
+              </select>
+              <p class="formula-field-hint">__MSG_custom_formula_mode_hint__</p>
+            </div>
+            <div class="formula-field-row">
+              <label>__MSG_custom_formula_template_label__</label>
+              <div class="formula-template-row">
+                <select id="formula-template">
+                  <option value="">__MSG_custom_formula_template_choose__</option>
+                </select>
+                <button type="button" id="formula-insert-template-btn">__MSG_btn_insert_template__</button>
+              </div>
+            </div>
+            <div class="formula-field-row">
+              <label for="formula-expression">__MSG_custom_formula_field_expression__</label>
+              <textarea id="formula-expression" rows="4" spellcheck="false" autocomplete="off" maxlength="1000"
+                        placeholder="__MSG_custom_formula_expr_placeholder__"></textarea>
+              <div id="formula-chips-wrap" class="formula-chips-wrap"></div>
+            </div>
+            <p id="custom-formula-error" class="formula-error" hidden></p>
+            <div class="formula-form-actions">
+              <button type="submit" id="custom-formula-save-btn">__MSG_btn_save_formula__</button>
+              <button type="button" id="custom-formula-cancel-btn">__MSG_btn_cancel__</button>
+            </div>
+          </form>
+          <details class="formula-help-details">
+            <summary>__MSG_custom_formula_help_summary__</summary>
+            <div class="formula-help-body">
+              <ul>
+                <li>__MSG_custom_formula_help_expression_only__</li>
+                <li>__MSG_custom_formula_help_ternary__</li>
+                <li>__MSG_custom_formula_help_readonly__</li>
+                <li>__MSG_custom_formula_help_returns__</li>
+                <li>__MSG_custom_formula_help_observe__</li>
+                <li>__MSG_custom_formula_help_add__</li>
+                <li>__MSG_custom_formula_help_clamped__</li>
+                <li>__MSG_custom_formula_help_errors__</li>
+                <li>__MSG_custom_formula_help_no_regex__</li>
+              </ul>
+              <p class="formula-help-fields-title">__MSG_custom_formula_help_fields_title__</p>
+              <pre class="formula-help-fields">has("score.reason.key")
+scoreOf("score.reason.key")
+min(a, b), max(a, b), clamp(value, min, max)
+from.domain, from.registrableDomain, from.subdomainDepth, from.leftLabelEntropy
+alignment.spfAligned, alignment.anyDkimAligned, alignment.anyAuthAligned
+messageId.domain, messageId.registrableDomain, messageId.matchesFromDomain
+headers.hasListHeaders
+baseScore, verdict</pre>
+            </div>
+          </details>
+        </div>
+
+        <button type="button" id="custom-formula-add-btn">__MSG_btn_add_formula__</button>
+      </section>
+
+      <section id="key-reference">
+        <h2>__MSG_section_key_reference__</h2>
+        <p>__MSG_key_reference_intro__</p>
+        <div id="key-reference-container"></div>
+      </section>
+
+    </div>
+
+    <!-- Tab: Diagnostics -->
+    <div id="tab-panel-diagnostics" class="tab-panel" role="tabpanel">
+
+      <section id="decision-log">
+        <h2>__MSG_section_decision_log__</h2>
+        <p>A local record of how each recently received message was scored and what action was taken. All data stays on your device.</p>
+        <p id="log-count" class="log-count"></p>
+        <button id="clear-log" type="button">__MSG_btn_clear_log__</button>
+        <button id="export-log" type="button">__MSG_btn_export_logs__</button>
+        <table>
+          <thead><tr><th>Time</th><th>From domain</th><th>Original</th><th>Current</th><th>Action</th></tr></thead>
+          <tbody id="log-body"></tbody>
+        </table>
+      </section>
+
+    </div>
+
+  </main>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

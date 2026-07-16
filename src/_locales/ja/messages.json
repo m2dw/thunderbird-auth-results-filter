@@ -1,0 +1,269 @@
+{
+  "tab_basic":           { "message": "基本",        "description": "基本設定タブ" },
+  "tab_advanced":        { "message": "詳細",        "description": "詳細設定タブ" },
+  "tab_custom_formulas": { "message": "カスタム式",  "description": "カスタム式タブ" },
+  "tab_diagnostics":     { "message": "診断",        "description": "診断タブ" },
+
+  "page_title": { "message": "Auth Results Filter", "description": "オプションページの見出し（製品名のため英語のまま）" },
+  "manifest_description": {
+    "message": "Authentication-Results ヘッダーを使って受信メールをフィルタリングします。",
+    "description": "Thunderbird に表示されるアドオン説明"
+  },
+
+  "section_protection_status":      { "message": "保護状態",             "description": "セクション見出し" },
+  "section_trusted_servers":        { "message": "信頼済み認証サーバー",  "description": "セクション見出し" },
+  "section_suggested_servers":      { "message": "候補サーバー",         "description": "セクション見出し" },
+  "section_mail_handling":          { "message": "メール処理",           "description": "セクション見出し" },
+  "section_recent_activity":        { "message": "最近のアクティビティ", "description": "セクション見出し" },
+  "section_score_settings":         { "message": "スコア設定",           "description": "セクション見出し" },
+  "section_sender_rules":           { "message": "送信者ドメインルール", "description": "セクション見出し" },
+  "section_manual_whitelist":       { "message": "手動許可リスト",       "description": "セクション見出し" },
+  "section_address_book_whitelist": { "message": "アドレス帳許可リスト", "description": "セクション見出し" },
+  "section_diagnostics":            { "message": "診断",                 "description": "セクション見出し（詳細タブ）" },
+  "section_decision_log":           { "message": "判定ログ",             "description": "セクション見出し" },
+
+  "status_no_trusted_servers": {
+    "message": "信頼済み認証サーバーが設定されていません。DMARC、SPF、DKIM のスコアリングは、上記で信頼済みサーバーを追加するまで無効です。",
+    "description": "信頼済みサーバーが未設定の場合に基本タブで表示される警告"
+  },
+  "firstrun_callout": {
+    "message": "最初の設定: 受信メールサーバーが Authentication-Results に書き込む認証サーバー名（authserv-id）を追加してください。追加するまでは DMARC/SPF/DKIM の結果はスコアに使われません。セットアップヒントは候補を出すだけで、信頼設定は自動では追加されません。",
+    "description": "信頼済みサーバーが未設定の場合に表示されるファーストラン案内"
+  },
+  "status_protection_active": {
+    "message": "保護有効 — $count$ 件の信頼済みサーバーが設定済みです。",
+    "description": "信頼済みサーバーが1件以上設定されている場合に表示（日本語は複数形不要）",
+    "placeholders": {
+      "count":  { "content": "$1", "example": "3" },
+      "plural": { "content": "$2", "example": "" }
+    }
+  },
+  "status_recent_no_trusted_ar": {
+    "message": "最近のメッセージに信頼済み認証結果からのスコアリングがありませんでした。信頼済みサーバー名がメールの Authentication-Results ヘッダーと一致しているか確認してください。",
+    "description": "最近のログエントリに信頼済み AR 結果がない場合のヒント"
+  },
+
+  "activity_no_messages": { "message": "まだメッセージは評価されていません。", "description": "最近のアクティビティの空状態" },
+  "activity_counts": {
+    "message": "$total$ 件のメッセージを評価済み — 正常: $normal$ 件、要確認: $review$ 件、高リスク: $highrisk$ 件。",
+    "description": "最近のアクティビティの集計",
+    "placeholders": {
+      "total":    { "content": "$1", "example": "42" },
+      "plural":   { "content": "$2", "example": "" },
+      "normal":   { "content": "$3", "example": "38" },
+      "review":   { "content": "$4", "example": "3" },
+      "highrisk": { "content": "$5", "example": "1" }
+    }
+  },
+  "activity_most_recent": { "message": "最近のメッセージ:", "description": "最近のアクティビティで直近5件の上に表示される見出し" },
+
+  "setup_hints_summary":        { "message": "アカウントドメインからの設定ヒント",      "description": "セットアップアシスタントの <details> サマリー要素" },
+  "setup_use_dns":              { "message": "MX 設定ヒントに DNS ルックアップを使用する", "description": "DNS ルックアップオプションのチェックボックスラベル" },
+  "setup_dns_resolver_label":   { "message": "DNS リゾルバー:",                         "description": "DNS リゾルバー選択のラベル" },
+  "setup_no_accounts":          { "message": "アカウントのメールドメインが見つかりません。", "description": "セットアップアシスタントでアカウントがない場合" },
+  "setup_unable_load_accounts": { "message": "アカウント情報を読み込めません。",          "description": "アカウント一覧の取得エラー" },
+  "setup_no_mx_records":        { "message": "MX レコードが見つかりません。",             "description": "DNS MX ルックアップで結果がない場合" },
+
+  "no_trusted_msg": { "message": "信頼済みドメインが設定されていません。", "description": "信頼済みドメインリストが空の場合に表示" },
+
+  "candidates_section_desc": {
+    "message": "セットアップアシスタントが見つけた、まだ信頼していないサーバー名です。ここにある項目はスコアリングに影響しません。スコアリングに使用するには、上の「信頼済み認証サーバー」に追加してください。",
+    "description": "候補サーバーセクションの説明文"
+  },
+  "candidates_none": { "message": "未信頼の候補がまだありません。", "description": "候補サーバーセクションの空状態" },
+  "candidate_trust_domain": {
+    "message": "$domain$ とすべてのサブドメインを信頼する",
+    "description": "登録可能ドメインとそのサブドメインを信頼するチェックボックスラベル",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+
+  "review_folder_no_accounts":        { "message": "アカウントが見つかりません。",       "description": "アカウント一覧が空の場合" },
+  "review_folder_unable_load":        { "message": "アカウントを読み込めません。",       "description": "アカウント一覧の取得エラー" },
+  "review_folder_select_placeholder": { "message": "フォルダーを選択…",                  "description": "確認フォルダー選択のデフォルトオプション" },
+
+  "setting_move_to_review":      { "message": "不審なメールを確認フォルダに移動する",                   "description": "確認フォルダ移動設定のチェックボックス" },
+  "setting_move_junk":           { "message": "高リスクのメールを直接迷惑メールフォルダに移動する",      "description": "迷惑メール移動設定のチェックボックス" },
+  "setting_notify":              { "message": "評価に通過したメッセージを通知する（閾値以下のスコア）", "description": "評価後通知設定のチェックボックス" },
+  "setting_notify_caveat":       { "message": "Thunderbird 本体の新着通知も有効な場合、通知が重複することがあります。アドオン側の処理後通知だけを使う場合は、Thunderbird 本体の通知をオフにしてください。", "description": "通知チェックボックスの下に表示される補足説明" },
+  "setting_enable_diagnostics":  { "message": "診断タブを有効にする",                                  "description": "診断モード設定のチェックボックス" },
+  "setting_enable_address_book": { "message": "アドレス帳許可リストを有効にする",                       "description": "アドレス帳許可リスト設定のチェックボックス" },
+
+  "score_mitigation_badge": { "message": "軽減",       "description": "スコア設定の軽減ルールに表示されるバッジ" },
+
+  "btn_add":              { "message": "追加",                           "description": "追加ボタン" },
+  "btn_remove":           { "message": "削除",                           "description": "削除ボタン" },
+  "btn_use":              { "message": "使用",                           "description": "セットアップ提案を使用するボタン" },
+  "btn_clear_log":        { "message": "ログをクリア",                    "description": "判定ログをクリアするボタン" },
+  "btn_export_logs":      { "message": "ログをエクスポート",               "description": "判定ログを JSON としてエクスポートするボタン" },
+  "btn_exporting":        { "message": "エクスポート中…",                  "description": "エクスポート処理中のボタンラベル" },
+  "btn_reset_all_scores": { "message": "すべてのスコアをデフォルトにリセット", "description": "全スコアグループをリセットするボタン" },
+  "btn_reset_layer2":     { "message": "Layer 2 をデフォルトにリセット",   "description": "Layer 2 スコアをリセットするボタン" },
+  "btn_reset_layer3":     { "message": "Layer 3 をデフォルトにリセット",   "description": "Layer 3 スコアをリセットするボタン" },
+  "btn_reset_layer4":     { "message": "Layer 4 をデフォルトにリセット",   "description": "Layer 4 スコアをリセットするボタン" },
+  "btn_move_to_inbox":    { "message": "受信トレイに移動",                 "description": "ポップアップの確認フォルダアクションボタン" },
+  "btn_whitelist_sender": { "message": "送信者を許可リストに追加",          "description": "ポップアップの確認フォルダアクションボタン" },
+  "btn_already_whitelisted": { "message": "許可リスト登録済み",            "description": "送信者が既に許可リストにある場合のボタン無効状態" },
+  "btn_open_options":     { "message": "オプション / ログを開く",          "description": "ポップアップからオプションページを開くボタン" },
+  "btn_confirm":          { "message": "確認",                            "description": "確認ボタン" },
+  "btn_cancel":           { "message": "キャンセル",                      "description": "キャンセルボタン" },
+
+  "whitelist_none":           { "message": "許可リストのエントリがありません。",                              "description": "手動許可リストセクションの空状態" },
+  "whitelist_email_invalid":  { "message": "有効なメールアドレスを入力してください（例: user@example.com）。","description": "許可リスト追加フォームの検証エラー" },
+  "whitelist_already_exists": { "message": "このアドレスはすでに許可リストにあります。",                      "description": "アドレスが既に登録されている場合のエラー" },
+  "whitelist_ab_permission_note": {
+    "message": "この機能を有効にすると、Thunderbird のアドレス帳へのアクセスが要求されます。",
+    "description": "アドレス帳許可リストを有効にする際のメモ"
+  },
+
+  "log_no_reasons":       { "message": "理由の詳細がありません。",  "description": "scoreReasons のないログエントリに表示" },
+  "log_no_reasons_label": { "message": "理由なし",                  "description": "ログエントリに理由が0件の場合の <summary> テキスト" },
+
+  "popup_no_message": {
+    "message": "現在表示されているメッセージはありません。",
+    "description": "メッセージが開いていない場合にポップアップに表示"
+  },
+  "popup_no_entry": {
+    "message": "このメッセージのスコア詳細が見つかりません。アドオンはメッセージの受信時にスコアリングを行います。アドオンのインストール前に受信したメッセージか、Message-ID が一致しない可能性があります。",
+    "description": "表示中のメッセージに一致するログエントリがない場合"
+  },
+  "popup_score_details": { "message": "スコアの詳細",     "description": "スコア詳細折りたたみの <summary> ラベル" },
+  "popup_all_reasons":   { "message": "すべてのスコア理由", "description": "ポップアップの全理由リスト上の見出し" },
+  "popup_inbox_not_found":{ "message": "受信トレイが見つかりません。",          "description": "受信トレイが見つからない場合のエラー" },
+  "popup_moved_to_inbox": { "message": "受信トレイに移動しました。",            "description": "受信トレイへの移動成功メッセージ" },
+  "popup_move_failed":    { "message": "移動に失敗しました。もう一度お試しください。", "description": "移動失敗時のエラーメッセージ" },
+  "popup_whitelist_confirm": {
+    "message": "\"$address$\" を手動許可リストに追加しますか？このアドレスからの今後のメッセージはスコアが下がります。",
+    "description": "許可リスト追加前の確認テキスト",
+    "placeholders": { "address": { "content": "$1", "example": "user@example.com" } }
+  },
+  "popup_whitelist_added": {
+    "message": "\"$address$\" を手動許可リストに追加しました。",
+    "description": "許可リスト追加成功メッセージ",
+    "placeholders": { "address": { "content": "$1", "example": "user@example.com" } }
+  },
+  "popup_whitelist_save_failed":     { "message": "許可リストエントリの保存に失敗しました。もう一度お試しください。", "description": "許可リスト保存の汎用エラー" },
+  "popup_no_sender_address":         { "message": "送信者のアドレスを特定できません。",            "description": "送信者が不明な場合の許可リストボタンツールチップ" },
+  "popup_already_whitelisted_title": { "message": "この送信者はすでに手動許可リストに登録されています。", "description": "送信者が既に登録済みの場合のツールチップ" },
+
+  "action_classified_normal":   { "message": "受信トレイに残す",         "description": "classified-normal アクションラベル" },
+  "action_classified_review":   { "message": "要確認（操作なし）",       "description": "classified-review アクションラベル" },
+  "action_classified_high_risk":{ "message": "高リスク（操作なし）",     "description": "classified-high-risk アクションラベル" },
+  "action_moved_review":        { "message": "確認フォルダに移動",       "description": "moved-review アクションラベル" },
+  "action_moved_junk":          { "message": "迷惑メールに移動",         "description": "moved-junk アクションラベル" },
+  "action_move_review_failed":  { "message": "確認フォルダへの移動失敗", "description": "move-review-failed アクションラベル" },
+  "action_move_junk_failed":    { "message": "迷惑メールへの移動失敗",   "description": "move-junk-failed アクションラベル" },
+  "action_no_review_folder":    { "message": "確認フォルダ未設定",       "description": "no-review-folder-configured アクションラベル" },
+
+  "section_custom_formulas": { "message": "カスタムスコアリング式（Layer 5）", "description": "カスタム式管理のセクション見出し（カスタム式タブ）" },
+  "section_key_reference": { "message": "スコア理由キーリファレンス", "description": "カスタム式タブのキーリファレンステーブルのセクション見出し" },
+  "key_reference_intro": {
+    "message": "式の has() と scoreOf() に渡せるキーの一覧です。挿入ボタンをクリックすると、式エディタのカーソル位置にスニペットが挿入されます。キーにカーソルを合わせると短い説明が表示されます。",
+    "description": "キーリファレンステーブル上の説明文"
+  },
+  "key_reference_layer_auth":      { "message": "L1 認証 (auth.*)",               "description": "キーリファレンスの Layer 1 認証結果キーグループ見出し" },
+  "key_reference_layer_identity":  { "message": "L2 送信者 ID (identity.*)",       "description": "キーリファレンスの Layer 2 送信者 ID アライメントキーグループ見出し" },
+  "key_reference_layer_heuristic": { "message": "L3 ヒューリスティック (heuristic.*)", "description": "キーリファレンスの Layer 3 ヒューリスティックキーグループ見出し" },
+  "key_reference_layer_composite": { "message": "L4 複合ルール (composite.*)",     "description": "キーリファレンスの Layer 4 複合ルールキーグループ見出し" },
+  "key_reference_layer_l5":        { "message": "L5 / 許可リスト",                 "description": "キーリファレンスの Layer 5 許可リスト・送信者ルールキーグループ見出し" },
+  "key_reference_col_title":       { "message": "タイトル",                        "description": "キーリファレンステーブルの列見出し" },
+  "key_reference_col_key":         { "message": "キー",                            "description": "キーリファレンステーブルの列見出し" },
+  "key_reference_col_default":     { "message": "デフォルト",                      "description": "キーリファレンステーブルの列見出し" },
+  "key_reference_btn_insert_has": {
+    "message": "has()",
+    "description": "スコア理由キーの has(\"key\") スニペットを挿入するボタン"
+  },
+  "key_reference_btn_insert_scoreof": {
+    "message": "scoreOf()",
+    "description": "スコア理由キーの scoreOf(\"key\") スニペットを挿入するボタン"
+  },
+  "custom_formula_intro": {
+    "message": "上級者向けの機能です。カスタム式は L1〜L4 のスコアリングが完了した後、Layer 5 として評価され、最終スコアを観察または調整できます。",
+    "description": "カスタム式リスト上部の説明"
+  },
+  "custom_formula_none":       { "message": "カスタム式が設定されていません。",  "description": "カスタム式リストの空状態" },
+  "custom_formula_add_title":  { "message": "式を追加",                         "description": "新しい式を追加する際の見出し" },
+  "custom_formula_edit_title": { "message": "式を編集",                         "description": "既存の式を編集する際の見出し" },
+  "custom_formula_field_id":         { "message": "ID",         "description": "式 ID 入力のラベル" },
+  "custom_formula_field_name":       { "message": "名前",       "description": "式名入力のラベル" },
+  "custom_formula_field_expression": { "message": "式",         "description": "式入力エリアのラベル" },
+  "custom_formula_field_mode":       { "message": "モード",     "description": "式モード選択のラベル" },
+  "btn_add_formula":    { "message": "式を追加", "description": "式追加フォームを開くボタン" },
+  "btn_edit_formula":   { "message": "編集",     "description": "式行の編集フォームを開くボタン" },
+  "btn_delete_formula": { "message": "削除",     "description": "式を削除するボタン" },
+  "btn_save_formula":   { "message": "保存",     "description": "式フォームを保存するボタン" },
+  "custom_formula_error_id_required":         { "message": "ID は必須です。",                                                        "description": "式 ID が空の場合の検証エラー" },
+  "custom_formula_error_id_invalid":          { "message": "ID には英数字・ハイフン・アンダースコアのみ使用できます。",              "description": "式 ID の文字が無効な場合の検証エラー" },
+  "custom_formula_error_id_duplicate":        { "message": "この ID を持つ式は既に存在します。",                                    "description": "式 ID が重複している場合の検証エラー" },
+  "custom_formula_error_expression_required": { "message": "式は必須です。",                                                        "description": "式が空の場合の検証エラー" },
+  "custom_formula_error_invalid_mode":        { "message": "無効なモードです。",                                                    "description": "式モードが無効な場合の内部検証エラー" },
+  "custom_formula_error_match_in_add_mode":  { "message": "match() は observe モードでのみ使用できます。observe に切り替えるか、match() の呼び出しを削除してください。", "description": "add モードの式で match() が使われている場合の検証エラー" },
+  "custom_formula_diag_summary":              { "message": "L5 式の診断",                                                         "description": "ログの式診断 <details> のサマリー要素" },
+  "custom_formula_template_label":   { "message": "テンプレート",                  "description": "式フォームのテンプレート選択行のラベル" },
+  "custom_formula_template_choose":  { "message": "— テンプレートを選択 —",        "description": "テンプレート選択の空オプション" },
+  "btn_insert_template":             { "message": "挿入",                          "description": "選択したテンプレートを式フォームに挿入するボタン" },
+  "custom_formula_tpl_boost_rule":   { "message": "ルール発動時にスコアを加算",    "description": "テンプレート名：既存の L4 ルールが発動した場合にスコアを加算" },
+  "custom_formula_tpl_deep_subdomain": { "message": "ランダムな深いサブドメイン（実験）", "description": "テンプレート名：ランダムに見える深いサブドメインの実験" },
+  "custom_formula_tpl_msgid_mismatch": { "message": "Message-ID の不一致（実験）", "description": "テンプレート名：Message-ID の不一致実験" },
+  "custom_formula_tpl_dkim_mitigate":  { "message": "DKIM 整合時にスコアを軽減",   "description": "テンプレート名：DKIM が整合している場合にスコアを軽減" },
+  "custom_formula_expr_placeholder": { "message": "has(\"composite.authAlignedRandomDomain\") ? 30 : 0", "description": "式入力欄が空のときに表示されるプレースホルダー" },
+  "custom_formula_help_summary":     { "message": "L5 式のリファレンス",            "description": "式ヘルプパネルの折りたたみラベル" },
+  "custom_formula_help_expression_only": {
+    "message": "式は単一の式です — JavaScript プログラムではありません。if、let、for、return などのステートメントは使用できません。",
+    "description": "ヘルプパネル：式はステートメントではなく式"
+  },
+  "custom_formula_help_ternary": {
+    "message": "条件分岐には三項演算子を使ってください: 条件 ? 40 : 0",
+    "description": "ヘルプパネル：分岐には三項演算子を使う"
+  },
+  "custom_formula_help_readonly": {
+    "message": "コンテキストフィールド（from、auth、alignment、headers など）は読み取り専用です。値を代入することはできません。",
+    "description": "ヘルプパネル：コンテキストフィールドは読み取り専用"
+  },
+  "custom_formula_help_returns":     { "message": "式は数値を返します。数値以外の結果は無視されます。", "description": "ヘルプパネル：式は数値を返す" },
+  "custom_formula_help_observe":     { "message": "observe モードは結果を記録しますが、メッセージのスコアは変更しません。add モードに切り替える前に observe モードで安全にテストしてください。", "description": "ヘルプパネル：observe モード" },
+  "custom_formula_help_add":         { "message": "add モードはクランプされた結果（−100 〜 +100）をメッセージスコアに加算します。", "description": "ヘルプパネル：add モード" },
+  "custom_formula_help_clamped":     { "message": "出力は適用前に [−100, +100] にクランプされます。", "description": "ヘルプパネル：クランプ" },
+  "custom_formula_help_errors":      { "message": "式のエラーはメッセージごとに捕捉され、診断列に表示されます。エラーのある式が他の式をブロックすることはありません。", "description": "ヘルプパネル：エラー処理" },
+  "custom_formula_help_no_regex":    { "message": "正規表現マッチング（match()）は add モードでは使用できません（v1）。match() を試すには observe モードを使ってください。", "description": "ヘルプパネル：add モードでの正規表現非対応" },
+  "custom_formula_help_fields_title":{ "message": "利用可能なフィールドと関数",    "description": "式ヘルプパネルのフィールド・関数リファレンスの見出し" },
+
+  "formula_chips_label":            { "message": "フィールド・関数を挿入:",                                                                                      "description": "式挿入チップ上部のヘッダー" },
+  "formula_chip_insert_title":      { "message": "カーソル位置に挿入",                                                                                             "description": "式チップボタンのツールチップ" },
+  "formula_chips_group_functions":  { "message": "関数",                                                                                                           "description": "関数チップグループのラベル" },
+  "formula_chips_group_from":       { "message": "From",                                                                                                           "description": "From フィールドチップグループのラベル" },
+  "formula_chips_group_alignment":  { "message": "アライメント",                                                                                                   "description": "Alignment フィールドチップグループのラベル" },
+  "formula_chips_group_message_id": { "message": "Message-ID",                                                                                                    "description": "Message-ID フィールドチップグループのラベル" },
+  "formula_chips_group_headers":    { "message": "ヘッダー",                                                                                                       "description": "Headers フィールドチップグループのラベル" },
+  "formula_chips_group_general":    { "message": "一般",                                                                                                           "description": "General フィールドチップグループのラベル" },
+  "formula_chips_ref_note":         { "message": "これらは v1 式 DSL でサポートされているフィールドと関数です。チップをクリックするとカーソル位置に挿入されます。",  "description": "式挿入チップ下部の参照注記" },
+
+  "dns_error_invalid_resolver": { "message": "DNS リゾルバーのアドレスが無効または未設定です。", "description": "invalid_resolver エラーコードの DNS エラー" },
+  "dns_error_timeout":          { "message": "DNS ルックアップがタイムアウトしました。",         "description": "timeout エラーコードの DNS エラー" },
+  "dns_error_network":          { "message": "DNS ルックアップに失敗しました（ネットワークエラー）。", "description": "network_error エラーコードの DNS エラー" },
+  "dns_error_http":             { "message": "DNS ルックアップに失敗しました（サーバーエラー）。",  "description": "http_error エラーコードの DNS エラー" },
+  "dns_error_dns":              { "message": "DNS サーバーがエラーを返しました。",               "description": "dns_error エラーコードの DNS エラー" },
+  "dns_error_generic":          { "message": "DNS ルックアップに失敗しました。",                 "description": "汎用 DNS エラーフォールバック" },
+
+  "notification_single_account": {
+    "message": "$account$ に 1通の新着メッセージを受信しました。",
+    "description": "単一の新着メッセージの通知タイトル。$account$ は受信アカウントのメールアドレス",
+    "placeholders": { "account": { "content": "$1", "example": "user@example.com" } }
+  },
+  "notification_single_fallback": {
+    "message": "$name$: 新着メッセージ 1 通",
+    "description": "アカウントメールアドレスが取得できない場合の単一新着メッセージの通知タイトル。$name$ はアカウント表示名またはフォルダー名",
+    "placeholders": { "name": { "content": "$1", "example": "Work" } }
+  },
+  "notification_multi_title":   { "message": "新着メッセージ",                            "description": "複数の新着メッセージをまとめた通知のタイトル" },
+  "notification_multi_body": {
+    "message": "$count$通の新着メッセージがあります。",
+    "description": "複数の新着メッセージの通知本文の最初の行",
+    "placeholders": { "count": { "content": "$1", "example": "3" } }
+  },
+  "notification_more_messages": {
+    "message": "+$count$ 件のメッセージ",
+    "description": "通知本文に追加される残りのメッセージ数の表示",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "notification_no_subject":    { "message": "（件名なし）",                              "description": "メッセージの件名が空の場合に通知本文に表示されるフォールバック" }
+}

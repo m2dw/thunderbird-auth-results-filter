@@ -1,0 +1,247 @@
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  color: #1a1a1a;
+}
+
+h1 { font-size: 1.4rem; }
+h2 { font-size: 1rem; border-bottom: 1px solid #ccc; padding-bottom: 0.2rem; margin-top: 0; }
+
+section { margin: 2rem 0; }
+
+.tab-bar {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 2px solid #ccc;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.tab-btn {
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #444;
+  position: relative;
+  bottom: -2px;
+}
+
+.tab-btn:hover { background: #e4e4e4; }
+
+.tab-btn[aria-selected="true"] {
+  background: #fff;
+  border-color: #ccc;
+  border-bottom-color: #fff;
+  color: #1a1a1a;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.tab-panel { display: none; }
+.tab-panel.tab-panel-active { display: block; }
+
+label { display: block; margin: 0.5rem 0; }
+
+table { border-collapse: collapse; width: 100%; margin-top: 0.5rem; }
+th, td { text-align: left; padding: 0.35rem 0.5rem; border-bottom: 1px solid #eee; }
+th { background: #f5f5f5; font-weight: 600; }
+
+button { cursor: pointer; }
+
+.psl-note { font-size: 0.85rem; color: #666; margin: 0.25rem 0 0.75rem; }
+
+.add-trusted-form { margin-top: 1rem; }
+.add-trusted-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.add-trusted-row input[type="text"] { flex: 1; min-width: 12rem; }
+.add-trusted-hint { font-size: 0.85rem; color: #555; margin: 0.35rem 0 0; }
+.add-trusted-error { font-size: 0.85rem; color: #c0392b; margin: 0.25rem 0 0; }
+.add-trusted-form[data-matchtype="domain"] select { background: #fff8e1; border-color: #f0ad4e; color: #7a5800; }
+.add-trusted-form[data-matchtype="domain"] .add-trusted-hint { color: #7a5800; font-weight: 600; }
+.trust-promote-btn { font-size: 0.82rem; color: #7a5800; background: #fff8e1; border: 1px solid #f0ad4e; border-radius: 3px; padding: 0.1rem 0.4rem; cursor: pointer; }
+.trust-promote-btn:hover { background: #fff0b3; }
+.candidate-group { margin: 0.75rem 0; }
+.candidate-group-domain { font-weight: 600; margin: 0 0 0.25rem; }
+.candidate-row { display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0; }
+.candidate-row label { margin: 0; }
+.review-folder-row { margin: 0.5rem 0; }
+
+.score-settings-table { width: auto; }
+.score-settings-table input[type="number"] { width: 5rem; text-align: right; }
+.score-subsection-heading { font-weight: 600; margin: 1rem 0 0.25rem; }
+
+.score-section { border: 1px solid #ddd; border-radius: 4px; margin: 0.75rem 0; padding: 0 0.75rem 0.5rem; background: #fafafa; }
+.score-section[open] { padding-bottom: 0.75rem; }
+.score-section-summary { cursor: pointer; user-select: none; font-weight: 600; font-size: 0.9rem; padding: 0.5rem 0; }
+.score-section-desc { font-size: 0.85rem; color: #555; margin: 0.25rem 0 0.5rem; }
+.score-default { color: #999; font-size: 0.82rem; white-space: nowrap; }
+.score-default::before { content: 'default: '; }
+.score-mitigation-badge { display: inline-block; font-size: 0.72rem; font-weight: 600; color: #1a6b3c; background: #e6f4ec; border: 1px solid #a8d9bc; border-radius: 3px; padding: 0 0.3rem; margin-left: 0.25rem; vertical-align: middle; }
+.score-warn { font-size: 0.85rem; color: #7a3a00; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 0.4rem 0.6rem; margin: 0.5rem 0 0.25rem; }
+.reset-section-btn { font-size: 0.82rem; margin-top: 0.5rem; padding: 0.25rem 0.6rem; }
+
+.classification-changed { background: #fff3cd; }
+
+.reason-row td { padding: 0 0.5rem 0.5rem; border-bottom: 1px solid #eee; }
+.reason-details { font-size: 0.85rem; color: #555; }
+.reason-details summary { cursor: pointer; user-select: none; }
+.reason-list { margin: 0.25rem 0 0 1rem; padding: 0; list-style: none; }
+.reason-item { padding: 0.15rem 0; }
+.reason-item.delta-changed { color: #c05000; font-weight: 600; }
+.reason-key { font-family: monospace; font-size: 0.8rem; color: #666; }
+.reason-delta { font-variant-numeric: tabular-nums; }
+.reason-context { color: #888; }
+.reason-empty { margin: 0.25rem 0; font-size: 0.85rem; color: #888; font-style: italic; }
+.reason-top-summary { margin: 0.2rem 0 0.15rem; font-size: 0.82rem; color: #444; }
+
+.metrics-details { margin-top: 0.4rem; font-size: 0.8rem; color: #666; }
+.metrics-details summary { cursor: pointer; user-select: none; color: #888; }
+.metrics-table { font-size: 0.8rem; margin-top: 0.25rem; width: auto; }
+.metrics-table th, .metrics-table td { padding: 0.15rem 0.4rem; font-weight: normal; }
+
+.alignment-details { margin-top: 0.4rem; font-size: 0.8rem; color: #666; }
+.alignment-details summary { cursor: pointer; user-select: none; color: #888; }
+.alignment-table { font-size: 0.8rem; margin-top: 0.25rem; width: auto; }
+.alignment-table th { padding: 0.15rem 0.4rem; font-weight: 600; text-align: left; white-space: nowrap; }
+.alignment-table td { padding: 0.15rem 0.4rem; }
+
+.setup-assistant { margin: 1rem 0; border: 1px solid #ddd; border-radius: 4px; padding: 0.5rem 0.75rem; background: #fafafa; }
+.setup-assistant summary { cursor: pointer; user-select: none; font-weight: 600; font-size: 0.9rem; }
+.setup-assistant-desc { font-size: 0.85rem; color: #555; margin: 0.5rem 0 0.25rem; }
+.setup-assistant-guidance { font-size: 0.8rem; color: #777; font-style: italic; margin: 0.25rem 0 0.5rem; }
+.setup-assistant-note { font-size: 0.85rem; color: #888; margin: 0.25rem 0; }
+.setup-suggestion-group { margin: 0.5rem 0; }
+.setup-suggestion-domain { font-weight: 600; font-size: 0.85rem; margin: 0 0 0.2rem; color: #333; }
+.setup-suggestion-row { display: flex; align-items: center; gap: 0.5rem; margin: 0.2rem 0; font-size: 0.85rem; }
+.setup-suggestion-host { font-family: monospace; }
+.setup-suggestion-source { font-size: 0.75rem; color: #999; border: 1px solid #ddd; border-radius: 3px; padding: 0 0.3rem; }
+.setup-suggestion-use-btn { font-size: 0.8rem; padding: 0.1rem 0.5rem; }
+.setup-dns-settings { margin: 0.75rem 0; padding: 0.5rem 0.75rem; background: #f0f4ff; border: 1px solid #c8d4f0; border-radius: 4px; }
+.setup-dns-note { font-size: 0.8rem; color: #555; margin: 0.35rem 0 0.5rem; }
+.setup-dns-resolver-row { margin-top: 0.35rem; }
+.setup-dns-resolver-row input[type="text"] { font-family: monospace; width: 10rem; }
+.setup-dns-status { font-size: 0.82rem; color: #666; margin: 0.15rem 0 0.1rem; }
+.setup-dns-status.dns-error { color: #c0392b; }
+.setup-suggestion-source.source-mx { border-color: #a8c4f0; color: #2a5caa; background: #eef3fc; }
+
+.tab-btn-hidden { display: none; }
+
+.status-warning {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  color: #7a5800;
+  margin: 0.5rem 0;
+}
+.status-ok {
+  background: #e6f4ec;
+  border: 1px solid #a8d9bc;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  color: #1a6b3c;
+  margin: 0.5rem 0;
+}
+.status-hint { font-size: 0.85rem; color: #666; margin: 0.35rem 0; }
+.firstrun-callout {
+  background: #eef3fc;
+  border: 1px solid #a8c4f0;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  color: #1a3c6b;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.activity-empty { font-size: 0.9rem; color: #888; font-style: italic; }
+.activity-counts { font-size: 0.9rem; margin: 0.35rem 0; }
+.activity-recent-heading { font-size: 0.85rem; color: #555; margin: 0.5rem 0 0.25rem; font-weight: 600; }
+.activity-recent-list { margin: 0; padding: 0 0 0 1.25rem; }
+.activity-entry { font-size: 0.85rem; color: #555; padding: 0.1rem 0; }
+.activity-entry-review { color: #7a5800; }
+.activity-entry-highrisk { color: #c0392b; font-weight: 600; }
+
+/* ── Custom formula section ───────────────────────────────────────────────── */
+.formula-safety-note { background: #fff8e1; border: 1px solid #f0ad4e; border-radius: 4px; padding: 0.4rem 0.6rem; color: #7a5800; }
+.formula-count { font-size: 0.85rem; color: #888; margin: 0.25rem 0; }
+
+.formula-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+.formula-info { flex: 1; min-width: 0; }
+.formula-name { font-weight: 600; font-size: 0.9rem; }
+.formula-mode-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 3px;
+  padding: 0 0.3rem;
+  margin-left: 0.25rem;
+  vertical-align: middle;
+}
+.formula-mode-observe  { color: #1a6b3c; background: #e6f4ec; border: 1px solid #a8d9bc; }
+.formula-mode-add      { color: #7a3a00; background: #fff3cd; border: 1px solid #ffc107; }
+.formula-mode-disabled { color: #888; background: #f0f0f0; border: 1px solid #ccc; }
+.formula-expr-preview  { display: block; font-family: monospace; font-size: 0.8rem; color: #555; margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40rem; }
+.formula-last-diag     { font-size: 0.78rem; color: #888; margin-top: 0.15rem; }
+.formula-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+.formula-actions button { font-size: 0.82rem; padding: 0.2rem 0.5rem; }
+
+.formula-form { margin: 0.5rem 0 1rem; }
+.formula-form h3 { font-size: 0.95rem; margin: 0 0 0.75rem; }
+.formula-field-row { margin-bottom: 0.6rem; }
+.formula-field-row label { font-weight: 600; font-size: 0.85rem; display: block; margin-bottom: 0.2rem; }
+.formula-field-row input[type="text"],
+.formula-field-row select { width: 24rem; max-width: 100%; }
+.formula-field-row textarea { width: 36rem; max-width: 100%; font-family: monospace; font-size: 0.85rem; resize: vertical; }
+.formula-field-hint { font-size: 0.8rem; color: #666; margin: 0.15rem 0 0; }
+.formula-error { font-size: 0.85rem; color: #c0392b; margin: 0.35rem 0; }
+.formula-form-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.formula-template-row { display: flex; gap: 0.4rem; align-items: center; }
+.formula-template-row select { width: auto; flex: 1; max-width: 24rem; }
+.formula-help-details { margin-top: 0.75rem; border: 1px solid #d0d0d0; border-radius: 4px; padding: 0.4rem 0.6rem; background: #fafafa; }
+.formula-help-details summary { cursor: pointer; user-select: none; font-size: 0.85rem; color: #444; font-weight: 600; }
+.formula-help-body { margin-top: 0.4rem; }
+.formula-help-body ul { margin: 0 0 0.4rem; padding-left: 1.4rem; font-size: 0.82rem; color: #333; }
+.formula-help-body li { margin-bottom: 0.2rem; }
+.formula-help-fields-title { font-size: 0.82rem; font-weight: 600; color: #444; margin: 0.4rem 0 0.2rem; }
+.formula-help-fields { font-size: 0.78rem; font-family: monospace; background: #f4f4f4; border: 1px solid #ddd; border-radius: 3px; padding: 0.4rem 0.6rem; margin: 0; white-space: pre; overflow-x: auto; color: #333; }
+
+/* Formula insertion chips */
+.formula-chips-wrap { margin: 0.4rem 0 0; width: 36rem; max-width: 100%; }
+.formula-chips-header { font-size: 0.78rem; font-weight: 600; color: #555; margin: 0 0 0.2rem; }
+.formula-chips-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem; margin-bottom: 0.2rem; }
+.formula-chips-group-label { font-size: 0.75rem; color: #888; min-width: 6rem; flex-shrink: 0; }
+.formula-chip {
+  font-family: monospace;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.35rem;
+  background: #f0f4f8;
+  border: 1px solid #c0cdd8;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #2c4a6e;
+  line-height: 1.4;
+}
+.formula-chip:hover { background: #dde8f0; border-color: #90a8c0; }
+.formula-chip:focus-visible { outline: 2px solid #4a90d9; outline-offset: 1px; }
+.formula-chips-ref-note { font-size: 0.75rem; color: #888; margin: 0.25rem 0 0; }
+
+/* Formula diagnostics in decision log */
+.formula-diag-details { margin-top: 0.4rem; font-size: 0.8rem; color: #666; }
+.formula-diag-details summary { cursor: pointer; user-select: none; color: #888; }
+.formula-diag-table { font-size: 0.8rem; margin-top: 0.25rem; width: auto; }
+.formula-diag-table th, .formula-diag-table td { padding: 0.15rem 0.4rem; }
+.formula-diag-applied-yes  { color: #1a6b3c; font-weight: 600; }
+.formula-diag-applied-no   { color: #888; }
+.formula-diag-error        { color: #c0392b; font-family: monospace; font-size: 0.78rem; }
