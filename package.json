@@ -1,6 +1,6 @@
 {
   "name": "thunderbird-auth-results-filter",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "type": "module",
   "scripts": {
     "vendor": "node scripts/vendor.mjs",
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "jsep": "1.4.0",
-    "mail-auth-signal": "0.5.2",
+    "mail-auth-signal": "0.5.3",
     "tldts": "7.4.0"
   }
 }

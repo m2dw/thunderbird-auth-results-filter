@@ -56,7 +56,7 @@ describe('npm run package — XPI vendoring regression checks', () => {
     expect(entries.has('vendor/mail-auth-signal.esm.js')).toBe(true);
   });
 
-  test('VENDOR.md declares the exact installed versions and immutable jsdelivr source URLs', () => {
+  test('VENDOR.md declares every packaged vendor path with its Version and URL, in the canonical Thunderbird format', () => {
     const vendorMd = entries.get('VENDOR.md').toString('utf8');
     const declarations = [
       ['jsep', 'vendor/jsep.esm.min.js'],
@@ -68,41 +68,40 @@ describe('npm run package — XPI vendoring regression checks', () => {
       // Pins in package.json must be exact versions, not ranges, so the
       // declaration below is unambiguous and reviewer-verifiable.
       expect(version).toMatch(/^\d+\.\d+\.\d+$/);
-      expect(vendorMd).toContain(path);
-      expect(vendorMd).toContain(`Version: ${version}`);
-      expect(vendorMd).toContain(`https://cdn.jsdelivr.net/npm/${name}@${version}/`);
+      const url = `https://cdn.jsdelivr.net/npm/${name}@${version}/`;
+      // The packaged path must be paired directly with its Version and URL
+      // (Thunderbird's canonical block format), not with a build-provenance
+      // node_modules/ path or a section heading the linter can't associate
+      // with the packaged file.
+      const block = new RegExp(
+        `^${path}:\\n \\- Version: ${version}\\n \\- URL: ${url}`,
+        'm',
+      );
+      expect(vendorMd).toMatch(block);
+    }
+    expect(vendorMd).not.toMatch(/Packaged from:\s*`?node_modules\//);
+  });
+
+  test('every declared vendor path exists in the XPI at exactly that path', () => {
+    const vendorMd = entries.get('VENDOR.md').toString('utf8');
+    const declaredPaths = [...vendorMd.matchAll(/^(vendor\/\S+):$/gm)].map((m) => m[1]);
+    expect(declaredPaths.length).toBeGreaterThan(0);
+    for (const path of declaredPaths) {
+      expect(entries.has(path)).toBe(true);
     }
   });
 
-  test('vendored JavaScript is copied byte-for-byte from the installed package', () => {
+  test('vendored JavaScript is copied byte-for-byte from the installed package, with no vendor-side patches', () => {
     const cases = [
       ['vendor/jsep.esm.min.js', 'node_modules/jsep/dist/jsep.min.js'],
       ['vendor/tldts.esm.min.js', 'node_modules/tldts/dist/index.esm.min.js'],
+      ['vendor/mail-auth-signal.esm.js', 'node_modules/mail-auth-signal/dist/browser/mail-auth-signal.esm.js'],
     ];
     for (const [archivePath, installedPath] of cases) {
       const fromArchive = entries.get(archivePath);
       const installed = readFileSync(resolve(root, installedPath));
       expect(fromArchive.equals(installed)).toBe(true);
     }
-  });
-
-  test('vendored mail-auth-signal.esm.js matches the installed package except for the documented tldts import patch', () => {
-    // background.html/options.html/popup.html cannot rely on import maps to
-    // resolve mail-auth-signal's bare "tldts" import: Thunderbird 102-107
-    // predate Firefox's import map support (see VENDOR.md). scripts/vendor.mjs
-    // patches that one import line to a relative URL instead; everything else
-    // must remain untouched.
-    const fromArchive = entries.get('vendor/mail-auth-signal.esm.js').toString('utf8');
-    const installed = readFileSync(
-      resolve(root, 'node_modules/mail-auth-signal/dist/index.js'),
-      'utf8',
-    );
-    const patched = installed.replace(
-      'import { getDomain } from "tldts";',
-      'import { getDomain } from "./tldts.esm.min.js";',
-    );
-    expect(patched).not.toBe(installed);
-    expect(fromArchive).toBe(patched);
   });
 });
 
