@@ -4,5 +4,3 @@ src/vendor/
 *.zip
 .n8n-artifacts/
 cache/
-.lib-cdn-lookup-cache/
-.lib-mozilla-hash-db-cache/

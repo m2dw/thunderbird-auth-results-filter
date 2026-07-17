@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "jsep": "1.4.0",
-    "mail-auth-signal": "0.5.3",
+    "mail-auth-signal": "0.5.2",
     "tldts": "7.4.0"
   }
 }
