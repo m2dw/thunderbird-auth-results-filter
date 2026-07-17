@@ -221,18 +221,21 @@ describe('adaptAuthResults', () => {
 //     are not in senderIdentity; local helper stays for scoring.
 
 describe('analyzeMailAuthSignals — senderIdentity with getRegistrableDomain injection', () => {
-  test('senderIdentity PSL fields are unpopulated without getRegistrableDomain', () => {
-    // The package always produces a fromDomainParts object, but registrableDomain
-    // stays null when no PSL resolver is injected.
+  test('senderIdentity PSL fields fall back to the package\'s own resolver without getRegistrableDomain', () => {
+    // As of mail-auth-signal 0.5.2 the package resolves registrableDomain with
+    // its own bundled tldts dependency when no PSL resolver is injected (this
+    // differed in 0.4.0, where it stayed null). The add-on always injects
+    // extractRegistrableDomain in production (see background.js), so this only
+    // documents the package's standalone default.
     const { metrics } = analyzeMailAuthSignals({
       headers: {
         from: 'Alice <alice@example.com>',
         'message-id': '<msg-1@mail.example.com>',
       },
     });
-    expect(metrics.senderIdentity.fromDomainParts.registrableDomain).toBeNull();
-    expect(metrics.senderIdentity.messageIdDomainParts.registrableDomain).toBeNull();
-    expect(metrics.senderIdentity.messageIdRegistrableDomainMatchesFromDomain).toBeNull();
+    expect(metrics.senderIdentity.fromDomainParts.registrableDomain).toBe('example.com');
+    expect(metrics.senderIdentity.messageIdDomainParts.registrableDomain).toBe('example.com');
+    expect(metrics.senderIdentity.messageIdRegistrableDomainMatchesFromDomain).toBe(true);
   });
 
   test('fromDomainParts is populated when getRegistrableDomain is injected', () => {

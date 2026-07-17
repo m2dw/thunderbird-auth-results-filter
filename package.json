@@ -1,9 +1,8 @@
 {
   "name": "thunderbird-auth-results-filter",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "vendor": "node scripts/vendor.mjs",
     "postinstall": "node scripts/vendor.mjs",
     "package": "node scripts/vendor.mjs && node scripts/generate-icons.mjs && node scripts/package-xpi.mjs"
@@ -13,12 +12,32 @@
     "jest": "^29.7.0"
   },
   "jest": {
-    "testEnvironment": "node",
-    "transform": {}
+    "projects": [
+      {
+        "displayName": "unit",
+        "testEnvironment": "node",
+        "transform": {},
+        "testPathIgnorePatterns": [
+          "/node_modules/",
+          "<rootDir>/test/xpiPackaging.test.js"
+        ]
+      },
+      {
+        "displayName": "packaging",
+        "testEnvironment": "node",
+        "transform": {},
+        "testMatch": [
+          "<rootDir>/test/xpiPackaging.test.js"
+        ],
+        "testPathIgnorePatterns": [
+          "/node_modules/"
+        ]
+      }
+    ]
   },
   "dependencies": {
-    "jsep": "^1.4.0",
-    "mail-auth-signal": "^0.4.0",
-    "tldts": "^7.4.0"
+    "jsep": "1.4.0",
+    "mail-auth-signal": "0.5.3",
+    "tldts": "7.4.0"
   }
 }
