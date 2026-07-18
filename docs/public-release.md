@@ -32,15 +32,23 @@ npm run release:public -- [options]
    artifacts (`dist/`, `src/vendor/`).
 4. Verifies version metadata agrees across `package.json` and `src/manifest.json`
    (and `--version` if passed).
-5. Runs `npm test` and `npm run package`.
+5. Runs `npm test` and `npm run package` against the **private working tree**.
 6. Confirms the versioned XPI `dist/auth-results-filter-<version>.xpi` was built.
 7. Exports only the allowlisted public source tree into a temporary directory.
-8. On publish: clones the public repo, replaces its tracked tree with the export,
-   creates a **single squashed commit**, then publishes in a fail-closed order —
-   it pushes the tag `v<version>`, creates the GitHub Release with the XPI
-   attached, and only then advances public `main`. See "Publish ordering" below.
-9. Prints a release summary (source ref/commit, public commit, tag, XPI filename,
-   verification results).
+8. Verifies the export is internally consistent: every retained public npm
+   script that references a `scripts/*.mjs` file must have that file present in
+   the export. Refuses to continue otherwise.
+9. Verifies the **exported public tree itself** (not just the private working
+   tree) by running `npm ci`, `npm test` and `npm run package` inside the export
+   directory. This is what catches a script silently dropped by
+   `sanitizePublicPackageJson()` — the private tree's `package.json` still has
+   every script, so testing only the private tree cannot detect it.
+10. On publish: clones the public repo, replaces its tracked tree with the export,
+    creates a **single squashed commit**, then publishes in a fail-closed order —
+    it pushes the tag `v<version>`, creates the GitHub Release with the XPI
+    attached, and only then advances public `main`. See "Publish ordering" below.
+11. Prints a release summary (source ref/commit, public commit, tag, XPI filename,
+    verification results).
 
 ## Safety model (fail-closed)
 
@@ -134,8 +142,8 @@ such ignored file exists under `src/`.
   tests and tests that read private `.github/workflows/app-*.yml` files, which
   are not exported and would otherwise fail in the public tree/CI).
 - `assets/` — icon source artwork used by `scripts/generate-icons.mjs`.
-- `scripts/vendor.mjs`, `scripts/generate-icons.mjs`, `scripts/package-xpi.mjs` —
-  the scripts needed to reproduce the XPI.
+- `scripts/vendor.mjs`, `scripts/generate-icons.mjs`, `scripts/package-xpi.mjs`,
+  `scripts/test.mjs` — the scripts needed to reproduce `npm test` and the XPI.
 - `docs/architecture-extraction-boundary.md`, `docs/release-readiness.md`,
   `docs/store-listing.md`, `docs/public-release.md`.
 - `.github/workflows/ci.yml` — public CI (test + package).
@@ -172,8 +180,15 @@ allowlist.
 
 ## CI/CD
 
-- **Tests before release run in the private repo.** `npm run release:public`
-  runs `npm test` and `npm run package` before any push.
+- **Tests before release run against both trees.** `npm run release:public`
+  runs `npm test` and `npm run package` against the private working tree, then
+  again — `npm ci`, `npm test`, `npm run package` — against the exported public
+  tree in a temporary directory. Testing only the private tree is not
+  sufficient: `sanitizePublicPackageJson()` can drop an npm script during
+  export (e.g. because its target file isn't in `PUBLIC_INCLUDE`) without that
+  ever affecting the private tree's own `package.json` or `npm test` run. The
+  script also fails closed if any retained public npm script references a
+  `scripts/*.mjs` file that the export doesn't actually contain.
 - **The public repo also runs CI.** `.github/workflows/ci.yml` runs `npm test`
   and `npm run package` on pushes to `main`/`release/**` and on PRs, and uploads
   the XPI as a build artifact. This lets the published tag/branch be verified

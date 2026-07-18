@@ -1,8 +1,9 @@
 {
   "name": "thunderbird-auth-results-filter",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "type": "module",
   "scripts": {
+    "test": "node scripts/test.mjs",
     "vendor": "node scripts/vendor.mjs",
     "postinstall": "node scripts/vendor.mjs",
     "package": "node scripts/vendor.mjs && node scripts/generate-icons.mjs && node scripts/package-xpi.mjs"
