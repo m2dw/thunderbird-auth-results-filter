@@ -12,6 +12,7 @@ import { extractBodySnippet } from '../modules/bodySnippet.js';
 import { buildNotificationContent } from '../modules/notificationContent.js';
 import { computeHeaderMetrics } from '../core/headerMetrics.js';
 import { prunedCandidates } from '../modules/candidates.js';
+import { extractAuthservIds, authservIdsTruncated } from '../modules/protectionStatus.js';
 import { getStorage, saveStorage } from '../modules/storage.js';
 import {
   shouldNotifyAfterAssessment,
@@ -143,6 +144,13 @@ browser.runtime.onInstalled.addListener(async ({ reason }) => {
     }
   } catch {
     // Ignore; lazy creation in applyAction will handle it.
+  }
+  // First run only: open the options page at the guided setup so the user can
+  // see that authentication scoring is not active yet. Not repeated on startup.
+  try {
+    await browser.tabs.create({ url: browser.runtime.getURL('options/options.html#setup') });
+  } catch {
+    // Non-fatal; the persistent status on the options page still applies.
   }
 });
 
@@ -301,6 +309,11 @@ async function handleNewMessage(message) {
     timestamp: now,
     subject: message.subject ?? '',
     fromDomain,
+    // accountId + authservIds let the options page derive per-account
+    // protection status. They are descriptive only and never add trust.
+    accountId: message.folder?.accountId ?? null,
+    authservIds: extractAuthservIds(parsed, trustedDomains),
+    authservIdsTruncated: authservIdsTruncated(parsed),
     authservId: parsed[0]?.authservId ?? '',
     trusted: parsed.length > 0 ? isTrustedAuthservId(parsed[0].authservId, trustedDomains) : null,
     score: result.score,

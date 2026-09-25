@@ -1,4 +1,4 @@
-import { getStorage, updateStorage, SCORE_DEFAULTS_VERSION } from '../modules/storage.js';
+import { getStorage, updateStorage, SCORE_DEFAULTS_VERSION, STORAGE_KEY } from '../modules/storage.js';
 import { validateFormulaFields, buildLastFormulaDiagnostics } from './formulaValidation.js';
 import { CHIP_GROUPS } from './formulaChips.js';
 import { MAX_CUSTOM_FORMULAS } from '../core/customFormulas.js';
@@ -6,6 +6,13 @@ import { validateTrustedEntry, getPromotableRegistrableDomain } from './trustedE
 import { isTrustedAuthservId } from '../core/trust.js';
 import { generateSuggestionsFromEmails, generateMxSuggestionsFromHosts } from '../modules/setupSuggestions.js';
 import { lookupMxHosts } from '../modules/mxLookup.js';
+import {
+  PROTECTION_STATES,
+  deriveAccountProtectionStatus,
+  summarizeAccountMail,
+  summarizeProtection,
+} from '../modules/protectionStatus.js';
+import { listSetupAccounts, confirmTrustedServerSetup, buildSetupCheck } from '../modules/accountSetup.js';
 import {
   classifyScore,
   recalculateScoreReasons,
@@ -26,7 +33,17 @@ import {
 } from '../modules/logExport.js';
 import { formatDelta, buildTopReasonsSummary, sliceRecentLog, logHasMore } from '../modules/logFormat.js';
 import { MAX_WHITELIST_ENTRIES } from '../core/whitelist.js';
-import { getMessage, localizedTitleForKey, localizedSummaryForKey, localizedTooltipForKey, localizeDocument } from '../modules/i18n.js';
+import {
+  getMessage,
+  localizedTitleForKey,
+  localizedSummaryForKey,
+  localizedTooltipForKey,
+  localizedReasonLabel,
+  localizedClassification,
+  localizedActionLabel,
+  localizedMatchType,
+  localizeDocument,
+} from '../modules/i18n.js';
 import { REGISTRY, getRuleMeta } from '../core/ruleRegistry.js';
 
 const $ = id => document.getElementById(id);
@@ -120,7 +137,7 @@ async function load() {
   await renderReviewFolderSettings(settings.reviewFolders ?? {});
   renderTrustedDomains(data.trustedDomains);
   renderCandidates(data.candidates);
-  renderProtectionStatus(data.trustedDomains, data.decisionLog);
+  await renderProtectionStatus(data);
   renderActivitySummary(data.decisionLog);
   renderScoreSettings(settings);
   renderSenderRules(data.senderDomainRules);
@@ -166,48 +183,440 @@ export function buildProtectionStatus(trustedDomains) {
   return { configured: valid.length > 0, count: valid.length };
 }
 
+/** i18n keys for each per-account protection state: [label, detail]. */
+const PROTECTION_STATE_MSG_KEYS = {
+  [PROTECTION_STATES.ACTIVE]:             ['status_state_active',             'status_state_active_detail'],
+  [PROTECTION_STATES.NOT_CONFIGURED]:     ['status_state_not_configured',     'status_state_not_configured_detail'],
+  [PROTECTION_STATES.AWAITING_MAIL]:      ['status_state_awaiting_mail',      'status_state_awaiting_mail_detail'],
+  [PROTECTION_STATES.NEEDS_CONFIRMATION]: ['status_state_needs_confirmation', 'status_state_needs_confirmation_detail'],
+  [PROTECTION_STATES.NO_USABLE_AR]:       ['status_state_no_usable_ar',       'status_state_no_usable_ar_detail'],
+};
+
+/** Setup-eligible accounts from the most recent status render. */
+let setupAccounts = [];
+/** Per-account statuses from the most recent status render, keyed by account id. */
+let lastProtectionStatuses = new Map();
+/** Storage snapshot used by the most recent status render. */
+let lastProtectionData = null;
+/** Incremented on every renderProtectionStatus call to detect stale async renders. */
+let renderProtectionStatusGeneration = 0;
+
 /**
- * Render the protection status section in the Basic tab.
- * Shows a warning when no trusted servers are configured.
+ * Render the protection status section in the Basic tab: one line per
+ * account stating whether authentication scoring is active, plus an overall
+ * summary. Never claims protection is active unless recent mail for the
+ * account carries results from a trusted server.
+ *
+ * @param {object} data - Full storage object.
  */
-function renderProtectionStatus(trustedDomains, decisionLog) {
+async function renderProtectionStatus(data) {
+  const generation = ++renderProtectionStatusGeneration;
+  let accounts = null;
+  try {
+    accounts = listSetupAccounts(await browser.accounts.list());
+  } catch {
+    accounts = null;
+  }
+  if (generation !== renderProtectionStatusGeneration) return;
+
+  lastProtectionData = data;
+  setupAccounts = accounts ?? [];
   const container = $('protection-status-content');
   container.innerHTML = '';
-  const status = buildProtectionStatus(trustedDomains);
+  const trustedCount = buildProtectionStatus(data.trustedDomains).count;
 
-  if (!status.configured) {
-    const warning = document.createElement('p');
-    warning.className = 'status-warning';
-    warning.textContent = getMessage('status_no_trusted_servers');
-    container.append(warning);
+  if (!accounts || accounts.length === 0) {
+    lastProtectionStatuses = new Map();
+    const p = document.createElement('p');
+    p.className = trustedCount > 0 ? 'status-hint' : 'status-warning';
+    p.textContent = trustedCount > 0
+      ? getMessage('status_accounts_unavailable', [String(trustedCount), trustedCount !== 1 ? 's' : ''])
+      : getMessage('status_no_trusted_servers');
+    container.append(p);
+    if (guidedSetupIsOpen()) refreshOpenGuidedSetup();
+    return;
+  }
 
+  const statuses = accounts.map(account => deriveAccountProtectionStatus({
+    accountId: account.id,
+    trustedDomains: data.trustedDomains,
+    accountSetup: data.settings?.accountSetup,
+    decisionLog: data.decisionLog,
+  }));
+  lastProtectionStatuses = new Map(statuses.map(s => [s.accountId, s]));
+  const summary = summarizeProtection(statuses);
+
+  const overall = document.createElement('p');
+  if (summary.allActive) {
+    overall.className = 'status-ok';
+    overall.textContent = getMessage('status_overall_all_active', [
+      String(summary.total), summary.total !== 1 ? 's' : '',
+    ]);
+  } else {
+    overall.className = 'status-warning';
+    overall.textContent = getMessage('status_overall_partial', [
+      String(summary.inactive), String(summary.total), summary.total !== 1 ? 's' : '',
+    ]);
+  }
+  container.append(overall);
+
+  if (summary.active === 0 && trustedCount === 0) {
     const callout = document.createElement('p');
     callout.className = 'firstrun-callout';
     callout.textContent = getMessage('firstrun_callout');
     container.append(callout);
+  }
+
+  const ul = document.createElement('ul');
+  ul.className = 'protection-account-list';
+  for (const account of accounts) {
+    const status = lastProtectionStatuses.get(account.id);
+    const [labelKey, detailKey] = PROTECTION_STATE_MSG_KEYS[status.state];
+    const li = document.createElement('li');
+    li.className = `protection-account protection-state-${status.state}`;
+
+    const head = document.createElement('div');
+    head.className = 'protection-account-head';
+    const name = document.createElement('span');
+    name.className = 'protection-account-name';
+    name.textContent = account.name;
+    const badge = document.createElement('span');
+    badge.className = 'protection-state-badge';
+    badge.textContent = getMessage(labelKey);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'protection-setup-btn';
+    btn.textContent = getMessage(
+      status.state === PROTECTION_STATES.ACTIVE ? 'btn_setup_change' : 'btn_setup_start',
+    );
+    btn.addEventListener('click', () => openGuidedSetup(account.id));
+    head.append(name, ' ', badge, ' ', btn);
+    li.append(head);
+
+    const detail = document.createElement('p');
+    detail.className = 'protection-account-detail';
+    detail.textContent = status.mismatch
+      ? getMessage('status_state_mismatch_detail')
+      : getMessage(detailKey, [String(status.mail.total)]);
+    li.append(detail);
+
+    if (status.confirmedHost) {
+      const host = document.createElement('p');
+      host.className = 'protection-account-meta';
+      host.textContent = getMessage('status_confirmed_host', [status.confirmedHost]);
+      li.append(host);
+    }
+    if (status.mail.total > 0) {
+      const counts = document.createElement('p');
+      counts.className = 'protection-account-meta';
+      counts.textContent = getMessage('status_mail_counts', [
+        String(status.mail.total),
+        String(status.mail.trusted),
+        String(status.mail.untrusted),
+        String(status.mail.none),
+      ]);
+      li.append(counts);
+    }
+    if (status.mail.unknown > 0) {
+      const unrecorded = document.createElement('p');
+      unrecorded.className = 'protection-account-meta';
+      unrecorded.textContent = getMessage('status_mail_unrecorded', [String(status.mail.unknown)]);
+      li.append(unrecorded);
+    }
+    ul.append(li);
+  }
+  container.append(ul);
+
+  if (!summary.allActive && !guidedSetupIsOpen()) {
+    const startBtn = document.createElement('button');
+    startBtn.type = 'button';
+    startBtn.id = 'protection-start-setup-btn';
+    startBtn.textContent = getMessage('btn_start_guided_setup');
+    startBtn.addEventListener('click', () => openGuidedSetup(null));
+    container.append(startBtn);
+  }
+
+  if (guidedSetupIsOpen()) refreshOpenGuidedSetup();
+}
+
+// ── Guided trusted-server setup ─────────────────────────────────────────────
+//
+// Account → server choice (account/MX hints or typed) → local check → explicit
+// confirmation. Only onGuidedSetupConfirm writes trust, and only when the
+// confirmation checkbox is ticked. Received headers are never offered as
+// suggestions.
+
+/** MX hints per account id, populated only by an explicit button click. */
+const guidedMxResults = new Map();
+
+function guidedSetupIsOpen() {
+  return !$('guided-setup').hidden;
+}
+
+function currentGuidedAccount() {
+  const id = $('guided-setup-account').value;
+  return setupAccounts.find(a => a.id === id) ?? null;
+}
+
+/**
+ * Open the guided setup, preselecting `accountId` or else the first account
+ * whose authentication scoring is not active.
+ */
+function openGuidedSetup(accountId) {
+  $('guided-setup').hidden = false;
+  $('guided-setup-error').hidden = true;
+  $('guided-setup-success').hidden = true;
+  const startBtn = $('protection-start-setup-btn');
+  if (startBtn) startBtn.remove();
+
+  const preferred = accountId
+    ?? setupAccounts.find(a => lastProtectionStatuses.get(a.id)?.state !== PROTECTION_STATES.ACTIVE)?.id
+    ?? setupAccounts[0]?.id
+    ?? '';
+  renderGuidedSetupAccountOptions(preferred);
+  renderGuidedSetupAccount();
+  $('guided-setup').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Bring an open guided setup up to date with the latest status render (e.g.
+ * after new mail was logged). The configuration check is recomputed for the
+ * current selection without touching the confirmation checkbox; only if the
+ * selected account disappeared is the account view rebuilt from scratch.
+ */
+function refreshOpenGuidedSetup() {
+  const previousId = $('guided-setup-account').value;
+  renderGuidedSetupAccountOptions();
+  if ($('guided-setup-account').value !== previousId) {
+    renderGuidedSetupAccount();
+  } else {
+    renderGuidedSetupCheckItems();
+  }
+}
+
+function closeGuidedSetup() {
+  $('guided-setup').hidden = true;
+  if (lastProtectionData) renderProtectionStatus(lastProtectionData);
+}
+
+/**
+ * (Re)build the account <select>, keeping the current selection when possible.
+ */
+function renderGuidedSetupAccountOptions(preferredId) {
+  const select = $('guided-setup-account');
+  const keep = preferredId ?? select.value;
+  select.innerHTML = '';
+  for (const account of setupAccounts) {
+    const opt = document.createElement('option');
+    opt.value = account.id;
+    const state = lastProtectionStatuses.get(account.id)?.state;
+    const label = state ? getMessage(PROTECTION_STATE_MSG_KEYS[state][0]) : '';
+    opt.textContent = label ? `${account.name} — ${label}` : account.name;
+    select.append(opt);
+  }
+  if (setupAccounts.some(a => a.id === keep)) select.value = keep;
+  const note = $('guided-setup-account-note');
+  note.hidden = setupAccounts.length > 0;
+  note.textContent = setupAccounts.length > 0 ? '' : getMessage('setup_no_accounts');
+}
+
+/** Heuristic hints plus any MX hints the user explicitly looked up. */
+function guidedSuggestionsFor(account) {
+  if (!account) return [];
+  const mx = guidedMxResults.get(account.id)?.suggestions ?? [];
+  const seen = new Set();
+  const result = [];
+  for (const s of [...mx, ...generateSuggestionsFromEmails(account.emails)]) {
+    if (seen.has(s.host)) continue;
+    seen.add(s.host);
+    result.push(s);
+  }
+  return result;
+}
+
+function selectedGuidedHost() {
+  const checked = document.querySelector('input[name="guided-setup-host"]:checked');
+  if (!checked) return '';
+  if (checked.id === 'guided-setup-other-radio') {
+    return $('guided-setup-other').value.trim().toLowerCase();
+  }
+  return checked.value;
+}
+
+/** Localize a formula diagnostic verdict change such as 'review -> high-risk'. */
+function formatVerdictChange(value) {
+  return String(value).split(' -> ').map(localizedClassification).join(' -> ');
+}
+
+/** Localized badge text for a setup suggestion source ('heuristic' | 'mx'). */
+function suggestionSourceLabel(source) {
+  if (source === 'heuristic') return getMessage('setup_source_heuristic');
+  if (source === 'mx') return getMessage('setup_source_mx');
+  return source ?? '';
+}
+
+/**
+ * Render server suggestions and MX controls for the selected account.
+ *
+ * @param {string} [keepHost] - Host to keep selected (e.g. after an MX lookup).
+ */
+async function renderGuidedSetupAccount(keepHost) {
+  const account = currentGuidedAccount();
+  const list = $('guided-setup-suggestions');
+  list.innerHTML = '';
+  $('guided-setup-other').value = '';
+  $('guided-setup-other-radio').checked = false;
+
+  const suggestions = guidedSuggestionsFor(account);
+  const preselect = keepHost
+    ?? (account ? lastProtectionStatuses.get(account.id)?.confirmedHost : null)
+    ?? null;
+  for (const s of suggestions) {
+    const label = document.createElement('label');
+    label.className = 'guided-setup-suggestion';
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'guided-setup-host';
+    radio.value = s.host;
+    radio.checked = s.host === preselect;
+    radio.addEventListener('change', renderGuidedSetupCheck);
+    const host = document.createElement('span');
+    host.className = 'setup-suggestion-host';
+    host.textContent = s.host;
+    const source = document.createElement('span');
+    source.className = `setup-suggestion-source${s.source === 'mx' ? ' source-mx' : ''}`;
+    source.textContent = suggestionSourceLabel(s.source);
+    label.append(radio, ' ', host, ' ', source);
+    list.append(label);
+  }
+  if (preselect && !suggestions.some(s => s.host === preselect)) {
+    $('guided-setup-other-radio').checked = true;
+    $('guided-setup-other').value = preselect;
+  }
+
+  // MX hints: only when the user already opted in to DNS lookup, and only on
+  // an explicit button click.
+  const data = await getStorage();
+  const dnsEnabled = data.settings?.setupHints?.dnsLookupEnabled ?? false;
+  const mxBtn = $('guided-setup-mx-btn');
+  const mxNote = $('guided-setup-mx-note');
+  mxBtn.hidden = !dnsEnabled;
+  mxBtn.disabled = !account || account.domains.length === 0;
+  const mx = account ? guidedMxResults.get(account.id) : null;
+  if (!dnsEnabled) {
+    mxNote.textContent = getMessage('guided_setup_mx_disabled');
+  } else if (mx?.errors?.length) {
+    mxNote.textContent = mx.errors.join(' ');
+  } else if (mx && mx.suggestions.length === 0) {
+    mxNote.textContent = getMessage('setup_no_mx_records');
+  } else {
+    mxNote.textContent = getMessage('guided_setup_mx_hint', [
+      account ? account.domains.join(', ') : '',
+      data.settings?.setupHints?.dnsResolver ?? '',
+    ]);
+  }
+
+  renderGuidedSetupCheck();
+}
+
+async function onGuidedSetupMxLookup() {
+  const account = currentGuidedAccount();
+  if (!account) return;
+  const data = await getStorage();
+  const setupHints = data.settings?.setupHints ?? {};
+  if (!setupHints.dnsLookupEnabled) return;
+  const keepHost = selectedGuidedHost() || null;
+  $('guided-setup-mx-btn').disabled = true;
+  $('guided-setup-mx-note').textContent = getMessage('guided_setup_mx_running');
+  const results = await Promise.all(account.domains.map(async domain =>
+    [domain, await lookupMxHosts(domain, setupHints.dnsResolver, setupHints.dnsTimeoutMs ?? 5000)]));
+  const suggestions = [];
+  const errors = [];
+  for (const [domain, result] of results) {
+    if (result.ok) {
+      suggestions.push(...generateMxSuggestionsFromHosts(result.hosts, domain));
+    } else {
+      errors.push(`${domain}: ${getMessage(DNS_ERROR_MSG_KEYS[result.error] ?? 'dns_error_generic')}`);
+    }
+  }
+  guidedMxResults.set(account.id, { suggestions, errors });
+  if (currentGuidedAccount()?.id === account.id) renderGuidedSetupAccount(keepHost);
+}
+
+/**
+ * Render the local configuration check for the selected account and host.
+ * Changing the host always clears the confirmation checkbox.
+ */
+function renderGuidedSetupCheck() {
+  renderGuidedSetupCheckItems();
+  const account = currentGuidedAccount();
+  const host = selectedGuidedHost();
+  $('guided-setup-confirm').checked = false;
+  $('guided-setup-confirm').disabled = !host || !account;
+  $('guided-setup-confirm-text').textContent = host
+    ? getMessage('guided_setup_confirm_label', [host])
+    : getMessage('guided_setup_confirm_label_empty');
+  $('guided-setup-error').hidden = true;
+}
+
+/**
+ * Render only the configuration check items from the latest status data.
+ * Leaves the confirmation checkbox as is.
+ */
+function renderGuidedSetupCheckItems() {
+  const account = currentGuidedAccount();
+  const host = selectedGuidedHost();
+  const data = lastProtectionData ?? { trustedDomains: [], decisionLog: [] };
+  const mail = account
+    ? summarizeAccountMail(data.decisionLog, account.id, data.trustedDomains, host)
+    : null;
+  const items = buildSetupCheck({
+    host,
+    accountDomains: account?.domains ?? [],
+    suggestions: guidedSuggestionsFor(account),
+    trustedDomains: data.trustedDomains,
+    mail,
+  });
+
+  const ul = $('guided-setup-check');
+  ul.innerHTML = '';
+  for (const item of items) {
+    const li = document.createElement('li');
+    li.className = `guided-check-item guided-check-${item.level}`;
+    li.textContent = getMessage(`guided_check_${item.key}`, item.params);
+    ul.append(li);
+  }
+}
+
+async function onGuidedSetupConfirm() {
+  const account = currentGuidedAccount();
+  const params = {
+    accountId: account?.id,
+    host: selectedGuidedHost(),
+    confirmed: $('guided-setup-confirm').checked === true,
+  };
+  const errorEl = $('guided-setup-error');
+  const successEl = $('guided-setup-success');
+  successEl.hidden = true;
+
+  const precheck = confirmTrustedServerSetup(await getStorage(), params);
+  if (!precheck.ok) {
+    errorEl.textContent = getMessage(`guided_setup_error_${precheck.error}`);
+    errorEl.hidden = false;
     return;
   }
+  errorEl.hidden = true;
 
-  const ok = document.createElement('p');
-  ok.className = 'status-ok';
-  ok.textContent = getMessage('status_protection_active', [
-    String(status.count),
-    status.count !== 1 ? 's' : '',
-  ]);
-  container.append(ok);
-
-  // Warn if recent log entries have no trusted AR results.
-  const recentEntries = (decisionLog ?? []).slice(0, 20);
-  const noTrustedCount = recentEntries.filter(e =>
-    Array.isArray(e.scoreReasons) && e.scoreReasons.length > 0
-    && !e.scoreReasons.some(r => r.key && !r.key.startsWith('authserv.untrusted') && r.key.startsWith('auth.')),
-  ).length;
-  if (recentEntries.length > 0 && noTrustedCount === recentEntries.length) {
-    const hint = document.createElement('p');
-    hint.className = 'status-hint';
-    hint.textContent = getMessage('status_recent_no_trusted_ar');
-    container.append(hint);
-  }
+  const next = await updateStorage(d => {
+    const result = confirmTrustedServerSetup(d, params);
+    return result.ok ? result.data : d;
+  });
+  renderTrustedDomains(next.trustedDomains);
+  renderCandidates(next.candidates);
+  await renderProtectionStatus(next);
+  renderGuidedSetupAccount(params.host.trim().toLowerCase());
+  successEl.textContent = getMessage('guided_setup_success', [params.host.trim().toLowerCase()]);
+  successEl.hidden = false;
 }
 
 /**
@@ -251,9 +660,9 @@ function renderActivitySummary(decisionLog) {
       const cls = entry.classification ?? classifyScore(entry.score ?? 0);
       li.textContent =
         `${new Date(entry.timestamp).toLocaleString()} — `
-        + `${entry.fromDomain || '(unknown)'} — `
-        + `${cls} — `
-        + `${entry.action ?? ''}`;
+        + `${entry.fromDomain || getMessage('activity_unknown_domain')} — `
+        + `${localizedClassification(cls)} — `
+        + `${localizedActionLabel(entry.action)}`;
       li.className = `activity-entry activity-entry-${cls.replace('-', '')}`;
       ul.append(li);
     }
@@ -424,7 +833,7 @@ function buildSuggestionRow(s) {
 
   const sourceSpan = document.createElement('span');
   sourceSpan.className = `setup-suggestion-source${s.source === 'mx' ? ' source-mx' : ''}`;
-  sourceSpan.textContent = s.source;
+  sourceSpan.textContent = suggestionSourceLabel(s.source);
 
   const btn = document.createElement('button');
   btn.type = 'button';
@@ -527,7 +936,7 @@ function renderTrustedDomains(domains) {
         promoteBtn.className = 'trust-promote-btn';
         promoteBtn.textContent = getMessage('trust_promote_btn', [promotable]);
         promoteBtn.dataset.registrableDomain = promotable;
-        promoteBtn.title = `Add ${promotable} as a registrable-domain trust entry. This will trust all subdomains of ${promotable}, not just ${d.value}.`;
+        promoteBtn.title = getMessage('trust_promote_title', [promotable, d.value]);
         promoteBtn.addEventListener('click', onPromoteToDomainTrust);
         li.append(' ', promoteBtn);
       }
@@ -546,7 +955,7 @@ async function onRemoveTrustedDomain(e) {
     ),
   }));
   renderTrustedDomains(next.trustedDomains);
-  renderProtectionStatus(next.trustedDomains, next.decisionLog);
+  renderProtectionStatus(next);
   // Re-render candidates: previously hidden entries may become visible
   // now that this trusted entry is gone.
   renderCandidates(next.candidates);
@@ -566,7 +975,7 @@ async function onPromoteToDomainTrust(e) {
     };
   });
   renderTrustedDomains(next.trustedDomains);
-  renderProtectionStatus(next.trustedDomains, next.decisionLog);
+  renderProtectionStatus(next);
   renderCandidates(next.candidates);
 }
 
@@ -858,7 +1267,7 @@ function renderSenderRules(rules) {
     const tdScore = document.createElement('td');
     const tdAction = document.createElement('td');
     tdDomain.textContent = rule.domain;
-    tdMatch.textContent = rule.matchType;
+    tdMatch.textContent = localizedMatchType(rule.matchType);
     tdScore.textContent = rule.score;
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -1105,17 +1514,17 @@ function createLogEntryRows(entry, scoreParams) {
 
   tdTime.textContent = new Date(entry.timestamp).toLocaleString();
   tdDomain.textContent = entry.fromDomain;
-  tdAction.textContent = entry.action;
+  tdAction.textContent = localizedActionLabel(entry.action);
 
   const originalClass = entry.classification ?? classifyScore(entry.score);
-  tdOriginal.textContent = `${entry.score} (${originalClass})`;
+  tdOriginal.textContent = `${entry.score} (${localizedClassification(originalClass)})`;
 
   let reasons = null;
   if (Array.isArray(entry.scoreReasons)) {
     reasons = recalculateScoreReasons(entry, { authScores, heuristicScores, layer2Scores, compositeScores, whitelistMitigationScore, addressBookMitigationScore });
     const currentScore = sumCurrentDeltas(reasons, heuristicScores);
     const currentClass = classifyScore(currentScore);
-    tdCurrent.textContent = `${currentScore} (${currentClass})`;
+    tdCurrent.textContent = `${currentScore} (${localizedClassification(currentClass)})`;
     if (originalClass !== currentClass) tr.className = 'classification-changed';
   } else {
     tdCurrent.textContent = '—';
@@ -1162,7 +1571,7 @@ function createLogEntryRows(entry, scoreParams) {
 
         const labelSpan = document.createElement('span');
         labelSpan.className = 'reason-label';
-        labelSpan.textContent = r.label ?? r.key;
+        labelSpan.textContent = localizedReasonLabel(r);
 
         const keyCode = document.createElement('code');
         keyCode.className = 'reason-key';
@@ -1335,7 +1744,7 @@ async function onTrustCandidateExact(e) {
     return { ...data, trustedDomains, candidates };
   });
   renderTrustedDomains(next.trustedDomains);
-  renderProtectionStatus(next.trustedDomains, next.decisionLog);
+  renderProtectionStatus(next);
   renderCandidates(next.candidates);
 }
 
@@ -1352,7 +1761,7 @@ async function onTrustCandidateDomain(e) {
     return { ...data, trustedDomains, candidates };
   });
   renderTrustedDomains(next.trustedDomains);
-  renderProtectionStatus(next.trustedDomains, next.decisionLog);
+  renderProtectionStatus(next);
   renderCandidates(next.candidates);
 }
 
@@ -1379,7 +1788,7 @@ function renderWhitelistEntries(entries) {
     const tdMatch = document.createElement('td');
     const tdAction = document.createElement('td');
     tdAddr.textContent = entry.value;
-    tdMatch.textContent = entry.matchType;
+    tdMatch.textContent = localizedMatchType(entry.matchType);
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = getMessage('btn_remove');
@@ -1668,6 +2077,8 @@ async function saveDnsSettings() {
     },
   }));
   renderSetupAssistant();
+  if (!dnsEnabled) guidedMxResults.clear();
+  if (guidedSetupIsOpen()) renderGuidedSetupAccount(selectedGuidedHost() || null);
 }
 
 async function clearLog() {
@@ -1675,7 +2086,7 @@ async function clearLog() {
   const next = await updateStorage(data => ({ ...data, decisionLog: [] }));
   renderDecisionLog(next.decisionLog, next.settings);
   renderActivitySummary(next.decisionLog);
-  renderProtectionStatus(next.trustedDomains, next.decisionLog);
+  renderProtectionStatus(next);
 }
 
 /**
@@ -2016,9 +2427,9 @@ function renderFormulaDiagnostics(diagnostics) {
 
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  ['Name', 'Mode', 'Value', 'Applied', 'Would-change score', 'Would-change verdict', 'Error'].forEach(text => {
+  ['name', 'mode', 'value', 'applied', 'would_score', 'would_verdict', 'error'].forEach(col => {
     const th = document.createElement('th');
-    th.textContent = text;
+    th.textContent = getMessage(`formula_diag_col_${col}`);
     headerRow.append(th);
   });
   thead.append(headerRow);
@@ -2037,7 +2448,7 @@ function renderFormulaDiagnostics(diagnostics) {
         cls: hasError ? '' : (diag.applied ? 'formula-diag-applied-yes' : 'formula-diag-applied-no'),
       },
       { text: hasError ? '—' : String(diag.wouldChangeScore ?? '—') },
-      { text: hasError ? '—' : (diag.wouldChangeVerdict ?? '—') },
+      { text: hasError || !diag.wouldChangeVerdict ? '—' : formatVerdictChange(diag.wouldChangeVerdict) },
       { text: diag.error ?? '', cls: diag.error ? 'formula-diag-error' : '' },
     ];
     cells.forEach(({ text, cls }) => {
@@ -2109,11 +2520,11 @@ function renderCustomFormulas(formulas, lastDiagnostics = new Map()) {
       const diagNote = document.createElement('p');
       diagNote.className = 'formula-last-diag';
       if (diag.error) {
-        diagNote.textContent = `Last result: error — ${diag.error}`;
+        diagNote.textContent = getMessage('formula_last_result_error', [diag.error]);
       } else {
-        const parts = [`Last result: ${diag.value}`];
-        if (diag.applied) parts.push('applied');
-        if (diag.wouldChangeVerdict) parts.push(`→ ${diag.wouldChangeVerdict}`);
+        const parts = [getMessage('formula_last_result', [String(diag.value)])];
+        if (diag.applied) parts.push(getMessage('formula_last_result_applied'));
+        if (diag.wouldChangeVerdict) parts.push(`→ ${formatVerdictChange(diag.wouldChangeVerdict)}`);
         diagNote.textContent = parts.join(' · ');
       }
       info.append(diagNote);
@@ -2283,14 +2694,15 @@ async function onDeleteFormula(id) {
 
 // ─── End custom formula management ───────────────────────────────────────────
 
-const ADD_TRUSTED_HINTS = {
-  exact: 'Trusts only this specific host. Subdomains are not trusted.',
-  domain: 'Trusts this domain and all its subdomains. Use with care — this is broader than exact-host trust.',
+const ADD_TRUSTED_HINT_KEYS = {
+  exact: 'add_trusted_hint_exact',
+  domain: 'add_trusted_hint_domain',
 };
 
 function onAddTrustedMatchTypeChange() {
   const matchType = $('add-trusted-matchtype').value;
-  $('add-trusted-hint').textContent = ADD_TRUSTED_HINTS[matchType] ?? '';
+  const hintKey = ADD_TRUSTED_HINT_KEYS[matchType];
+  $('add-trusted-hint').textContent = hintKey ? getMessage(hintKey) : '';
   $('add-trusted-form').dataset.matchtype = matchType;
   $('add-trusted-error').hidden = true;
 }
@@ -2321,7 +2733,7 @@ async function onAddTrustedFormSubmit(e) {
   });
   $('add-trusted-value').value = '';
   renderTrustedDomains(next.trustedDomains);
-  renderProtectionStatus(next.trustedDomains, next.decisionLog);
+  renderProtectionStatus(next);
   renderCandidates(next.candidates);
 }
 
@@ -2344,7 +2756,22 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => activateTab(btn.dataset.tab));
 });
 
+// '#setup' (used once by the first-run tab) opens the guided setup on the Basic tab.
+const openGuidedSetupOnLoad = location.hash === '#setup';
 activateTab(TAB_IDS.includes(location.hash.slice(1)) ? location.hash.slice(1) : TAB_IDS[0]);
+
+$('guided-setup-account').addEventListener('change', () => {
+  $('guided-setup-success').hidden = true;
+  renderGuidedSetupAccount();
+});
+$('guided-setup-other-radio').addEventListener('change', renderGuidedSetupCheck);
+$('guided-setup-other').addEventListener('input', () => {
+  $('guided-setup-other-radio').checked = true;
+  renderGuidedSetupCheck();
+});
+$('guided-setup-mx-btn').addEventListener('click', onGuidedSetupMxLookup);
+$('guided-setup-confirm-btn').addEventListener('click', onGuidedSetupConfirm);
+$('guided-setup-close-btn').addEventListener('click', closeGuidedSetup);
 
 $('setup-hint-dns-enabled').addEventListener('change', saveDnsSettings);
 $('setup-hint-dns-resolver').addEventListener('change', saveDnsSettings);
@@ -2378,4 +2805,21 @@ $('custom-formula-form').addEventListener('submit', onFormulaFormSubmit);
 $('formula-insert-template-btn').addEventListener('click', onInsertTemplate);
 
 initFormulaTemplateSelect();
-load();
+load().then(() => {
+  if (openGuidedSetupOnLoad) openGuidedSetup(null);
+});
+
+// Recompute the protection status when the background logs new mail while this
+// page is open. Debounced so a burst of incoming messages re-renders once.
+let protectionRefreshTimer = null;
+browser.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== 'local' || !(STORAGE_KEY in changes)) return;
+  clearTimeout(protectionRefreshTimer);
+  protectionRefreshTimer = setTimeout(async () => {
+    try {
+      await renderProtectionStatus(await getStorage());
+    } catch {
+      // Non-fatal; the next change or page reload refreshes the status.
+    }
+  }, 500);
+});

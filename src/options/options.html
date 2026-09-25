@@ -25,46 +25,77 @@
         <div id="protection-status-content">
           <!-- Rendered by options.js -->
         </div>
+        <details id="authserv-explainer" class="authserv-explainer">
+          <summary>__MSG_authserv_explainer_summary__</summary>
+          <p>__MSG_authserv_explainer_body__</p>
+          <p>__MSG_authserv_explainer_advanced__</p>
+        </details>
+
+        <div id="guided-setup" class="guided-setup" hidden>
+          <h3>__MSG_guided_setup_title__</h3>
+
+          <div class="guided-step">
+            <p class="guided-step-title">__MSG_guided_setup_step_account__</p>
+            <select id="guided-setup-account"></select>
+            <p class="guided-setup-note" id="guided-setup-account-note" hidden></p>
+          </div>
+
+          <div class="guided-step">
+            <p class="guided-step-title">__MSG_guided_setup_step_server__</p>
+            <p class="guided-setup-note">__MSG_guided_setup_step_server_desc__</p>
+            <div id="guided-setup-suggestions" role="radiogroup"></div>
+            <div class="guided-setup-other-row">
+              <label>
+                <input type="radio" name="guided-setup-host" id="guided-setup-other-radio" value="">
+                __MSG_guided_setup_other__
+              </label>
+              <input type="text" id="guided-setup-other" placeholder="__MSG_guided_setup_other_placeholder__" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="guided-setup-mx">
+              <button type="button" id="guided-setup-mx-btn">__MSG_guided_setup_mx_btn__</button>
+              <p class="guided-setup-note" id="guided-setup-mx-note"></p>
+            </div>
+          </div>
+
+          <div class="guided-step">
+            <p class="guided-step-title">__MSG_guided_setup_step_check__</p>
+            <ul id="guided-setup-check" class="guided-setup-check"></ul>
+          </div>
+
+          <div class="guided-step">
+            <p class="guided-step-title">__MSG_guided_setup_step_confirm__</p>
+            <label class="guided-setup-confirm-label">
+              <input type="checkbox" id="guided-setup-confirm">
+              <span id="guided-setup-confirm-text"></span>
+            </label>
+            <div class="guided-setup-actions">
+              <button type="button" id="guided-setup-confirm-btn">__MSG_guided_setup_confirm_btn__</button>
+              <button type="button" id="guided-setup-close-btn">__MSG_guided_setup_close_btn__</button>
+            </div>
+            <p class="guided-setup-error" id="guided-setup-error" hidden></p>
+            <p class="guided-setup-success" id="guided-setup-success" hidden></p>
+          </div>
+        </div>
       </section>
 
       <section id="trusted-domains">
         <h2>__MSG_section_trusted_servers__</h2>
-        <p>
-          Your incoming mail server stamps each message with an
-          <code>Authentication-Results</code> header that identifies itself by a
-          server name (the <em>authserv-id</em>). Add that name here so this
-          add-on knows which authentication results to use for scoring. Results
-          from servers not on this list are ignored.
-        </p>
+        <p>__MSG_trusted_servers_intro__</p>
         <p id="no-trusted-msg">__MSG_no_trusted_msg__</p>
         <ul id="trusted-domain-list"></ul>
         <details id="setup-assistant" class="setup-assistant">
           <summary>__MSG_setup_hints_summary__</summary>
-          <p class="setup-assistant-desc">
-            These are suggested server names derived from your account email
-            domains. They are <strong>hints only</strong>, not trusted entries.
-            Click <strong>Use</strong> to copy a suggestion to the form below,
-            verify it matches your provider's actual server name, then click
-            <strong>Add</strong>.
-          </p>
-          <p class="setup-assistant-guidance">
-            To confirm the correct server name, check your mail provider's
-            documentation or inspect a recent message's
-            <code>Authentication-Results</code> header.
-          </p>
+          <p class="setup-assistant-desc">__MSG_setup_assistant_desc__</p>
+          <p class="setup-assistant-guidance">__MSG_setup_assistant_guidance__</p>
           <div class="setup-dns-settings">
             <label>
               <input type="checkbox" id="setup-hint-dns-enabled">
               __MSG_setup_use_dns__
             </label>
-            <p class="setup-dns-note">
-              MX lookup sends account email domains to the configured DNS resolver.
-              DNS lookup is used only to generate setup hints.
-              Trusted entries are not added automatically — you must explicitly add them.
-            </p>
+            <p class="setup-dns-note">__MSG_setup_dns_note__</p>
             <div id="setup-dns-resolver-row" class="setup-dns-resolver-row">
               <label>
-                DNS resolver:
+                __MSG_setup_dns_resolver_label__
                 <select id="setup-hint-dns-resolver">
                   <option value="8.8.8.8">8.8.8.8 (Google Public DNS)</option>
                   <option value="8.8.4.4">8.8.4.4 (Google Public DNS)</option>
@@ -80,14 +111,14 @@
 
         <form id="add-trusted-form" class="add-trusted-form">
           <div class="add-trusted-row">
-            <input type="text" id="add-trusted-value" placeholder="e.g. mail.example.com" autocomplete="off" spellcheck="false">
+            <input type="text" id="add-trusted-value" placeholder="__MSG_add_trusted_placeholder__" autocomplete="off" spellcheck="false">
             <select id="add-trusted-matchtype">
-              <option value="exact">Exact host</option>
-              <option value="domain">Registrable domain</option>
+              <option value="exact">__MSG_match_type_exact_host__</option>
+              <option value="domain">__MSG_match_type_registrable_domain__</option>
             </select>
             <button type="submit">__MSG_btn_add__</button>
           </div>
-          <p class="add-trusted-hint" id="add-trusted-hint">Trusts only this specific host. Subdomains are not trusted.</p>
+          <p class="add-trusted-hint" id="add-trusted-hint">__MSG_add_trusted_hint_exact__</p>
           <p class="add-trusted-error" id="add-trusted-error" hidden></p>
         </form>
       </section>
@@ -118,11 +149,11 @@
         <p class="setting-note" id="notify-caveat">__MSG_setting_notify_caveat__</p>
         <div id="notification-options">
           <label>
-            Notify only if score is at or below:
+            __MSG_setting_notification_max_score__
             <input type="number" id="notification-max-score" min="0" max="99" step="1">
           </label>
           <label>
-            Minimum interval between notifications (ms):
+            __MSG_setting_notification_min_interval__
             <input type="number" id="notification-min-interval" min="0" max="60000" step="500">
           </label>
         </div>
@@ -142,25 +173,19 @@
 
       <section id="score-settings">
         <h2>__MSG_section_score_settings__</h2>
-        <p class="score-note">
-          Score thresholds are fixed: 0–49 normal, 50–99 review, 100+ high risk.
-          The inputs below control how much each signal adds to or subtracts from
-          a message's total score. Authentication scoring (Layer 1) only uses
-          results from the trusted server names you configure in the Basic tab;
-          results from unrecognised servers are ignored.
-        </p>
+        <p class="score-note">__MSG_score_settings_note__</p>
 
         <details class="score-section" open>
-          <summary class="score-section-summary">Email authentication results (Layer 1)</summary>
-          <p class="score-section-desc">DMARC, SPF, and DKIM result scores. Only results from your trusted authentication servers (Basic tab) are used.</p>
+          <summary class="score-section-summary">__MSG_score_layer1_summary__</summary>
+          <p class="score-section-desc">__MSG_score_layer1_desc__</p>
           <div id="auth-score-inputs">
             <!-- Auth method score inputs rendered by options.js -->
           </div>
         </details>
 
         <details class="score-section">
-          <summary class="score-section-summary">Sender identity alignment (Layer 2)</summary>
-          <p class="score-section-desc">Scores for mismatches between the visible From address and the authenticated identity. These are evidence signals; their combined default (25) stays well below the Review threshold (50).</p>
+          <summary class="score-section-summary">__MSG_score_layer2_summary__</summary>
+          <p class="score-section-desc">__MSG_score_layer2_desc__</p>
           <div id="layer2-score-inputs">
             <!-- Layer 2 identity alignment score inputs rendered by options.js -->
           </div>
@@ -168,18 +193,18 @@
         </details>
 
         <details class="score-section">
-          <summary class="score-section-summary">Address pattern heuristics (Layer 3)</summary>
-          <p class="score-section-desc">Weak signals based on whether the From address looks machine-generated. These are evidence for Layer 4 rules. <strong>Keep these values low</strong> — the cap limits total Layer 3 contribution so it cannot push a message into Review on its own.</p>
+          <summary class="score-section-summary">__MSG_score_layer3_summary__</summary>
+          <p class="score-section-desc">__MSG_score_layer3_desc__</p>
           <div id="heuristic-score-inputs">
             <!-- Layer 3 heuristic score inputs rendered by options.js -->
           </div>
-          <p id="layer3-cap-warning" class="score-warn" hidden>Warning: the Layer 3 cap is at or above the Review threshold (50). Layer 3 heuristics alone could push a message into Review — this is outside the intended low-pass design.</p>
+          <p id="layer3-cap-warning" class="score-warn" hidden>__MSG_score_layer3_cap_warning__</p>
           <button type="button" id="reset-layer3-scores" class="reset-section-btn">__MSG_btn_reset_layer3__</button>
         </details>
 
         <details class="score-section">
-          <summary class="score-section-summary">Combined signal rules (Layer 4)</summary>
-          <p class="score-section-desc">Rules that fire only when multiple independent signals converge. These are the primary Review/Junk drivers. Mitigation rules (negative scores) reduce false positives for known-good delivery patterns.</p>
+          <summary class="score-section-summary">__MSG_score_layer4_summary__</summary>
+          <p class="score-section-desc">__MSG_score_layer4_desc__</p>
           <div id="composite-score-inputs">
             <!-- Layer 4 composite rule score inputs rendered by options.js -->
           </div>
@@ -191,36 +216,31 @@
 
       <section id="sender-rules">
         <h2>__MSG_section_sender_rules__</h2>
-        <p>Add score adjustments for specific sender domains. Positive values increase suspicion; negative values reduce it.</p>
+        <p>__MSG_sender_rules_desc__</p>
         <table>
-          <thead><tr><th>Domain</th><th>Match</th><th>Score</th><th></th></tr></thead>
+          <thead><tr><th>__MSG_col_domain__</th><th>__MSG_col_match__</th><th>__MSG_score_col_score__</th><th></th></tr></thead>
           <tbody id="sender-rule-body"></tbody>
         </table>
       </section>
 
       <section id="manual-whitelist">
         <h2>__MSG_section_manual_whitelist__</h2>
-        <p>
-          Whitelist entries reduce this add-on's spam score for matching senders.
-          They do <strong>not</strong> authenticate the message or prove it is
-          genuine — they lower the score to reduce false positives for senders
-          you recognise.
-        </p>
+        <p>__MSG_whitelist_desc__</p>
         <div class="whitelist-mitigation-row">
           <label>
-            Score reduction when a sender matches:
+            __MSG_whitelist_mitigation_label__
             <input type="number" id="whitelist-mitigation-score" min="-100" max="0" step="1" value="-50">
           </label>
-          <p class="score-note">Range: 0 to −100. Default: −50. Use −100 to keep whitelisted senders below the Review threshold.</p>
+          <p class="score-note">__MSG_whitelist_mitigation_note__</p>
         </div>
         <p id="no-whitelist-msg">__MSG_whitelist_none__</p>
         <table id="whitelist-table">
-          <thead><tr><th>Address</th><th>Match</th><th></th></tr></thead>
+          <thead><tr><th>__MSG_col_address__</th><th>__MSG_col_match__</th><th></th></tr></thead>
           <tbody id="whitelist-body"></tbody>
         </table>
         <form id="add-whitelist-form" class="add-whitelist-form">
           <div class="add-whitelist-row">
-            <input type="text" id="add-whitelist-address" placeholder="e.g. user@example.com" autocomplete="off" spellcheck="false">
+            <input type="text" id="add-whitelist-address" placeholder="__MSG_whitelist_email_placeholder__" autocomplete="off" spellcheck="false">
             <button type="submit">__MSG_btn_add__</button>
           </div>
           <p class="add-whitelist-error" id="add-whitelist-error" hidden></p>
@@ -229,36 +249,26 @@
 
       <section id="address-book-whitelist">
         <h2>__MSG_section_address_book_whitelist__</h2>
-        <p>
-          When enabled, senders found in your Thunderbird address books receive a
-          score reduction. This does <strong>not</strong> authenticate the message
-          — it lowers the score to reduce false positives for known contacts.
-        </p>
+        <p>__MSG_address_book_desc__</p>
         <label>
           <input type="checkbox" id="address-book-whitelist-enabled">
           __MSG_setting_enable_address_book__
         </label>
-        <p class="score-note" id="address-book-permission-note" hidden>
-          Enabling this feature will request access to your Thunderbird address books.
-        </p>
+        <p class="score-note" id="address-book-permission-note" hidden>__MSG_whitelist_ab_permission_note__</p>
         <div id="address-book-whitelist-options">
           <div class="whitelist-mitigation-row">
             <label>
-              Score reduction when sender is in your address books:
+              __MSG_address_book_mitigation_label__
               <input type="number" id="address-book-mitigation-score" min="-100" max="0" step="1" value="-50">
             </label>
-            <p class="score-note">Range: 0 to −100. Default: −50.</p>
+            <p class="score-note">__MSG_address_book_mitigation_note__</p>
           </div>
         </div>
       </section>
 
       <section id="diagnostics-access">
         <h2>__MSG_section_diagnostics__</h2>
-        <p class="score-note">
-          Diagnostics mode shows a detailed decision log with raw scores, score
-          reasons, heuristic metrics, and export tools. This is intended for
-          troubleshooting and tuning — not needed for day-to-day use.
-        </p>
+        <p class="score-note">__MSG_diagnostics_desc__</p>
         <label>
           <input type="checkbox" id="diagnostics-mode-enabled">
           __MSG_setting_enable_diagnostics__
@@ -362,12 +372,12 @@ baseScore, verdict</pre>
 
       <section id="decision-log">
         <h2>__MSG_section_decision_log__</h2>
-        <p>A local record of how each recently received message was scored and what action was taken. All data stays on your device.</p>
+        <p>__MSG_decision_log_desc__</p>
         <p id="log-count" class="log-count"></p>
         <button id="clear-log" type="button">__MSG_btn_clear_log__</button>
         <button id="export-log" type="button">__MSG_btn_export_logs__</button>
         <table>
-          <thead><tr><th>Time</th><th>From domain</th><th>Original</th><th>Current</th><th>Action</th></tr></thead>
+          <thead><tr><th>__MSG_log_col_time__</th><th>__MSG_log_col_from_domain__</th><th>__MSG_log_col_original__</th><th>__MSG_log_col_current__</th><th>__MSG_log_col_action__</th></tr></thead>
           <tbody id="log-body"></tbody>
         </table>
       </section>

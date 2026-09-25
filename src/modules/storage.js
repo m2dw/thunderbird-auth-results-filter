@@ -1,4 +1,5 @@
 import { migrateScoreDefaults, SCORE_DEFAULTS_VERSION } from './scoreDefaultsMigration.js';
+import { sanitizeAccountSetup } from './accountSetup.js';
 import {
   MAX_CUSTOM_FORMULAS,
   MAX_FORMULA_EXPRESSION_LENGTH,
@@ -8,7 +9,7 @@ import {
 
 export { SCORE_DEFAULTS_VERSION };
 
-const STORAGE_KEY = 'authResultsFilter';
+export const STORAGE_KEY = 'authResultsFilter';
 
 /**
  * Clamp the custom formulas array to the documented limits so that storage
@@ -69,6 +70,9 @@ export const DEFAULTS = {
       dnsResolver: '8.8.8.8',
       dnsTimeoutMs: 5000,
     },
+    // Guided-setup confirmations: { [accountId]: { host, confirmedAt } }.
+    // Bounded by sanitizeAccountSetup. Never populated from received headers.
+    accountSetup: {},
     scoreDefaultsVersion: SCORE_DEFAULTS_VERSION,
     authScores: {
       dmarc: { pass: 0, fail: 15, none: 35, policy: 0 },
@@ -113,6 +117,7 @@ export async function getStorage() {
       layer2Scores: { ...DEFAULTS.settings.layer2Scores, ...(storedSettings.layer2Scores ?? {}) },
       compositeScores: { ...DEFAULTS.settings.compositeScores, ...(storedSettings.compositeScores ?? {}) },
       setupHints: { ...DEFAULTS.settings.setupHints, ...(storedSettings.setupHints ?? {}) },
+      accountSetup: sanitizeAccountSetup(storedSettings.accountSetup),
     },
   };
   // Migrate score defaults if stored values match a known old profile.
@@ -132,6 +137,12 @@ export async function saveStorage(data) {
     ...data,
     customFormulas: sanitizeFormulas(data.customFormulas ?? []),
   };
+  if (data.settings && typeof data.settings === 'object') {
+    sanitized.settings = {
+      ...data.settings,
+      accountSetup: sanitizeAccountSetup(data.settings.accountSetup),
+    };
+  }
   await browser.storage.local.set({ [STORAGE_KEY]: sanitized });
 }
 

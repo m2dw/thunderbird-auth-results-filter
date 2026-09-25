@@ -43,7 +43,7 @@ Check items off as they are confirmed ready. Link issues where further work is t
 - [ ] PRIVACY.md is accurate and covers all stored data fields and the two opt-in external-service cases (DNS, address book).
 - [ ] Permission rationale documented: explain why each permission in `manifest.json` is required, either in README or a dedicated docs file.
 - [ ] Known limitations documented (e.g. registrable-domain trust not yet enabled by default, scoring tuned from limited real-world data, ARC/forwarding guard absent).
-- [ ] Screenshots prepared: Options setup screen, popup scoring details, review folder in Thunderbird.
+- [ ] Four real screenshots prepared for README: popup verdict, review-folder quick actions, trusted-server setup, and notification settings. Review the first image's remaining spam text against the privacy checklist before public/store publication. See `docs/store-listing.md#screenshot-checklist` and `assets/screenshots/README.md`.
 - [ ] Store description written (summary, what it does, what it does not do).
 
 ## Packaging

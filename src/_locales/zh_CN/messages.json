@@ -1,0 +1,868 @@
+{
+  "tab_basic":                { "message": "基本",           "description": "Basic settings tab label" },
+  "tab_advanced":             { "message": "高级",           "description": "Advanced settings tab label" },
+  "tab_custom_formulas":      { "message": "自定义公式",     "description": "Custom Formulas tab label" },
+  "tab_diagnostics":          { "message": "诊断",           "description": "Diagnostics tab label" },
+
+  "page_title": { "message": "Auth Results Filter", "description": "Options page heading" },
+  "manifest_description": {
+    "message": "根据 Authentication-Results 邮件头筛选收到的邮件。",
+    "description": "Add-on description shown by Thunderbird"
+  },
+
+  "section_protection_status":      { "message": "保护状态",             "description": "Section heading" },
+  "section_trusted_servers":        { "message": "受信任的认证服务器",   "description": "Section heading" },
+  "section_suggested_servers":      { "message": "建议的服务器",         "description": "Section heading" },
+  "section_mail_handling":          { "message": "邮件处理",             "description": "Section heading" },
+  "section_recent_activity":        { "message": "最近活动",             "description": "Section heading" },
+  "section_score_settings":         { "message": "评分设置",             "description": "Section heading" },
+  "section_sender_rules":           { "message": "发件人域名规则",       "description": "Section heading" },
+  "section_manual_whitelist":       { "message": "手动白名单",           "description": "Section heading" },
+  "section_address_book_whitelist": { "message": "通讯录白名单",         "description": "Section heading" },
+  "section_diagnostics":            { "message": "诊断",                 "description": "Section heading (Advanced tab)" },
+  "section_decision_log":           { "message": "判定日志",             "description": "Section heading" },
+
+  "status_no_trusted_servers": {
+    "message": "尚未配置受信任的认证服务器。在您确认受信任的服务器之前，DMARC、SPF 和 DKIM 评分处于停用状态。",
+    "description": "Warning shown in Basic tab when no trusted servers are set up and account status is unavailable"
+  },
+  "firstrun_callout": {
+    "message": "首要设置步骤：告诉本扩展您的邮件服务商使用哪台服务器检查收到的邮件。在您确认之前，发件人认证检查（DMARC/SPF/DKIM）不会用于评分。请使用下方的引导设置——它会根据您的账户推荐名称，但在您确认之前，任何名称都不会被信任。",
+    "description": "First-run callout shown when no trusted servers are configured, explaining what to do next"
+  },
+  "status_accounts_unavailable": {
+    "message": "已配置 $count$ 台受信任的服务器。由于无法加载账户信息，暂时无法显示各账户的状态。",
+    "description": "Shown when accounts cannot be listed but trusted servers exist",
+    "placeholders": {
+      "count":  { "content": "$1", "example": "2" },
+      "plural": { "content": "$2", "example": "s" }
+    }
+  },
+  "status_overall_all_active": {
+    "message": "全部 $total$ 个账户的认证评分均已启用。",
+    "description": "Overall status when every account has active authentication scoring",
+    "placeholders": {
+      "total":  { "content": "$1", "example": "2" },
+      "plural": { "content": "$2", "example": "s" }
+    }
+  },
+  "status_overall_partial": {
+    "message": "$total$ 个账户中有 $inactive$ 个的认证评分未启用。在设置完成之前，保护仅部分生效。",
+    "description": "Overall status when one or more accounts do not have active authentication scoring",
+    "placeholders": {
+      "inactive": { "content": "$1", "example": "1" },
+      "total":    { "content": "$2", "example": "2" },
+      "plural":   { "content": "$3", "example": "s" }
+    }
+  },
+  "status_state_active":             { "message": "认证评分已启用",                     "description": "Per-account protection state label" },
+  "status_state_not_configured":     { "message": "未配置受信任的认证服务器",           "description": "Per-account protection state label" },
+  "status_state_awaiting_mail":      { "message": "已配置——等待新邮件以进行验证",       "description": "Per-account protection state label" },
+  "status_state_needs_confirmation": { "message": "设置需要确认",                       "description": "Per-account protection state label" },
+  "status_state_no_usable_ar":       { "message": "服务商似乎未提供可用的认证结果",     "description": "Per-account protection state label" },
+  "status_state_active_detail": {
+    "message": "此账户的近期邮件已由您信任的服务器检查，因此 DMARC、SPF 和 DKIM 结果会用于评分。",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_not_configured_detail": {
+    "message": "此账户尚未使用发件人认证检查（DMARC、SPF、DKIM）。在您确认服务商的服务器之前，只会对较弱的信号进行评分。",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_awaiting_mail_detail": {
+    "message": "已配置受信任的服务器，但此账户的近期邮件尚未经其检查。此账户的认证评分尚未得到验证。",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_needs_confirmation_detail": {
+    "message": "此账户的近期邮件带有来自您尚未确认的服务器的认证结果。在您确认服务商的服务器之前，这些结果会被忽略。",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_mismatch_detail": {
+    "message": "已配置受信任的服务器，但此账户的近期邮件是由另一台服务器检查的。此账户的认证评分未能生效——请检查设置。",
+    "description": "Per-account explanation when trusted servers exist but do not match this account's mail"
+  },
+  "status_state_no_usable_ar_detail": {
+    "message": "此账户最近的 $count$ 封邮件都没有 Authentication-Results 邮件头，因此认证评分无法对其生效。其他信号仍会参与评分。",
+    "description": "Per-account protection state explanation",
+    "placeholders": { "count": { "content": "$1", "example": "5" } }
+  },
+  "status_confirmed_host": {
+    "message": "已确认的服务器：$host$",
+    "description": "Per-account line showing the server confirmed in guided setup",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "status_mail_counts": {
+    "message": "最近 $total$ 封邮件：$trusted$ 封由受信任的服务器检查，$untrusted$ 封由未确认的服务器检查，$none$ 封没有认证结果。",
+    "description": "Per-account recent mail summary",
+    "placeholders": {
+      "total":     { "content": "$1", "example": "20" },
+      "trusted":   { "content": "$2", "example": "18" },
+      "untrusted": { "content": "$3", "example": "1" },
+      "none":      { "content": "$4", "example": "1" }
+    }
+  },
+  "status_mail_unrecorded": {
+    "message": "有 $count$ 封邮件列出的检查服务器多于记录上限，因此不计入任何一类。",
+    "description": "Per-account note for log entries whose authserv-id list was truncated",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "btn_setup_start":       { "message": "设置",           "description": "Per-account button opening the guided setup" },
+  "btn_setup_change":       { "message": "查看 / 更改",   "description": "Per-account button reopening the guided setup" },
+  "btn_start_guided_setup": { "message": "开始引导设置",  "description": "Button opening the guided setup" },
+
+  "authserv_explainer_summary": { "message": "什么是受信任的认证服务器？", "description": "Summary of the authserv-id explainer" },
+  "authserv_explainer_body": {
+    "message": "邮件到达时，您的邮件服务商会检查发件人是否真实（SPF、DKIM、DMARC），并把判定结果写入一个隐藏的邮件头。每条判定结果都标有做出判定的服务器名称。由于任何人（包括垃圾邮件发送者）都能写入这样的邮件头，本扩展只使用标有您已确认的服务器名称的判定结果。任何内容都不会被自动信任。",
+    "description": "Plain-language explanation of authserv-id"
+  },
+  "authserv_explainer_advanced": {
+    "message": "技术细节：该邮件头为 Authentication-Results（RFC 8601），服务器名称即其中的 authserv-id。下方的受信任列表保存的是 authserv-id 值。",
+    "description": "Raw technical terms for advanced users"
+  },
+
+  "guided_setup_title":            { "message": "引导设置：受信任的认证服务器",   "description": "Guided setup heading" },
+  "guided_setup_step_account":     { "message": "1. 选择要设置的账户",            "description": "Guided setup step" },
+  "guided_setup_step_server":      { "message": "2. 选择服务商的检查服务器",      "description": "Guided setup step" },
+  "guided_setup_step_server_desc": {
+    "message": "建议来自此账户的邮箱域名（如果您使用 DNS 选项，也来自 DNS MX 记录）。它们仅是推测——在您于下方确认之前，任何建议都不会被信任。服务商的帮助页面通常会列出正确的名称。",
+    "description": "Guided setup step description"
+  },
+  "guided_setup_other":            { "message": "其他：",                         "description": "Label for typed server name" },
+  "guided_setup_other_placeholder": { "message": "例如 mx.example.com",           "description": "Placeholder for the typed server name input" },
+  "guided_setup_mx_btn":           { "message": "查询 MX 提示（DNS）",            "description": "Button that runs an opt-in MX lookup" },
+  "guided_setup_mx_disabled": {
+    "message": "基于 DNS 的提示已关闭。您可以在下方的“根据账户域名生成设置提示”中开启；开启后，账户的邮箱域名会被发送到公共 DNS 解析服务器。",
+    "description": "Shown when opt-in DNS lookup is disabled"
+  },
+  "guided_setup_mx_hint": {
+    "message": "点击该按钮会将 $domains$ 发送到 DNS 解析服务器 $resolver$。",
+    "description": "Privacy note before MX lookup",
+    "placeholders": {
+      "domains":  { "content": "$1", "example": "example.com" },
+      "resolver": { "content": "$2", "example": "8.8.8.8" }
+    }
+  },
+  "guided_setup_mx_running":       { "message": "正在查询 MX 记录…",              "description": "Shown while the MX lookup runs" },
+  "guided_setup_step_check":       { "message": "3. 配置检查",                    "description": "Guided setup step" },
+  "guided_setup_step_confirm":     { "message": "4. 确认",                        "description": "Guided setup step" },
+  "guided_setup_confirm_label": {
+    "message": "我已核实 $host$ 是我的邮件服务商用来检查收到邮件的服务器名称，并且我希望信任其结果。",
+    "description": "Explicit confirmation checkbox label",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_setup_confirm_label_empty": { "message": "请先选择或输入服务器名称。", "description": "Confirmation label when no host is selected" },
+  "guided_setup_confirm_btn":      { "message": "确认并信任",                     "description": "Guided setup confirm button" },
+  "guided_setup_close_btn":        { "message": "关闭",                           "description": "Guided setup close button" },
+  "guided_setup_success": {
+    "message": "已保存。$host$ 现已受信任。上方的状态会随新邮件到达而更新；您可以随时重新打开此设置。",
+    "description": "Shown after a successful confirmation",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_setup_error_confirmation_required": { "message": "请勾选确认框以信任此服务器。", "description": "Guided setup error" },
+  "guided_setup_error_missing_account":       { "message": "请选择一个账户。",             "description": "Guided setup error" },
+  "guided_setup_error_missing_host":          { "message": "请选择或输入服务器名称。",     "description": "Guided setup error" },
+  "guided_setup_error_invalid_host":          { "message": "服务器名称无效：只能使用字母、数字、连字符和点。", "description": "Guided setup error" },
+
+  "guided_check_account_domains": {
+    "message": "账户邮箱域名：$domains$",
+    "description": "Configuration check item",
+    "placeholders": { "domains": { "content": "$1", "example": "example.com" } }
+  },
+  "guided_check_account_domains_none": { "message": "此账户没有电子邮件地址，因此无法提供建议。", "description": "Configuration check item" },
+  "guided_check_mail_none_yet":        { "message": "此账户尚无已评估的邮件。新邮件到达时将验证状态。", "description": "Configuration check item" },
+  "guided_check_mail_summary": {
+    "message": "最近 $total$ 封邮件：$trusted$ 封由受信任的服务器检查，$untrusted$ 封由未确认的服务器检查，$none$ 封没有认证结果。",
+    "description": "Configuration check item",
+    "placeholders": {
+      "total":     { "content": "$1", "example": "20" },
+      "trusted":   { "content": "$2", "example": "0" },
+      "untrusted": { "content": "$3", "example": "19" },
+      "none":      { "content": "$4", "example": "1" }
+    }
+  },
+  "guided_check_mail_unrecorded": {
+    "message": "有 $count$ 封近期邮件列出的检查服务器多于记录上限，因此不计入任何一类。",
+    "description": "Configuration check item",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "guided_check_mail_no_ar": {
+    "message": "此账户的近期邮件没有认证结果。您的服务商可能不提供认证结果；在其提供之前，信任某台服务器不会产生任何效果。",
+    "description": "Configuration check item"
+  },
+  "guided_check_host_invalid": {
+    "message": "“$host$”不是有效的服务器名称。",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "bad host" } }
+  },
+  "guided_check_host_already_trusted": {
+    "message": "$host$ 已受信任。确认后会将其记录到此账户。",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_check_host_matches_mx": {
+    "message": "$host$ 是此账户域名的 MX（收信）服务器。",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_check_host_matches_hint": {
+    "message": "$host$ 与根据此账户域名推荐的名称一致。",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "guided_check_host_related_domain": {
+    "message": "该服务器名称与此账户属于同一域名（$domain$）。",
+    "description": "Configuration check item",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "guided_check_host_unrelated": {
+    "message": "$host$ 与此账户的域名或 MX 提示无关。对于托管邮件服务，这可能是正常的，但请向服务商再次确认。",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mx.other.example" } }
+  },
+  "guided_check_host_seen": {
+    "message": "此账户最近 $total$ 封邮件中有 $seen$ 封出现了该名称。邮件头可以被伪造，因此仅可将此作为交叉核对。",
+    "description": "Configuration check item",
+    "placeholders": {
+      "seen":  { "content": "$1", "example": "18" },
+      "total": { "content": "$2", "example": "20" }
+    }
+  },
+  "guided_check_host_not_seen": {
+    "message": "$host$ 未出现在此账户的近期邮件中。如果确认它，认证评分可能仍保持未启用。",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "guided_check_host_possibly_seen": {
+    "message": "$host$ 不在已记录的服务器名称中，但有 $count$ 封近期邮件列出的服务器多于记录上限，因此它可能出现在其中。",
+    "description": "Configuration check item",
+    "placeholders": {
+      "host":  { "content": "$1", "example": "mail.example.com" },
+      "count": { "content": "$2", "example": "2" }
+    }
+  },
+
+  "activity_no_messages":{ "message": "尚未评估任何邮件。", "description": "Empty state for Recent Activity section" },
+  "activity_counts": {
+    "message": "已评估 $total$ 封邮件——正常 $normal$ 封，待审查 $review$ 封，高风险 $highrisk$ 封。",
+    "description": "Summary counts in Recent Activity section",
+    "placeholders": {
+      "total":    { "content": "$1", "example": "42" },
+      "plural":   { "content": "$2", "example": "s" },
+      "normal":   { "content": "$3", "example": "38" },
+      "review":   { "content": "$4", "example": "3" },
+      "highrisk": { "content": "$5", "example": "1" }
+    }
+  },
+  "activity_most_recent": { "message": "最近：", "description": "Heading above last 5 entries in Recent Activity" },
+  "activity_unknown_domain": { "message": "（未知）", "description": "Recent Activity fallback when the From domain is unknown" },
+
+  "classification_normal":    { "message": "正常",   "description": "Classification label for scores 0-49" },
+  "classification_review":    { "message": "待审查", "description": "Classification label for scores 50-99" },
+  "classification_high_risk": { "message": "高风险", "description": "Classification label for scores 100+" },
+  "classification_unknown":   { "message": "未知",   "description": "Classification label when the log entry has no classification" },
+
+  "setup_hints_summary":         { "message": "根据账户域名生成设置提示",    "description": "Summary element for setup assistant <details>" },
+  "setup_use_dns":               { "message": "使用 DNS 查询获取 MX 设置提示", "description": "Checkbox label for DNS lookup option" },
+  "setup_dns_resolver_label":    { "message": "DNS 解析服务器：",            "description": "Label for DNS resolver select" },
+  "setup_no_accounts":           { "message": "未找到账户邮箱域名。",        "description": "Shown when no accounts are available in setup assistant" },
+  "setup_unable_load_accounts":  { "message": "无法加载账户信息。",          "description": "Error when account list cannot be fetched" },
+  "setup_no_mx_records":         { "message": "未找到 MX 记录。",            "description": "Shown when DNS MX lookup returns no records" },
+  "setup_assistant_desc": {
+    "message": "以下是根据您的账户邮箱域名推导出的建议服务器名称。它们仅是提示，并非受信任的条目。点击“使用”将建议复制到下方表单，核实它与服务商实际使用的服务器名称一致后，再点击“添加”。",
+    "description": "Description inside the setup hints <details>"
+  },
+  "setup_assistant_guidance": {
+    "message": "要确认正确的服务器名称，请查阅邮件服务商的文档，或查看近期邮件的 Authentication-Results 邮件头。",
+    "description": "Guidance inside the setup hints <details>"
+  },
+  "setup_dns_note": {
+    "message": "MX 查询会将账户邮箱域名发送到所配置的 DNS 解析服务器。DNS 查询仅用于生成设置提示。受信任的条目不会被自动添加——您必须手动明确添加。",
+    "description": "Privacy note below the DNS lookup checkbox"
+  },
+  "setup_source_heuristic":      { "message": "推测",                        "description": "Badge for a setup suggestion derived from the account domain" },
+  "setup_source_mx":             { "message": "MX",                          "description": "Badge for a setup suggestion derived from DNS MX records" },
+
+  "no_trusted_msg":       { "message": "尚未配置受信任的域名。",       "description": "Shown when trusted domain list is empty" },
+  "trust_exact_match_label": {
+    "message": "$host$（精确匹配）",
+    "description": "Label for an exact-host trusted entry",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "trust_domain_label": {
+    "message": "$domain$（含子域名）",
+    "description": "Label for a registrable-domain trusted entry",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "trust_promote_btn": {
+    "message": "信任域名（$domain$ 及其子域名）",
+    "description": "Button to promote an exact entry to domain trust",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "trust_promote_title": {
+    "message": "将 $domain$ 添加为可注册域名信任条目。这将信任 $domain$ 的所有子域名，而不仅是 $host$。",
+    "description": "Tooltip for the promote-to-domain-trust button",
+    "placeholders": {
+      "domain": { "content": "$1", "example": "example.com" },
+      "host":   { "content": "$2", "example": "mail.example.com" }
+    }
+  },
+  "trusted_servers_intro": {
+    "message": "您的收信服务器会在每封邮件上添加 Authentication-Results 邮件头，并用服务器名称（authserv-id）标识自身。请在此处添加该名称，以便本扩展知道哪些认证结果可用于评分。来自不在此列表中的服务器的结果会被忽略。",
+    "description": "Introductory paragraph of the Trusted Authentication Servers section"
+  },
+  "add_trusted_placeholder":       { "message": "例如 mail.example.com", "description": "Placeholder for the add-trusted-server input" },
+  "match_type_exact_host":         { "message": "精确主机",              "description": "Option label for exact-host trust" },
+  "match_type_registrable_domain": { "message": "可注册域名",            "description": "Option label for registrable-domain trust" },
+  "add_trusted_hint_exact": {
+    "message": "仅信任此特定主机，不信任其子域名。",
+    "description": "Hint below the add-trusted form for exact-host trust"
+  },
+  "add_trusted_hint_domain": {
+    "message": "信任此域名及其所有子域名。请谨慎使用——其范围比精确主机信任更广。",
+    "description": "Hint below the add-trusted form for registrable-domain trust"
+  },
+  "trusted_error_empty":         { "message": "值不能为空。",                                   "description": "Trusted entry validation error" },
+  "trusted_error_invalid_host":  { "message": "主机名无效：只能使用字母、数字、连字符和点。",   "description": "Trusted entry validation error" },
+  "trusted_error_public_suffix": { "message": "此值是公共后缀，不能用于域名信任。",             "description": "Trusted entry validation error" },
+  "trusted_error_not_registrable": {
+    "message": "进行可注册域名信任时，请输入可注册域名本身（例如 $registrable$，而不是 $value$）。",
+    "description": "Trusted entry validation error",
+    "placeholders": {
+      "registrable": { "content": "$1", "example": "example.com" },
+      "value":       { "content": "$2", "example": "mail.example.com" }
+    }
+  },
+  "trusted_error_duplicate":     { "message": "此条目已存在于受信任列表中。",                   "description": "Trusted entry validation error" },
+
+  "candidates_section_desc": {
+    "message": "设置助手识别出的、您尚未信任的认证服务器名称。它们未生效——请将正确的名称添加到上方的“受信任的认证服务器”以启用评分。",
+    "description": "Description paragraph for the Suggested Servers section"
+  },
+  "candidates_none": { "message": "尚未发现未受信任的候选项。", "description": "Empty state for Suggested Servers section" },
+  "candidate_trust_domain": {
+    "message": "信任 $domain$ 及其所有子域名",
+    "description": "Checkbox label for trusting a registrable domain and its subdomains",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "candidate_exact_match": {
+    "message": "$host$（精确匹配）",
+    "description": "Checkbox label for an exact-host candidate",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+
+  "review_folder_no_accounts":       { "message": "未找到账户。",       "description": "Shown when the account list is empty for review folder selection" },
+  "review_folder_unable_load":       { "message": "无法加载账户。",     "description": "Error when account list cannot be fetched for review folder selection" },
+  "review_folder_select_placeholder": { "message": "选择文件夹…",       "description": "Default option in review folder select dropdown" },
+
+  "setting_move_to_review":     { "message": "将可疑邮件移至待审查文件夹",                     "description": "Checkbox label for move-to-review setting" },
+  "setting_move_junk":          { "message": "将高风险邮件直接移至垃圾邮件文件夹",             "description": "Checkbox label for move-to-junk setting" },
+  "setting_notify":             { "message": "为通过评估的邮件发送通知（分数不高于阈值）",     "description": "Checkbox label for notify-after-assessment setting" },
+  "setting_notify_caveat":      { "message": "如果 Thunderbird 自带的新邮件通知也已开启，您可能会看到重复的通知。如果只想看到本扩展在筛选后发出的通知，请关闭 Thunderbird 的通知。", "description": "Explanatory note shown below the notify-after-assessment checkbox" },
+  "setting_enable_diagnostics": { "message": "启用“诊断”标签页",                               "description": "Checkbox label for diagnostics mode setting" },
+  "setting_enable_address_book":{ "message": "启用通讯录白名单减分",                           "description": "Checkbox label for address-book whitelist" },
+  "setting_notification_max_score":    { "message": "仅在分数不高于以下值时通知：", "description": "Label for the notification score limit input" },
+  "setting_notification_min_interval": { "message": "通知之间的最短间隔（毫秒）：",   "description": "Label for the notification interval input" },
+
+  "score_col_result":          { "message": "结果",   "description": "Column header in auth score table" },
+  "score_col_signal":          { "message": "信号",   "description": "Column header in Layer 2/3 score table" },
+  "score_col_rule":            { "message": "规则",   "description": "Column header in Layer 4 score table" },
+  "score_col_score":           { "message": "分数",   "description": "Column header in score tables" },
+  "score_col_default":         { "message": "默认值", "description": "Column header in score tables" },
+  "score_mitigation_badge":    { "message": "减分",   "description": "Badge shown on mitigation rules in score settings" },
+  "score_layer3_cap_warning": {
+    "message": "警告：第 3 层上限达到或超过了待审查阈值（50）。仅凭第 3 层启发式规则就可能把邮件归为待审查——这超出了其作为低权重信号的设计意图。",
+    "description": "Warning shown when Layer 3 cap is too high"
+  },
+  "score_settings_note": {
+    "message": "分数阈值固定为：0–49 正常，50–99 待审查，100 及以上高风险。下方的输入项控制每个信号为邮件总分增加或减少多少分。认证评分（第 1 层）只使用您在“基本”标签页中配置的受信任服务器名称所给出的结果；来自无法识别的服务器的结果会被忽略。",
+    "description": "Note at the top of the Score Settings section"
+  },
+  "score_layer1_summary": { "message": "电子邮件认证结果（第 1 层）", "description": "Score settings group heading" },
+  "score_layer1_desc": {
+    "message": "DMARC、SPF 和 DKIM 结果的分数。仅使用来自受信任认证服务器（“基本”标签页）的结果。",
+    "description": "Score settings group description"
+  },
+  "score_layer2_summary": { "message": "发件人身份一致性（第 2 层）", "description": "Score settings group heading" },
+  "score_layer2_desc": {
+    "message": "针对可见的 From 地址与已认证身份不一致的情况给出的分数。它们只是佐证信号；其默认合计值（25）远低于待审查阈值（50）。",
+    "description": "Score settings group description"
+  },
+  "score_layer3_summary": { "message": "地址模式启发式规则（第 3 层）", "description": "Score settings group heading" },
+  "score_layer3_desc": {
+    "message": "根据 From 地址是否看似机器生成而得出的弱信号，作为第 4 层规则的佐证。请保持较低的数值——上限会限制第 3 层的总贡献，使其无法单独将邮件归为待审查。",
+    "description": "Score settings group description"
+  },
+  "score_layer4_summary": { "message": "组合信号规则（第 4 层）", "description": "Score settings group heading" },
+  "score_layer4_desc": {
+    "message": "仅当多个相互独立的信号同时出现时才会触发的规则，是判定待审查/垃圾邮件的主要依据。减分规则（负分）可降低对已知正常投递模式的误判。",
+    "description": "Score settings group description"
+  },
+
+  "sender_rules_desc": {
+    "message": "为特定发件人域名添加分数调整。正值会提高可疑程度；负值会降低可疑程度。",
+    "description": "Description of the Sender Domain Rules section"
+  },
+  "col_domain":        { "message": "域名",     "description": "Table column header" },
+  "col_match":         { "message": "匹配方式", "description": "Table column header for the match type" },
+  "col_address":       { "message": "地址",     "description": "Table column header" },
+  "match_type_exact":  { "message": "精确",     "description": "Match type shown in rule and whitelist tables" },
+  "match_type_domain": { "message": "域名",     "description": "Match type shown in rule and whitelist tables" },
+
+  "btn_add":              { "message": "添加",                 "description": "Button label" },
+  "btn_remove":           { "message": "移除",                 "description": "Button label" },
+  "btn_use":              { "message": "使用",                 "description": "Use a setup suggestion" },
+  "btn_clear_log":        { "message": "清除日志",             "description": "Button to clear the decision log" },
+  "btn_export_logs":      { "message": "导出日志",             "description": "Button to export the decision log as JSON" },
+  "btn_exporting":        { "message": "正在导出…",            "description": "Button label while export is in progress" },
+  "btn_reset_all_scores": { "message": "将所有分数恢复默认值", "description": "Button to reset all score groups" },
+  "btn_reset_layer2":     { "message": "将第 2 层恢复默认值",  "description": "Button to reset Layer 2 scores" },
+  "btn_reset_layer3":     { "message": "将第 3 层恢复默认值",  "description": "Button to reset Layer 3 scores" },
+  "btn_reset_layer4":     { "message": "将第 4 层恢复默认值",  "description": "Button to reset Layer 4 scores" },
+  "btn_move_to_inbox":    { "message": "移至收件箱",           "description": "Review action button in popup" },
+  "btn_whitelist_sender": { "message": "将发件人加入白名单",   "description": "Review action button in popup" },
+  "btn_already_whitelisted": { "message": "已在白名单中",      "description": "Disabled state of whitelist button when sender is already listed" },
+  "btn_open_options":     { "message": "打开选项 / 日志",      "description": "Button in popup to open the options page" },
+  "btn_confirm":          { "message": "确认",                 "description": "Confirmation button" },
+  "btn_cancel":           { "message": "取消",                 "description": "Cancel button" },
+  "btn_show_older": {
+    "message": "显示更早的 $count$ 条记录",
+    "description": "Button to load older log entries",
+    "placeholders": { "count": { "content": "$1", "example": "50" } }
+  },
+
+  "whitelist_none":          { "message": "尚未配置白名单条目。",                           "description": "Empty state for Manual Whitelist section" },
+  "whitelist_email_invalid": { "message": "请输入有效的电子邮件地址（例如 user@example.com）。", "description": "Validation error for whitelist add form" },
+  "whitelist_already_exists":{ "message": "此地址已在白名单中。",                           "description": "Error when address is already whitelisted" },
+  "whitelist_full": {
+    "message": "白名单已满（最多 $max$ 条）。请先移除一个条目再添加新条目。",
+    "description": "Error when whitelist is at capacity",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
+  "whitelist_ab_permission_note": {
+    "message": "启用此功能将请求访问您的 Thunderbird 通讯录。",
+    "description": "Note shown when address book whitelist is about to be enabled"
+  },
+  "whitelist_desc": {
+    "message": "白名单条目会降低本扩展对匹配发件人给出的垃圾邮件分数。它们不会认证邮件，也不能证明邮件是真实的——只是降低分数，以减少对您认识的发件人的误判。",
+    "description": "Description of the Manual Whitelist section"
+  },
+  "whitelist_mitigation_label": { "message": "发件人匹配时减去的分数：", "description": "Label for the manual whitelist score input" },
+  "whitelist_mitigation_note": {
+    "message": "范围：0 至 −100。默认值：−50。使用 −100 可使白名单发件人保持在待审查阈值以下。",
+    "description": "Note below the manual whitelist score input"
+  },
+  "whitelist_email_placeholder": { "message": "例如 user@example.com", "description": "Placeholder for the add-whitelist input" },
+  "address_book_desc": {
+    "message": "启用后，在您的 Thunderbird 通讯录中找到的发件人会获得减分。这不会认证邮件——只是降低分数，以减少对已知联系人的误判。",
+    "description": "Description of the Address Book Whitelist section"
+  },
+  "address_book_mitigation_label": { "message": "发件人在通讯录中时减去的分数：", "description": "Label for the address book score input" },
+  "address_book_mitigation_note":  { "message": "范围：0 至 −100。默认值：−50。", "description": "Note below the address book score input" },
+  "diagnostics_desc": {
+    "message": "诊断模式会显示详细的判定日志，包括原始分数、评分原因、启发式指标和导出工具。它用于故障排查和调优——日常使用中并不需要。",
+    "description": "Description of the Diagnostics section in the Advanced tab"
+  },
+
+  "metrics_alignment_summary": { "message": "一致性指标", "description": "Summary element for alignment metrics <details>" },
+  "metrics_heuristic_summary": { "message": "启发式指标", "description": "Summary element for heuristic metrics <details>" },
+
+  "log_count_all": {
+    "message": "已存储记录：$total$ / 1000",
+    "description": "Decision log entry count (all visible)",
+    "placeholders": { "total": { "content": "$1", "example": "42" } }
+  },
+  "log_count_showing": {
+    "message": "已存储记录：$total$ / 1000——显示最近 $showing$ 条",
+    "description": "Decision log entry count when not all are shown",
+    "placeholders": {
+      "total":   { "content": "$1", "example": "1000" },
+      "showing": { "content": "$2", "example": "50" }
+    }
+  },
+  "log_no_reasons":       { "message": "没有可用的原因详情。", "description": "Shown for log entries without scoreReasons" },
+  "log_no_reasons_label": { "message": "无原因",               "description": "<summary> text when a log entry has zero reasons" },
+  "log_reasons_one": {
+    "message": "$count$ 个原因",
+    "description": "Singular reason count",
+    "placeholders": { "count": { "content": "$1", "example": "1" } }
+  },
+  "log_reasons_many": {
+    "message": "$count$ 个原因",
+    "description": "Plural reason count",
+    "placeholders": { "count": { "content": "$1", "example": "5" } }
+  },
+  "decision_log_desc": {
+    "message": "本地记录，显示每封近期收到的邮件如何评分以及采取了什么操作。所有数据都保留在您的设备上。",
+    "description": "Description of the Decision Log section"
+  },
+  "log_col_time":        { "message": "时间",     "description": "Decision log column header" },
+  "log_col_from_domain": { "message": "发件域名", "description": "Decision log column header" },
+  "log_col_original":    { "message": "原始",     "description": "Decision log column header: score when the message arrived" },
+  "log_col_current":     { "message": "当前",     "description": "Decision log column header: score recalculated with current settings" },
+  "log_col_action":      { "message": "操作",     "description": "Decision log column header" },
+
+  "popup_no_message": {
+    "message": "当前没有显示邮件。",
+    "description": "Shown in popup when no message is open"
+  },
+  "popup_status_inactive": {
+    "message": "此账户的认证评分未启用。",
+    "description": "Popup notice when the displayed message's account has no active authentication scoring"
+  },
+  "popup_btn_open_setup": { "message": "打开设置", "description": "Popup button opening the options page setup" },
+  "popup_loading":        { "message": "正在加载…", "description": "Popup placeholder while score details load" },
+  "popup_protective_factors": { "message": "降低分数的因素", "description": "Popup heading for factors that kept the score lower" },
+  "popup_fact_dkim_aligned":  { "message": "DKIM 签名与 From 域名一致", "description": "Popup protective factor" },
+  "popup_fact_no_trusted_auth": { "message": "未找到受信任的 Authentication-Results 邮件头", "description": "Popup protective factor" },
+  "popup_fact_below_review": {
+    "message": "分数（$score$）低于待审查阈值（$threshold$）",
+    "description": "Popup protective factor",
+    "placeholders": {
+      "score":     { "content": "$1", "example": "20" },
+      "threshold": { "content": "$2", "example": "50" }
+    }
+  },
+  "popup_fact_below_high_risk": {
+    "message": "分数（$score$）低于高风险阈值（$threshold$）",
+    "description": "Popup protective factor",
+    "placeholders": {
+      "score":     { "content": "$1", "example": "70" },
+      "threshold": { "content": "$2", "example": "100" }
+    }
+  },
+  "popup_identity_from":        { "message": "发件人",     "description": "Popup identity table label" },
+  "popup_identity_subject":     { "message": "主题",       "description": "Popup identity table label" },
+  "popup_identity_from_domain": { "message": "发件域名",   "description": "Popup identity table label" },
+  "popup_identity_message_id":  { "message": "Message-ID", "description": "Popup identity table label" },
+  "popup_no_entry": {
+    "message": "未找到此邮件的评分详情。本扩展会在邮件到达时进行评分；此邮件可能是在安装本扩展之前收到的，或者无法匹配其 Message-ID。",
+    "description": "Shown in popup when no log entry matches the displayed message"
+  },
+  "popup_score": {
+    "message": "分数：$score$",
+    "description": "Score badge in popup",
+    "placeholders": { "score": { "content": "$1", "example": "75" } }
+  },
+  "popup_score_details":  { "message": "评分详情",     "description": "<summary> label for score details collapsible" },
+  "popup_all_reasons":    { "message": "全部评分原因", "description": "Heading above full reason list in popup" },
+  "popup_inbox_not_found":{ "message": "未找到收件箱文件夹。",   "description": "Error when inbox cannot be found" },
+  "popup_moved_to_inbox": { "message": "已移至收件箱。",         "description": "Success message after moving to inbox" },
+  "popup_move_failed":    { "message": "移动失败。请重试。",     "description": "Error message when move fails" },
+  "popup_whitelist_confirm": {
+    "message": "将“$address$”添加到手动白名单？今后来自此地址的邮件将获得减分。",
+    "description": "Confirmation text before adding to whitelist",
+    "placeholders": { "address": { "content": "$1", "example": "user@example.com" } }
+  },
+  "popup_whitelist_added": {
+    "message": "已将“$address$”添加到手动白名单。",
+    "description": "Success message after whitelist add",
+    "placeholders": { "address": { "content": "$1", "example": "user@example.com" } }
+  },
+  "popup_whitelist_full": {
+    "message": "白名单已满（最多 $max$ 条）。请先移除一个条目再添加新条目。",
+    "description": "Error when whitelist is full in popup",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
+  "popup_whitelist_save_failed":     { "message": "保存白名单条目失败。请重试。", "description": "Generic whitelist save error" },
+  "popup_no_sender_address":         { "message": "无法确定发件人地址。",         "description": "Whitelist button tooltip when sender is unknown" },
+  "popup_already_whitelisted_title": { "message": "此发件人已在手动白名单中。",   "description": "Whitelist button tooltip when sender is already listed" },
+  "popup_error": {
+    "message": "加载评分详情时出错：$error$",
+    "description": "Error displayed when popup init throws",
+    "placeholders": { "error": { "content": "$1", "example": "NetworkError" } }
+  },
+
+  "action_classified_normal":   { "message": "保留在收件箱",               "description": "Action label for classified-normal" },
+  "action_classified_review":   { "message": "评为待审查（未执行操作）",   "description": "Action label for classified-review" },
+  "action_classified_high_risk":{ "message": "评为高风险（未执行操作）",   "description": "Action label for classified-high-risk" },
+  "action_moved_review":        { "message": "已移至待审查文件夹",         "description": "Action label for moved-review" },
+  "action_moved_junk":          { "message": "已移至垃圾邮件",             "description": "Action label for moved-junk" },
+  "action_moved_junk_mark_failed": { "message": "已移至垃圾邮件（标记为垃圾邮件失败）", "description": "Action label for moved-junk-mark-failed: the message was moved to Junk but setting the junk flag failed" },
+  "action_move_review_failed":  { "message": "移至待审查文件夹失败",       "description": "Action label for move-review-failed" },
+  "action_move_junk_failed":    { "message": "移至垃圾邮件失败",           "description": "Action label for move-junk-failed" },
+  "action_no_review_folder":    { "message": "未配置待审查文件夹",         "description": "Action label for no-review-folder-configured" },
+
+  "section_custom_formulas": { "message": "自定义评分公式（第 5 层）", "description": "Section heading for custom formula management (Custom Formulas tab)" },
+  "section_key_reference": { "message": "评分原因键参考", "description": "Section heading for the key reference table in the Custom Formulas tab" },
+  "key_reference_intro": {
+    "message": "可在公式表达式中传给 has() 和 scoreOf() 的键。点击插入按钮可将代码片段插入公式编辑器的光标处。将鼠标悬停在键上可查看简短说明。",
+    "description": "Introductory paragraph above the key reference table"
+  },
+  "key_reference_layer_auth":      { "message": "L1 认证（auth.*）",         "description": "Key reference group heading for Layer 1 authentication result keys" },
+  "key_reference_layer_identity":  { "message": "L2 身份（identity.*）",     "description": "Key reference group heading for Layer 2 identity alignment keys" },
+  "key_reference_layer_heuristic": { "message": "L3 启发式（heuristic.*）",  "description": "Key reference group heading for Layer 3 heuristic keys" },
+  "key_reference_layer_composite": { "message": "L4 组合（composite.*）",    "description": "Key reference group heading for Layer 4 composite rule keys" },
+  "key_reference_layer_l5":        { "message": "L5 / 白名单",               "description": "Key reference group heading for Layer 5 whitelist and sender rule keys" },
+  "key_reference_col_title":       { "message": "标题",                      "description": "Column header in the key reference table" },
+  "key_reference_col_key":         { "message": "键",                        "description": "Column header in the key reference table" },
+  "key_reference_col_default":     { "message": "默认值",                    "description": "Column header in the key reference table" },
+  "key_reference_btn_insert_has": {
+    "message": "has()",
+    "description": "Button to insert has(\"key\") snippet for a score reason key"
+  },
+  "key_reference_btn_insert_scoreof": {
+    "message": "scoreOf()",
+    "description": "Button to insert scoreOf(\"key\") snippet for a score reason key"
+  },
+  "custom_formula_intro": {
+    "message": "面向高级用户的进阶功能。自定义公式作为第 5 层，在 L1–L4 评分完成后进行计算，可以观察或调整邮件的最终分数。",
+    "description": "Introductory note above custom formula list"
+  },
+  "custom_formula_safety": {
+    "message": "公式仅在本地运行，绝不会发送到外部。使用 observe 模式可在不改变评分的情况下测试公式。add 模式会将限幅后的结果（−100 至 +100）加到邮件分数上。通过 match() 进行的正则匹配仅在 observe 模式下可用。单个公式中的错误会按邮件被捕获并忽略。",
+    "description": "Safety copy for custom formula section"
+  },
+  "custom_formula_none":       { "message": "尚未配置自定义公式。", "description": "Empty state for custom formula list" },
+  "custom_formula_add_title":  { "message": "添加公式",             "description": "Heading shown when adding a new formula" },
+  "custom_formula_edit_title": { "message": "编辑公式",             "description": "Heading shown when editing an existing formula" },
+  "custom_formula_field_id":   { "message": "ID",                   "description": "Label for formula ID input" },
+  "custom_formula_field_name": { "message": "名称",                 "description": "Label for formula name input" },
+  "custom_formula_field_expression": { "message": "表达式",         "description": "Label for formula expression textarea" },
+  "custom_formula_field_mode": { "message": "模式",                 "description": "Label for formula mode selector" },
+  "custom_formula_id_hint": {
+    "message": "在评分键（custom.formula.<id>）中使用的固定标识符。只能使用字母、数字、连字符和下划线。保存后无法更改。",
+    "description": "Hint text below formula ID input"
+  },
+  "custom_formula_mode_hint": {
+    "message": "observe：计算并记录，但不改变分数。add：将结果加到分数上。disabled：完全跳过该公式。",
+    "description": "Hint text below formula mode selector"
+  },
+  "custom_formula_count_all": {
+    "message": "公式：$count$ / 20",
+    "description": "Shows how many custom formulas are stored",
+    "placeholders": { "count": { "content": "$1", "example": "3" } }
+  },
+  "btn_add_formula":    { "message": "添加公式", "description": "Button to open the add-formula form" },
+  "btn_edit_formula":   { "message": "编辑",     "description": "Button to open the edit-formula form for a formula row" },
+  "btn_delete_formula": { "message": "删除",     "description": "Button to delete a formula" },
+  "btn_save_formula":   { "message": "保存",     "description": "Button to save the formula form" },
+  "custom_formula_error_id_required":         { "message": "ID 为必填项。",                                 "description": "Validation error for empty formula ID" },
+  "custom_formula_error_id_too_long": {
+    "message": "ID 过长（最多 $max$ 个字符）。",
+    "description": "Validation error when formula ID exceeds length limit",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
+  "custom_formula_error_id_invalid":          { "message": "ID 只能包含字母、数字、连字符和下划线。",       "description": "Validation error for invalid formula ID characters" },
+  "custom_formula_error_id_duplicate":        { "message": "已存在使用此 ID 的公式。",                      "description": "Validation error for duplicate formula ID" },
+  "custom_formula_error_name_too_long": {
+    "message": "名称过长（最多 $max$ 个字符）。",
+    "description": "Validation error when formula name exceeds length limit",
+    "placeholders": { "max": { "content": "$1", "example": "200" } }
+  },
+  "custom_formula_error_expression_required": { "message": "表达式为必填项。",                              "description": "Validation error for empty formula expression" },
+  "custom_formula_error_expression_too_long": {
+    "message": "表达式过长（最多 $max$ 个字符）。",
+    "description": "Validation error when expression exceeds length limit",
+    "placeholders": { "max": { "content": "$1", "example": "1000" } }
+  },
+  "custom_formula_error_parse": {
+    "message": "解析错误：$error$",
+    "description": "Validation error when formula expression fails to parse",
+    "placeholders": { "error": { "content": "$1", "example": "Unexpected token" } }
+  },
+  "custom_formula_error_invalid_mode":  { "message": "模式无效。",                "description": "Internal validation error for formula mode" },
+  "custom_formula_error_match_in_add_mode": { "message": "match() 仅在 observe 模式下可用。请切换到 observe 模式或移除 match() 调用。", "description": "Validation error when match() is used in add-mode formula" },
+  "custom_formula_diag_summary":        { "message": "L5 公式诊断",               "description": "Summary element for formula diagnostics <details> in log" },
+  "formula_diag_col_name":          { "message": "名称",               "description": "Formula diagnostics column header" },
+  "formula_diag_col_mode":          { "message": "模式",               "description": "Formula diagnostics column header" },
+  "formula_diag_col_value":         { "message": "值",                 "description": "Formula diagnostics column header" },
+  "formula_diag_col_applied":       { "message": "已应用",             "description": "Formula diagnostics column header" },
+  "formula_diag_col_would_score":   { "message": "将改变分数",         "description": "Formula diagnostics column header" },
+  "formula_diag_col_would_verdict": { "message": "将改变判定",         "description": "Formula diagnostics column header" },
+  "formula_diag_col_error":         { "message": "错误",               "description": "Formula diagnostics column header" },
+  "formula_last_result": {
+    "message": "上次结果：$value$",
+    "description": "Last diagnostic result shown under a formula",
+    "placeholders": { "value": { "content": "$1", "example": "30" } }
+  },
+  "formula_last_result_error": {
+    "message": "上次结果：错误——$error$",
+    "description": "Last diagnostic error shown under a formula",
+    "placeholders": { "error": { "content": "$1", "example": "ReferenceError" } }
+  },
+  "formula_last_result_applied": { "message": "已应用", "description": "Marker shown when the last formula result was applied to the score" },
+  "custom_formula_list_full": {
+    "message": "已达到公式数量上限（$max$）。请先移除一个公式再添加新公式。",
+    "description": "Error when the formula list is at capacity",
+    "placeholders": { "max": { "content": "$1", "example": "20" } }
+  },
+  "custom_formula_template_label":   { "message": "模板",               "description": "Label for the template picker row in the formula form" },
+  "custom_formula_template_choose":  { "message": "— 选择模板 —",       "description": "Default empty option in the template picker select" },
+  "btn_insert_template":             { "message": "插入",               "description": "Button to insert the selected template into the formula form" },
+  "custom_formula_tpl_boost_rule":   { "message": "规则触发时加分",     "description": "Template name: boost when an existing L4 rule fired" },
+  "custom_formula_tpl_deep_subdomain": { "message": "深层随机子域名",   "description": "Template name: deep random-looking subdomain experiment" },
+  "custom_formula_tpl_msgid_mismatch": { "message": "Message-ID 不一致", "description": "Template name: Message-ID mismatch experiment" },
+  "custom_formula_tpl_dkim_mitigate":  { "message": "DKIM 一致时减分",  "description": "Template name: mitigate when DKIM is aligned" },
+  "custom_formula_expr_placeholder": { "message": "has(\"composite.authAlignedRandomDomain\") ? 30 : 0", "description": "Placeholder shown in the expression textarea when empty" },
+  "custom_formula_help_summary":     { "message": "L5 公式参考",        "description": "Summary label for the collapsible formula help panel" },
+  "custom_formula_help_expression_only": {
+    "message": "公式是单个表达式——不是 JavaScript 程序。不支持 if、let、for 和 return 等语句。",
+    "description": "Help panel bullet: formulas are expressions not statements"
+  },
+  "custom_formula_help_ternary": {
+    "message": "使用三元表达式实现条件逻辑：condition ? 40 : 0",
+    "description": "Help panel bullet: use ternary for branching"
+  },
+  "custom_formula_help_readonly": {
+    "message": "上下文字段（from、auth、alignment、headers 等）是只读的，不能给它们赋值。",
+    "description": "Help panel bullet: context fields are read-only"
+  },
+  "custom_formula_help_returns":     { "message": "公式返回一个数字；非数字结果会被忽略。", "description": "Help panel bullet: formulas return a number" },
+  "custom_formula_help_observe":     { "message": "observe 模式会记录结果，但不改变邮件分数。在切换到 add 模式之前，可先用 observe 模式安全地测试公式。", "description": "Help panel bullet: observe mode" },
+  "custom_formula_help_add":         { "message": "add 模式会将限幅后的结果（−100 至 +100）加到邮件分数上。", "description": "Help panel bullet: add mode" },
+  "custom_formula_help_clamped":     { "message": "输出在应用前会被限制在 [−100, +100] 范围内。", "description": "Help panel bullet: clamping" },
+  "custom_formula_help_errors":      { "message": "公式中的错误会按邮件被捕获，并显示在诊断列中；一个有问题的公式不会影响其他公式。", "description": "Help panel bullet: error handling" },
+  "custom_formula_help_no_regex":    { "message": "add 模式（v1）不支持通过 match() 进行正则匹配。请使用 observe 模式试验 match()。", "description": "Help panel bullet: no regex in add mode" },
+  "custom_formula_help_fields_title":{ "message": "可用的字段和函数", "description": "Heading above the fields/functions reference in the formula help panel" },
+
+  "formula_chips_label":                { "message": "插入字段 / 函数：",                                           "description": "Header above formula insertion chips" },
+  "formula_chip_insert_title":          { "message": "在光标处插入",                                                 "description": "Tooltip for formula chip buttons" },
+  "formula_chips_group_functions":      { "message": "函数",                                                         "description": "Label for the Functions chip group" },
+  "formula_chips_group_from":           { "message": "From",                                                         "description": "Label for the From fields chip group" },
+  "formula_chips_group_alignment":      { "message": "一致性",                                                       "description": "Label for the Alignment fields chip group" },
+  "formula_chips_group_message_id":     { "message": "Message-ID",                                                   "description": "Label for the Message-ID fields chip group" },
+  "formula_chips_group_headers":        { "message": "邮件头",                                                       "description": "Label for the Headers fields chip group" },
+  "formula_chips_group_general":        { "message": "常规",                                                         "description": "Label for the General fields chip group" },
+  "formula_chips_ref_note":             { "message": "以下是 v1 公式 DSL 支持的字段和函数。点击标签可将其插入到光标位置。", "description": "Reference note below formula insertion chips" },
+
+  "dns_error_invalid_resolver": { "message": "DNS 解析服务器地址缺失或无效。", "description": "DNS error for invalid_resolver code" },
+  "dns_error_timeout":          { "message": "DNS 查询超时。",                 "description": "DNS error for timeout code" },
+  "dns_error_network":          { "message": "DNS 查询失败（网络错误）。",     "description": "DNS error for network_error code" },
+  "dns_error_http":             { "message": "DNS 查询失败（服务器错误）。",   "description": "DNS error for http_error code" },
+  "dns_error_dns":              { "message": "DNS 服务器返回了错误。",         "description": "DNS error for dns_error code" },
+  "dns_error_generic":          { "message": "DNS 查询失败。",                 "description": "Generic DNS error fallback" },
+
+  "rule_authserv_untrusted_title":   { "message": "未受信任的 authserv-id",                                "description": "Rule registry title" },
+  "rule_authserv_untrusted_summary": { "message": "Authentication-Results 邮件头来自您未信任的域名。",     "description": "Rule registry summary" },
+  "rule_sender_rule_title":          { "message": "发件人域名规则",                                        "description": "Rule registry title" },
+  "rule_sender_rule_summary":        { "message": "此邮件匹配了用户定义的发件人域名规则。",                "description": "Rule registry summary" },
+  "rule_whitelist_manual_title":     { "message": "手动白名单",                                            "description": "Rule registry title" },
+  "rule_whitelist_manual_summary":   { "message": "发件人地址在您的手动白名单中。",                        "description": "Rule registry summary" },
+  "rule_whitelist_addressBook_title":  { "message": "通讯录联系人",                                        "description": "Rule registry title" },
+  "rule_whitelist_addressBook_summary":{ "message": "发件人在您的 Thunderbird 通讯录中。",                 "description": "Rule registry summary" },
+
+  "rule_identity_spfMailFromMismatch_title":          { "message": "SPF MAIL FROM 与 From 不同",                         "description": "Rule registry title" },
+  "rule_identity_spfMailFromMismatch_summary":        { "message": "SPF 通过的是与可见 From 地址不同的域名。",           "description": "Rule registry summary" },
+  "rule_identity_dkimDomainMismatch_title":           { "message": "DKIM 签名域名与 From 不同",                          "description": "Rule registry title" },
+  "rule_identity_dkimDomainMismatch_summary":         { "message": "所有通过的 DKIM 签名都来自与 From 地址无关的域名。", "description": "Rule registry summary" },
+  "rule_identity_dmarcNoneWithThirdPartyAuth_title":  { "message": "DMARC none 且仅有第三方认证",                        "description": "Rule registry title" },
+  "rule_identity_dmarcNoneWithThirdPartyAuth_summary":{ "message": "没有 DMARC 策略，且所有通过的 SPF/DKIM 都来自无关域名。", "description": "Rule registry summary" },
+
+  "rule_heuristic_randomFromDomainLabel_title":   { "message": "From 域名标签看似随机",                                   "description": "Rule registry title" },
+  "rule_heuristic_randomFromDomainLabel_summary": { "message": "From 域名中的某个标签看似机器生成（高熵、元音少）。",     "description": "Rule registry summary" },
+  "rule_heuristic_randomFromLocalPart_title":     { "message": "From 本地部分看似随机",                                   "description": "Rule registry title" },
+  "rule_heuristic_randomFromLocalPart_summary":   { "message": "From 地址的本地部分（@ 之前）看似机器生成。",             "description": "Rule registry summary" },
+
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_title":   { "message": "SPF 一致、DKIM 不一致、本地部分随机",           "description": "Rule registry title" },
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_summary": { "message": "SPF 一致，但 DKIM 不一致，且本地部分看似随机。", "description": "Rule registry summary" },
+  "rule_composite_authAlignedRandomDomain_title":              { "message": "认证一致但域名看似随机的发件人",                "description": "Rule registry title" },
+  "rule_composite_authAlignedRandomDomain_summary":            { "message": "认证一致，但 From 域名本身看似机器生成。",      "description": "Rule registry summary" },
+  "rule_composite_thirdPartyAuthRandomLocal_title":            { "message": "第三方认证通过、本地部分随机、无一致性",        "description": "Rule registry title" },
+  "rule_composite_thirdPartyAuthRandomLocal_summary":          { "message": "仅第三方认证通过，本地部分看似随机，且没有任何一致性。", "description": "Rule registry summary" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_title":   { "message": "Message-ID 域名不一致且认证不一致",             "description": "Rule registry title" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_summary": { "message": "Message-ID 域名与 From 域名不同，且认证不一致。", "description": "Rule registry summary" },
+  "rule_composite_messageIdUnregistrableMismatch_title":       { "message": "Message-ID 域名不可注册或与 From 不一致",       "description": "Rule registry title" },
+  "rule_composite_messageIdUnregistrableMismatch_summary":     { "message": "Message-ID 域名不可注册（仅有顶级域）或没有有效的可注册域名。", "description": "Rule registry summary" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_title":  { "message": "From/Sender 不一致且认证不一致",                "description": "Rule registry title" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_summary":{ "message": "From 和 Sender 邮件头指向不同的域名，且认证不一致。", "description": "Rule registry summary" },
+  "rule_composite_deepRandomFromSubdomain_title":              { "message": "From 使用看似随机的深层子域名",                 "description": "Rule registry title" },
+  "rule_composite_deepRandomFromSubdomain_summary":            { "message": "From 地址使用了带有看似随机标签的深层子域名。", "description": "Rule registry summary" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_title":  { "message": "委托发送的新闻邮件：DKIM 一致、投递路径一致",    "description": "Rule registry title" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_summary":{ "message": "DKIM 一致，且投递路径与正规 ESP 相符。",        "description": "Rule registry summary" },
+  "rule_composite_spfPassDkimFailRandomLocal_title":           { "message": "SPF 通过、DKIM 失败、本地部分随机",             "description": "Rule registry title" },
+  "rule_composite_spfPassDkimFailRandomLocal_summary":         { "message": "SPF 通过但 DKIM 失败，且本地部分看似随机。",    "description": "Rule registry summary" },
+  "rule_composite_dkimAlignedLexicalMitigation_title":        { "message": "DKIM 一致时的名称误判减分",                     "description": "Rule registry title" },
+  "rule_composite_dkimAlignedLexicalMitigation_summary":      { "message": "DKIM 一致；降低对看似随机的名称的启发式扣分。", "description": "Rule registry summary" },
+  "rule_composite_ownDomainAuthFail_title":                    { "message": "自有账户域名认证失败",                          "description": "Rule registry title" },
+  "rule_composite_ownDomainAuthFail_summary":                  { "message": "邮件声称来自您的某个账户域名，但认证失败。",    "description": "Rule registry summary" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_title":   { "message": "From 无法解析且基础设施不一致",          "description": "Rule registry title" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_summary": { "message": "From 邮件头无法解析为有效地址，且基础设施信号不一致。", "description": "Rule registry summary" },
+  "rule_composite_geoTokenCompoundDomain_title":               { "message": "地理/关键词复合可注册域名",                     "description": "Rule registry title" },
+  "rule_composite_geoTokenCompoundDomain_summary":             { "message": "可注册域名是包含已知垃圾邮件地理/关键词标记的连字符复合词，且认证不一致。", "description": "Rule registry summary" },
+  "rule_composite_deepServiceWordSubdomain_title":             { "message": "含服务类词语的深层子域名",                      "description": "Rule registry title" },
+  "rule_composite_deepServiceWordSubdomain_summary":           { "message": "深层子域名中含有与一次性域名垃圾邮件相关的服务类词语（例如 mail-01）。", "description": "Rule registry summary" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_title":   { "message": "DMARC 失败减分：DKIM 一致且存在列表邮件头",     "description": "Rule registry title" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_summary": { "message": "DMARC 失败，但 DKIM 一致且存在 List 邮件头——很可能是邮件列表。", "description": "Rule registry summary" },
+  "rule_composite_dkimFailWithAlignedPass_title":              { "message": "DKIM 失败但有一致的 DKIM 通过",                 "description": "Rule registry title" },
+  "rule_composite_dkimFailWithAlignedPass_summary":            { "message": "至少一个 DKIM 签名失败，但另一个一致的签名通过。", "description": "Rule registry summary" },
+  "rule_composite_brandDivergencePhishing_title":              { "message": "显示名称冒用品牌的钓鱼",                        "description": "Rule registry title" },
+  "rule_composite_brandDivergencePhishing_summary":            { "message": "From 显示名称与知名品牌相符，但 From 域名与该品牌无关。", "description": "Rule registry summary" },
+  "rule_composite_unsecuredDeepSubdomain_title":               { "message": "DMARC none 的深层子域名",                       "description": "Rule registry title" },
+  "rule_composite_unsecuredDeepSubdomain_summary":             { "message": "From 地址使用了深层子域名，其所属域名没有 DMARC 强制策略，也没有一致的认证。", "description": "Rule registry summary" },
+  "rule_composite_unauthenticatedFromSpoof_title":             { "message": "未认证的 From 且发件人信息不一致",              "description": "Rule registry title" },
+  "rule_composite_unauthenticatedFromSpoof_summary":           { "message": "可见的 From 域名没有一致且受信任的认证，且另一个发件人标识与其不符。", "description": "Rule registry summary" },
+  "rule_composite_authenticatedDisplayNameSpoof_title":        { "message": "已认证发件人的显示名称中含伪造邮箱地址",        "description": "Rule registry title" },
+  "rule_composite_authenticatedDisplayNameSpoof_summary":      { "message": "邮件对其 From 域名认证通过，但显示名称中包含指向其他域名的电子邮件地址。", "description": "Rule registry summary" },
+  "rule_composite_alignedAuthenticationConfirmed_title":       { "message": "已确认认证一致",                                "description": "Rule registry title" },
+  "rule_composite_alignedAuthenticationConfirmed_summary":     { "message": "可见的 From 域名具有一致且受信任的认证，且没有相互矛盾的信号。", "description": "Rule registry summary" },
+  "rule_composite_publicDomainSpoofing_title":                 { "message": "公共邮箱服务商域名认证失败",                    "description": "Rule registry title" },
+  "rule_composite_publicDomainSpoofing_summary":               { "message": "可见的 From 域名属于主要公共邮箱服务商，但认证失败且发送基础设施不一致。", "description": "Rule registry summary" },
+
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_tooltip":   { "message": "垃圾邮件只控制 MAIL FROM 域名以通过 SPF，同时使用一次性的本地部分。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_authAlignedRandomDomain_tooltip":              { "message": "攻击者拥有一个随机字符串域名，并借助真实的 ESP 获得一致的认证。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_thirdPartyAuthRandomLocal_tooltip":            { "message": "通过第三方中继、使用一次性 From 地址的垃圾邮件。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_tooltip":   { "message": "当认证基础设施无关时，伪造邮件的 Message-ID 域名往往不一致。注意：转发或别名邮件的 Message-ID 可能来自最初的发信域名。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_messageIdUnregistrableMismatch_tooltip":       { "message": "强烈的伪造迹象；正规邮件通常都有有效的 Message-ID 域名。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_tooltip":  { "message": "From 与 Sender 不一致是重发或冒充的常见模式。注意：邮件列表和转发服务可能会将 Sender 设为其自己的域名。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_deepRandomFromSubdomain_tooltip":              { "message": "垃圾邮件活动注册一个域名，并从许多随机子路径发送，以规避按域名的屏蔽。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_tooltip":  { "message": "降低对通过委托 DKIM 签名的 ESP 发送的群发邮件的误判。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_spfPassDkimFailRandomLocal_tooltip":           { "message": "表明这是仅依赖 SPF 并使用一次性本地部分的群发发件人。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_dkimAlignedLexicalMitigation_tooltip":         { "message": "有效且一致的 DKIM 签名意味着 From 域名对邮件进行了签名，因此随机的本地部分不那么可疑。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_ownDomainAuthFail_tooltip":                    { "message": "高置信度的冒充信号：您自己的域名通常应当能够认证成功。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_tooltip": { "message": "格式错误的 From 邮件头加上不一致的基础设施是强烈的伪造迹象。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_geoTokenCompoundDomain_tooltip":               { "message": "一种常见的一次性域名垃圾邮件模式，使用地理名称或关键词标记。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_deepServiceWordSubdomain_tooltip":             { "message": "垃圾邮件发送者会重复使用 mail-01.random-domain.tld 这类模式，以规避按域名的信誉评估。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_tooltip":   { "message": "邮件列表常会导致 DMARC 失败但保留 DKIM；将其视为高风险会造成误判。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_dkimFailWithAlignedPass_tooltip":              { "message": "同时存在通过和失败的一致 DKIM 签名并不常见，且与邮件被篡改有关。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_brandDivergencePhishing_tooltip":              { "message": "钓鱼发件人控制一个无关域名并正确完成认证，同时在可见的 From 字段中使用知名品牌名称来欺骗收件人。注意：官方品牌别名（例如 American Express 的 aexp.com）以及不在热门域名列表中的地区品牌域名可能会显示为不一致。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_unsecuredDeepSubdomain_tooltip":               { "message": "一次性域名常配置看似服务用途的深层子域名（例如 sivakeso.support.sn5799.com），同时不设置 DMARC，以规避按标签和认证强制的检查。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_unauthenticatedFromSpoof_tooltip":             { "message": "伪造邮件通常缺少一致的认证，同时带有暴露真实发送基础设施的不一致邮件头（Message-ID、Return-Path、Reply-To）。注意：当本扩展基于 PSL 的一致性判断认为认证一致时（例如 From 为 news.example.com 而 SPF 对 example.com 通过），此规则不会触发。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_authenticatedDisplayNameSpoof_tooltip":        { "message": "攻击者会构造类似“user@victim.com”的显示名称，同时从已认证但无关的域名发送，以欺骗只看显示名称的用户。注意：正规邮件客户端和邮件列表很少在显示名称中嵌入电子邮件地址；这种模式几乎只见于钓鱼手法。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_alignedAuthenticationConfirmed_tooltip":       { "message": "正面确认发件人域名已正确认证；作为诊断信号记录在判定日志中。", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_publicDomainSpoofing_tooltip":                 { "message": "来自 Outlook、iCloud、Yahoo 等服务商的正规邮件通常都经过认证；声称来自这些域名但认证失败的邮件极有可能伪造了 From。注意：当本扩展基于 PSL 的一致性判断认为发件人已认证时（例如来自服务商域名子域 bounce.mail.outlook.com 的 SPF 通过），此规则不会触发。", "description": "Rule registry tooltip (why + caveat)" },
+
+  "rule_template_auth_title": {
+    "message": "$method$ $result$",
+    "description": "Title for auth.<method>.<result> score keys",
+    "placeholders": {
+      "method": { "content": "$1", "example": "DMARC" },
+      "result": { "content": "$2", "example": "fail" }
+    }
+  },
+  "rule_template_auth_summary": {
+    "message": "$method$ 认证结果：$result$。",
+    "description": "Summary for auth.<method>.<result> score keys",
+    "placeholders": {
+      "method": { "content": "$1", "example": "DMARC" },
+      "result": { "content": "$2", "example": "fail" }
+    }
+  },
+  "rule_template_custom_formula_title": {
+    "message": "自定义公式：$id$",
+    "description": "Title for custom.formula.<id> score keys",
+    "placeholders": { "id": { "content": "$1", "example": "my-formula" } }
+  },
+  "rule_template_custom_formula_summary": { "message": "用户定义的自定义评分公式（L5 进阶功能）。", "description": "Summary for custom.formula.<id> score keys" },
+
+  "notification_single_account": {
+    "message": "$account$：1 封新邮件",
+    "description": "Notification title for a single new message; $account$ is the receiving account email address",
+    "placeholders": { "account": { "content": "$1", "example": "user@example.com" } }
+  },
+  "notification_single_fallback": {
+    "message": "$name$：1 封新邮件",
+    "description": "Notification title for a single new message when account email is unavailable; $name$ is the account display name or folder name",
+    "placeholders": { "name": { "content": "$1", "example": "Work" } }
+  },
+  "notification_multi_title":   { "message": "新邮件",                   "description": "Notification title when multiple new messages are coalesced into one notification" },
+  "notification_multi_body": {
+    "message": "有 $count$ 封新邮件。",
+    "description": "First line of the notification body for multiple new messages",
+    "placeholders": { "count": { "content": "$1", "example": "3" } }
+  },
+  "notification_more_messages": {
+    "message": "另有 $count$ 封邮件",
+    "description": "Line appended to the notification body showing how many additional messages are queued",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "notification_no_subject":    { "message": "（无主题）",               "description": "Fallback shown in the notification body when the message subject is empty" }
+}

@@ -3,8 +3,18 @@ import { findLogEntryByRfcMessageId, reasonContextPairs, isInReviewFolder, build
 import { formatDelta } from '../modules/logFormat.js';
 import { parseMailboxAddress } from '../core/messageIdentity.js';
 import { MAX_WHITELIST_ENTRIES } from '../core/whitelist.js';
-import { getMessage, localizedSummaryForKey } from '../modules/i18n.js';
-import { summaryForKey, titleForKey } from '../core/ruleRegistry.js';
+import {
+  getMessage,
+  localizeDocument,
+  localizedActionLabel,
+  localizedClassification,
+  localizedReasonLabel,
+  localizedSummaryForKey,
+  localizedTitleForKey,
+} from '../modules/i18n.js';
+import { deriveAccountProtectionStatus, PROTECTION_STATES } from '../modules/protectionStatus.js';
+
+localizeDocument();
 
 async function init() {
   const content = document.getElementById('content');
@@ -54,10 +64,43 @@ async function init() {
     p.textContent = getMessage('popup_no_entry');
     content.appendChild(p);
     renderActionsPanel(content, { inReviewFolder, message, senderAddress, data });
+    prependProtectionNotice(content, message, data);
     return;
   }
 
   renderEntry(content, entry, { inReviewFolder, message, senderAddress, data });
+  prependProtectionNotice(content, message, data);
+}
+
+/**
+ * Show a one-line notice when authentication scoring is not active for the
+ * displayed message's account. Nothing is shown when it is active.
+ */
+function prependProtectionNotice(container, message, data) {
+  const accountId = message?.folder?.accountId;
+  if (!accountId) return;
+  const status = deriveAccountProtectionStatus({
+    accountId,
+    trustedDomains: data.trustedDomains,
+    accountSetup: data.settings?.accountSetup,
+    decisionLog: data.decisionLog,
+  });
+  if (status.state === PROTECTION_STATES.ACTIVE) return;
+
+  const notice = document.createElement('div');
+  notice.className = 'protection-notice';
+  const text = document.createElement('span');
+  text.textContent = getMessage('popup_status_inactive');
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'protection-notice-btn';
+  btn.textContent = getMessage('popup_btn_open_setup');
+  btn.addEventListener('click', () => {
+    // '#setup' makes the options page open the guided setup on load.
+    browser.tabs.create({ url: browser.runtime.getURL('options/options.html#setup') });
+  });
+  notice.append(text, ' ', btn);
+  container.prepend(notice);
 }
 
 function renderEntry(container, entry, context = {}) {
@@ -69,7 +112,7 @@ function renderEntry(container, entry, context = {}) {
 
   const classEl = document.createElement('span');
   classEl.className = `classification ${entry.classification ?? ''}`;
-  classEl.textContent = entry.classification ?? 'unknown';
+  classEl.textContent = localizedClassification(entry.classification);
   summaryPanel.appendChild(classEl);
 
   const scoreBadge = document.createElement('span');
@@ -80,7 +123,7 @@ function renderEntry(container, entry, context = {}) {
   if (entry.action) {
     const actionEl = document.createElement('span');
     actionEl.className = 'action-label';
-    actionEl.textContent = formatActionLabel(entry.action);
+    actionEl.textContent = localizedActionLabel(entry.action);
     summaryPanel.appendChild(actionEl);
   }
 
@@ -97,7 +140,7 @@ function renderEntry(container, entry, context = {}) {
 
       const labelSpan = document.createElement('span');
       labelSpan.className = 'reason-label';
-      labelSpan.textContent = reason.label ?? reason.key;
+      labelSpan.textContent = localizedReasonLabel(reason);
       const primaryTooltip = localizedSummaryForKey(reason.key);
       if (primaryTooltip) labelSpan.title = primaryTooltip;
 
@@ -120,7 +163,7 @@ function renderEntry(container, entry, context = {}) {
 
     const pfHeading = document.createElement('p');
     pfHeading.className = 'protective-facts-heading';
-    pfHeading.textContent = 'Protective factors';
+    pfHeading.textContent = getMessage('popup_protective_factors');
     pfSection.appendChild(pfHeading);
 
     const pfList = document.createElement('ul');
@@ -133,17 +176,19 @@ function renderEntry(container, entry, context = {}) {
       if (fact.factKey === 'mitigation') {
         const nameSpan = document.createElement('span');
         nameSpan.className = 'protective-fact-name';
-        nameSpan.textContent = titleForKey(fact.scoreKey);
-        const tip = summaryForKey(fact.scoreKey);
+        nameSpan.textContent = localizedTitleForKey(fact.scoreKey);
+        const tip = localizedSummaryForKey(fact.scoreKey);
         if (tip) nameSpan.title = tip;
         li.appendChild(nameSpan);
       } else if (fact.factKey === 'dkimAligned') {
-        li.textContent = 'DKIM signature aligned with From domain';
+        li.textContent = getMessage('popup_fact_dkim_aligned');
       } else if (fact.factKey === 'noTrustedAuth') {
-        li.textContent = 'No trusted Authentication-Results headers found';
+        li.textContent = getMessage('popup_fact_no_trusted_auth');
       } else if (fact.factKey === 'belowThreshold') {
-        li.textContent =
-          `Score (${fact.score}) is below the ${fact.thresholdName} threshold (${fact.threshold})`;
+        const msgKey = fact.thresholdName === 'High-risk'
+          ? 'popup_fact_below_high_risk'
+          : 'popup_fact_below_review';
+        li.textContent = getMessage(msgKey, [String(fact.score), String(fact.threshold)]);
       }
 
       pfList.appendChild(li);
@@ -161,16 +206,16 @@ function renderEntry(container, entry, context = {}) {
   details.className = 'score-details';
 
   const detailsSummary = document.createElement('summary');
-  detailsSummary.textContent = 'Score details';
+  detailsSummary.textContent = getMessage('popup_score_details');
   details.appendChild(detailsSummary);
 
   // Identity fields
   const id = entry.messageIdentity ?? {};
   const identityRows = [
-    { label: 'From', value: id.from },
-    { label: 'Subject', value: id.subject },
-    { label: 'From domain', value: entry.fromDomain },
-    { label: 'Message-ID', value: id.rfcMessageId },
+    { label: getMessage('popup_identity_from'), value: id.from },
+    { label: getMessage('popup_identity_subject'), value: id.subject },
+    { label: getMessage('popup_identity_from_domain'), value: entry.fromDomain },
+    { label: getMessage('popup_identity_message_id'), value: id.rfcMessageId },
   ];
   const hasIdentity = identityRows.some(r => r.value);
   if (hasIdentity) {
@@ -195,7 +240,7 @@ function renderEntry(container, entry, context = {}) {
   if (Array.isArray(reasons) && reasons.length > 0) {
     const h3 = document.createElement('h3');
     h3.className = 'details-heading';
-    h3.textContent = 'All score reasons';
+    h3.textContent = getMessage('popup_all_reasons');
     details.appendChild(h3);
 
     const ul = document.createElement('ul');
@@ -210,7 +255,7 @@ function renderEntry(container, entry, context = {}) {
 
       const labelSpan = document.createElement('span');
       labelSpan.className = 'reason-label';
-      labelSpan.textContent = reason.label ?? reason.key;
+      labelSpan.textContent = localizedReasonLabel(reason);
       const reasonTooltip = localizedSummaryForKey(reason.key);
       if (reasonTooltip) labelSpan.title = reasonTooltip;
       summaryDiv.appendChild(labelSpan);
@@ -265,14 +310,14 @@ function renderActionsPanel(container, context) {
     // Move to Inbox button
     const moveBtn = document.createElement('button');
     moveBtn.className = 'review-action-btn';
-    moveBtn.textContent = 'Move to Inbox';
+    moveBtn.textContent = getMessage('btn_move_to_inbox');
     moveBtn.addEventListener('click', async () => {
       moveBtn.disabled = true;
       whitelistBtn.disabled = true;
       try {
         const inboxId = await findInboxId(message.folder?.accountId);
         if (!inboxId) {
-          showStatus(statusEl, 'Inbox folder not found.', 'error');
+          showStatus(statusEl, getMessage('popup_inbox_not_found'), 'error');
           moveBtn.disabled = false;
           whitelistBtn.disabled = false;
           return;
@@ -280,9 +325,9 @@ function renderActionsPanel(container, context) {
         // Attempt to clear junk flag before moving; ignore errors.
         try { await browser.messages.update(message.id, { junk: false }); } catch { /* ignore */ }
         await browser.messages.move([message.id], inboxId);
-        showStatus(statusEl, 'Moved to Inbox.', 'success');
+        showStatus(statusEl, getMessage('popup_moved_to_inbox'), 'success');
       } catch {
-        showStatus(statusEl, 'Move failed. Please try again.', 'error');
+        showStatus(statusEl, getMessage('popup_move_failed'), 'error');
         moveBtn.disabled = false;
         whitelistBtn.disabled = false;
       }
@@ -292,20 +337,20 @@ function renderActionsPanel(container, context) {
     // Whitelist Sender button
     const whitelistBtn = document.createElement('button');
     whitelistBtn.className = 'review-action-btn';
-    whitelistBtn.textContent = 'Whitelist Sender';
+    whitelistBtn.textContent = getMessage('btn_whitelist_sender');
 
     const whitelistEntry = buildWhitelistEntry(senderAddress);
     if (!whitelistEntry) {
       whitelistBtn.disabled = true;
-      whitelistBtn.title = 'Sender address could not be determined.';
+      whitelistBtn.title = getMessage('popup_no_sender_address');
     } else {
       const existing = (data?.manualWhitelist ?? [])
         .some(e => e.matchType === 'exact' && e.value === whitelistEntry.value);
 
       if (existing) {
         whitelistBtn.disabled = true;
-        whitelistBtn.title = 'This sender is already in the manual whitelist.';
-        whitelistBtn.textContent = 'Already Whitelisted';
+        whitelistBtn.title = getMessage('popup_already_whitelisted_title');
+        whitelistBtn.textContent = getMessage('btn_already_whitelisted');
       } else {
         whitelistBtn.addEventListener('click', () => {
           renderWhitelistConfirm(panel, moveBtn, whitelistBtn, statusEl, whitelistEntry, data);
@@ -318,7 +363,7 @@ function renderActionsPanel(container, context) {
   // Open Options / Logs — always available for deeper inspection
   const optionsBtn = document.createElement('button');
   optionsBtn.className = 'review-action-btn options-btn';
-  optionsBtn.textContent = 'Open Options / Logs';
+  optionsBtn.textContent = getMessage('btn_open_options');
   optionsBtn.addEventListener('click', () => {
     browser.runtime.openOptionsPage();
   });
@@ -338,12 +383,12 @@ function renderWhitelistConfirm(section, moveBtn, whitelistBtn, statusEl, entry,
 
   const msg = document.createElement('p');
   msg.className = 'whitelist-confirm-msg';
-  msg.textContent = `Add "${entry.value}" to the manual whitelist? Future messages from this address will receive a score reduction.`;
+  msg.textContent = getMessage('popup_whitelist_confirm', [entry.value]);
   confirmDiv.appendChild(msg);
 
   const confirmBtn = document.createElement('button');
   confirmBtn.className = 'review-action-btn confirm-btn';
-  confirmBtn.textContent = 'Confirm';
+  confirmBtn.textContent = getMessage('btn_confirm');
   confirmBtn.addEventListener('click', async () => {
     confirmBtn.disabled = true;
     cancelBtn.disabled = true;
@@ -358,11 +403,11 @@ function renderWhitelistConfirm(section, moveBtn, whitelistBtn, statusEl, entry,
       });
       confirmDiv.remove();
       moveBtn.disabled = false;
-      showStatus(statusEl, `"${entry.value}" added to the manual whitelist.`, 'success');
+      showStatus(statusEl, getMessage('popup_whitelist_added', [entry.value]), 'success');
     } catch (err) {
       const msg = err?.message === 'full'
-        ? `Whitelist is full (max ${MAX_WHITELIST_ENTRIES} entries). Remove an entry before adding a new one.`
-        : 'Failed to save whitelist entry. Please try again.';
+        ? getMessage('popup_whitelist_full', [String(MAX_WHITELIST_ENTRIES)])
+        : getMessage('popup_whitelist_save_failed');
       showStatus(statusEl, msg, 'error');
       confirmBtn.disabled = false;
       cancelBtn.disabled = false;
@@ -373,7 +418,7 @@ function renderWhitelistConfirm(section, moveBtn, whitelistBtn, statusEl, entry,
 
   const cancelBtn = document.createElement('button');
   cancelBtn.className = 'review-action-btn cancel-btn';
-  cancelBtn.textContent = 'Cancel';
+  cancelBtn.textContent = getMessage('btn_cancel');
   cancelBtn.addEventListener('click', () => {
     confirmDiv.remove();
     whitelistBtn.hidden = false;
@@ -427,21 +472,6 @@ function deltaClass(delta) {
   return 'zero';
 }
 
-function formatActionLabel(action) {
-  const map = {
-    'classified-normal': 'Left in inbox',
-    'classified-review': 'Scored review (no action)',
-    'classified-high-risk': 'Scored high-risk (no action)',
-    'moved-review': 'Moved to review folder',
-    'moved-junk': 'Moved to Junk',
-    'moved-junk-mark-failed': 'Moved to Junk',
-    'move-review-failed': 'Move to review failed',
-    'move-junk-failed': 'Move to Junk failed',
-    'no-review-folder-configured': 'No review folder configured',
-  };
-  return map[action] ?? action;
-}
-
 // toggle doesn't bubble, so use capture phase to catch <details> open/close
 document.addEventListener('toggle', updatePopupHeight, true);
 
@@ -457,7 +487,7 @@ init().then(updatePopupHeight).catch(err => {
     content.innerHTML = '';
     const p = document.createElement('p');
     p.className = 'no-entry';
-    p.textContent = `Error loading score details: ${err.message}`;
+    p.textContent = getMessage('popup_error', [err.message]);
     content.appendChild(p);
   }
 });

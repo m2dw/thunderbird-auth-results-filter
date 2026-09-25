@@ -2,7 +2,19 @@
 
 [![CI](https://github.com/m2dw/thunderbird-auth-results-filter/actions/workflows/ci.yml/badge.svg)](https://github.com/m2dw/thunderbird-auth-results-filter/actions/workflows/ci.yml)
 
-A Thunderbird add-on that reads `Authentication-Results` headers and sender identity signals to score suspicious messages and move them to a review folder or Junk.
+**[Install from the official Thunderbird Add-ons site](https://addons.thunderbird.net/thunderbird/addon/auth-results-filter/)**
+
+A Thunderbird add-on that flags likely phishing and spam using `Authentication-Results` headers (SPF, DKIM, DMARC) and sender-domain scoring, moving suspicious mail to a review folder or Junk — mail processing stays on your device, with one opt-in exception (see below).
+
+## Screenshots
+
+| Message popup: verdict and reasons | Review-folder quick actions |
+|---|---|
+| ![Message popup showing the Review verdict, score, and authentication failures](assets/screenshots/01-message-popup-verdict.png) | ![Popup for a message in the review folder with Move to Inbox and Whitelist Sender actions](assets/screenshots/02-review-folder-workflow.png) |
+| See why a message was flagged: score, classification, and reasons.<br>振り分けの理由を、スコアと判定結果で確認できます。 | Move a false positive back to Inbox or whitelist its sender.<br>誤検知は受信トレイへ戻すか、送信者を許可できます。 |
+| Trusted authentication servers | Notification settings |
+| ![Basic settings showing one trusted authentication server and the setup controls](assets/screenshots/03-trusted-authentication-servers.png) | ![Notification settings showing the score limit and interval](assets/screenshots/04-notification-settings.png) |
+| Choose which mail server's authentication results to trust.<br>認証結果を信頼するメールサーバーを指定できます。 | Choose which assessed messages trigger a notification.<br>判定後に通知するメールの条件を設定できます。 |
 
 ## What it does
 
@@ -64,7 +76,16 @@ The add-on requests the following permissions from Thunderbird:
 
 ## Installation
 
-The packaged `.xpi` file under `dist/` can be installed in Thunderbird via
+**Recommended:** install from the official Thunderbird Add-ons listing:
+https://addons.thunderbird.net/thunderbird/addon/auth-results-filter/
+
+This is the reviewed, automatically updated distribution and is the right choice
+for most users.
+
+### Manual XPI install (development / alternative)
+
+For development or testing an unreleased build, the packaged `.xpi` file under
+`dist/` can be installed in Thunderbird via
 **Add-ons Manager → Install Add-on From File**.
 
 ## Development

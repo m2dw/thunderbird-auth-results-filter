@@ -23,27 +23,224 @@
   "section_decision_log":           { "message": "判定ログ",             "description": "セクション見出し" },
 
   "status_no_trusted_servers": {
-    "message": "信頼済み認証サーバーが設定されていません。DMARC、SPF、DKIM のスコアリングは、上記で信頼済みサーバーを追加するまで無効です。",
-    "description": "信頼済みサーバーが未設定の場合に基本タブで表示される警告"
+    "message": "信頼済み認証サーバーが設定されていません。DMARC、SPF、DKIM のスコアリングは、信頼済みサーバーを確認して登録するまで無効です。",
+    "description": "信頼済みサーバーが未設定かつアカウント状態を取得できない場合に基本タブで表示される警告"
   },
   "firstrun_callout": {
-    "message": "最初の設定: 受信メールサーバーが Authentication-Results に書き込む認証サーバー名（authserv-id）を追加してください。追加するまでは DMARC/SPF/DKIM の結果はスコアに使われません。セットアップヒントは候補を出すだけで、信頼設定は自動では追加されません。",
+    "message": "最初の設定: メールプロバイダーが受信メールの検査に使っているサーバー名を登録してください。登録するまでは送信者認証（DMARC/SPF/DKIM）の結果はスコアに使われません。下のガイド付きセットアップがアカウント情報から候補を提示しますが、あなたが確認するまで何も信頼されません。",
     "description": "信頼済みサーバーが未設定の場合に表示されるファーストラン案内"
   },
-  "status_protection_active": {
-    "message": "保護有効 — $count$ 件の信頼済みサーバーが設定済みです。",
-    "description": "信頼済みサーバーが1件以上設定されている場合に表示（日本語は複数形不要）",
+  "status_accounts_unavailable": {
+    "message": "$count$ 件の信頼済みサーバーが設定されています。アカウント情報を読み込めないため、アカウントごとの状態は表示できません。",
+    "description": "アカウント一覧を取得できないが信頼済みサーバーがある場合に表示（日本語は複数形不要）",
     "placeholders": {
-      "count":  { "content": "$1", "example": "3" },
+      "count":  { "content": "$1", "example": "2" },
       "plural": { "content": "$2", "example": "" }
     }
   },
-  "status_recent_no_trusted_ar": {
-    "message": "最近のメッセージに信頼済み認証結果からのスコアリングがありませんでした。信頼済みサーバー名がメールの Authentication-Results ヘッダーと一致しているか確認してください。",
-    "description": "最近のログエントリに信頼済み AR 結果がない場合のヒント"
+  "status_overall_all_active": {
+    "message": "すべてのアカウント（$total$ 件）で認証スコアリングが有効です。",
+    "description": "全アカウントで認証スコアリングが有効な場合の全体状態",
+    "placeholders": {
+      "total":  { "content": "$1", "example": "2" },
+      "plural": { "content": "$2", "example": "" }
+    }
+  },
+  "status_overall_partial": {
+    "message": "$total$ 件中 $inactive$ 件のアカウントで認証スコアリングが有効になっていません。セットアップが完了するまで保護は部分的です。",
+    "description": "一部のアカウントで認証スコアリングが無効な場合の全体状態",
+    "placeholders": {
+      "inactive": { "content": "$1", "example": "1" },
+      "total":    { "content": "$2", "example": "2" },
+      "plural":   { "content": "$3", "example": "" }
+    }
+  },
+  "status_state_active":             { "message": "認証スコアリング有効",                             "description": "アカウントごとの保護状態ラベル" },
+  "status_state_not_configured":     { "message": "信頼済み認証サーバー未設定",                       "description": "アカウントごとの保護状態ラベル" },
+  "status_state_awaiting_mail":      { "message": "設定済み — 新着メールでの確認待ち",                "description": "アカウントごとの保護状態ラベル" },
+  "status_state_needs_confirmation": { "message": "セットアップの確認が必要",                         "description": "アカウントごとの保護状態ラベル" },
+  "status_state_no_usable_ar":       { "message": "プロバイダーが利用可能な認証結果を付与していないようです", "description": "アカウントごとの保護状態ラベル" },
+  "status_state_active_detail": {
+    "message": "このアカウントの最近のメールは信頼済みサーバーで検査されているため、DMARC、SPF、DKIM の結果がスコアに使われています。",
+    "description": "アカウントごとの保護状態の説明"
+  },
+  "status_state_not_configured_detail": {
+    "message": "このアカウントではまだ送信者認証（DMARC、SPF、DKIM）の結果が使われていません。プロバイダーのサーバーを確認して登録するまでは、より弱いシグナルのみでスコアリングされます。",
+    "description": "アカウントごとの保護状態の説明"
+  },
+  "status_state_awaiting_mail_detail": {
+    "message": "信頼済みサーバーは設定されていますが、このアカウントの最近のメールはまだそのサーバーで検査されていません。このアカウントの認証スコアリングは未確認です。",
+    "description": "アカウントごとの保護状態の説明"
+  },
+  "status_state_needs_confirmation_detail": {
+    "message": "このアカウントの最近のメールには、未確認のサーバーによる認証結果が付いています。プロバイダーのサーバーを確認して登録するまで、それらの結果は無視されます。",
+    "description": "アカウントごとの保護状態の説明"
+  },
+  "status_state_mismatch_detail": {
+    "message": "信頼済みサーバーは設定されていますが、このアカウントの最近のメールは別のサーバーで検査されています。このアカウントでは認証スコアリングが機能していません。セットアップを見直してください。",
+    "description": "信頼済みサーバーがこのアカウントのメールと一致しない場合の説明"
+  },
+  "status_state_no_usable_ar_detail": {
+    "message": "このアカウントの直近 $count$ 件のメールに Authentication-Results ヘッダーがなかったため、認証スコアリングは機能しません。その他のシグナルは引き続きスコアリングされます。",
+    "description": "アカウントごとの保護状態の説明",
+    "placeholders": { "count": { "content": "$1", "example": "5" } }
+  },
+  "status_confirmed_host": {
+    "message": "確認済みサーバー: $host$",
+    "description": "ガイド付きセットアップで確認したサーバーを示す行",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "status_mail_counts": {
+    "message": "直近 $total$ 件: 信頼済みサーバーで検査 $trusted$ 件、未確認サーバー $untrusted$ 件、認証結果なし $none$ 件。",
+    "description": "アカウントごとの最近のメール集計",
+    "placeholders": {
+      "total":     { "content": "$1", "example": "20" },
+      "trusted":   { "content": "$2", "example": "18" },
+      "untrusted": { "content": "$3", "example": "1" },
+      "none":      { "content": "$4", "example": "1" }
+    }
+  },
+  "status_mail_unrecorded": {
+    "message": "$count$ 件のメールは記録上限を超える数の検査サーバーを含んでいたため、どちらにも数えていません。",
+    "description": "authserv-id の一覧が切り詰められたログ項目についての注記",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "btn_setup_start":       { "message": "設定する",               "description": "ガイド付きセットアップを開くアカウントごとのボタン" },
+  "btn_setup_change":       { "message": "確認 / 変更",            "description": "ガイド付きセットアップを再度開くアカウントごとのボタン" },
+  "btn_start_guided_setup": { "message": "ガイド付きセットアップを開始", "description": "ガイド付きセットアップを開くボタン" },
+
+  "authserv_explainer_summary": { "message": "信頼済み認証サーバーとは？", "description": "authserv-id 説明の見出し" },
+  "authserv_explainer_body": {
+    "message": "メールが届くと、メールプロバイダーは送信者が本物かどうか（SPF、DKIM、DMARC）を検査し、その結果を隠しヘッダーに書き込みます。各結果には、検査したサーバーの名前が付いています。このようなヘッダーは誰でも（迷惑メール送信者でも）書けるため、このアドオンはあなたが確認したサーバー名の付いた結果だけを使います。自動的に信頼されるものはありません。",
+    "description": "authserv-id の平易な説明"
+  },
+  "authserv_explainer_advanced": {
+    "message": "技術的な詳細: このヘッダーは Authentication-Results（RFC 8601）で、サーバー名はその authserv-id です。下の信頼済みリストには authserv-id の値が保存されます。",
+    "description": "上級者向けの技術用語"
   },
 
-  "activity_no_messages": { "message": "まだメッセージは評価されていません。", "description": "最近のアクティビティの空状態" },
+  "guided_setup_title":            { "message": "ガイド付きセットアップ: 信頼済み認証サーバー", "description": "ガイド付きセットアップの見出し" },
+  "guided_setup_step_account":     { "message": "1. 設定するアカウントを選択",                 "description": "ガイド付きセットアップの手順" },
+  "guided_setup_step_server":      { "message": "2. プロバイダーの検査サーバーを選択",         "description": "ガイド付きセットアップの手順" },
+  "guided_setup_step_server_desc": {
+    "message": "候補はこのアカウントのメールドメイン（および DNS MX オプションを使う場合は MX レコード）から作られた推測です。下で確認するまでどれも信頼されません。正しい名前は通常プロバイダーのヘルプページに記載されています。",
+    "description": "ガイド付きセットアップの手順の説明"
+  },
+  "guided_setup_other":            { "message": "その他:",                                     "description": "サーバー名を入力する欄のラベル" },
+  "guided_setup_other_placeholder": { "message": "例: mx.example.com",                         "description": "サーバー名入力欄のプレースホルダー" },
+  "guided_setup_mx_btn":           { "message": "MX ヒントを検索 (DNS)",                       "description": "オプトインの MX 検索を実行するボタン" },
+  "guided_setup_mx_disabled": {
+    "message": "DNS によるヒントはオフです。下の「アカウントドメインからの設定ヒント」で有効にできます。有効にするとアカウントのメールドメインが公開 DNS リゾルバーに送信されます。",
+    "description": "オプトインの DNS 検索が無効な場合に表示"
+  },
+  "guided_setup_mx_hint": {
+    "message": "ボタンを押すと $domains$ が DNS リゾルバー $resolver$ に送信されます。",
+    "description": "MX 検索前のプライバシー注意",
+    "placeholders": {
+      "domains":  { "content": "$1", "example": "example.com" },
+      "resolver": { "content": "$2", "example": "8.8.8.8" }
+    }
+  },
+  "guided_setup_mx_running":       { "message": "MX レコードを検索しています…",               "description": "MX 検索中に表示" },
+  "guided_setup_step_check":       { "message": "3. 設定チェック",                             "description": "ガイド付きセットアップの手順" },
+  "guided_setup_step_confirm":     { "message": "4. 確認",                                     "description": "ガイド付きセットアップの手順" },
+  "guided_setup_confirm_label": {
+    "message": "$host$ がメールプロバイダーの受信メール検査に使われているサーバー名であることを確認し、その結果を信頼します。",
+    "description": "明示的な確認チェックボックスのラベル",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_setup_confirm_label_empty": { "message": "先にサーバー名を選択または入力してください。", "description": "ホスト未選択時の確認ラベル" },
+  "guided_setup_confirm_btn":      { "message": "確認して信頼する",                            "description": "ガイド付きセットアップの確認ボタン" },
+  "guided_setup_close_btn":        { "message": "閉じる",                                      "description": "ガイド付きセットアップを閉じるボタン" },
+  "guided_setup_success": {
+    "message": "保存しました。$host$ を信頼済みにしました。状態は新着メールの到着に応じて更新されます。このセットアップはいつでも開き直せます。",
+    "description": "確認成功時に表示",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_setup_error_confirmation_required": { "message": "このサーバーを信頼するには確認ボックスにチェックを入れてください。", "description": "ガイド付きセットアップのエラー" },
+  "guided_setup_error_missing_account":       { "message": "アカウントを選択してください。",                       "description": "ガイド付きセットアップのエラー" },
+  "guided_setup_error_missing_host":          { "message": "サーバー名を選択または入力してください。",             "description": "ガイド付きセットアップのエラー" },
+  "guided_setup_error_invalid_host":          { "message": "無効なサーバー名です。英数字、ハイフン、ドットのみ使用できます。", "description": "ガイド付きセットアップのエラー" },
+
+  "guided_check_account_domains": {
+    "message": "アカウントのメールドメイン: $domains$",
+    "description": "設定チェック項目",
+    "placeholders": { "domains": { "content": "$1", "example": "example.com" } }
+  },
+  "guided_check_account_domains_none": { "message": "このアカウントにはメールアドレスがないため、候補を提示できません。", "description": "設定チェック項目" },
+  "guided_check_mail_none_yet":        { "message": "このアカウントのメールはまだ評価されていません。新着メールが届くと状態が確認されます。", "description": "設定チェック項目" },
+  "guided_check_mail_summary": {
+    "message": "直近 $total$ 件: 信頼済みサーバーで検査 $trusted$ 件、未確認サーバー $untrusted$ 件、認証結果なし $none$ 件。",
+    "description": "設定チェック項目",
+    "placeholders": {
+      "total":     { "content": "$1", "example": "20" },
+      "trusted":   { "content": "$2", "example": "0" },
+      "untrusted": { "content": "$3", "example": "19" },
+      "none":      { "content": "$4", "example": "1" }
+    }
+  },
+  "guided_check_mail_unrecorded": {
+    "message": "直近のメールのうち $count$ 件は記録上限を超える数の検査サーバーを含んでいたため、どちらにも数えていません。",
+    "description": "設定チェック項目",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "guided_check_mail_no_ar": {
+    "message": "このアカウントの最近のメールには認証結果がありません。プロバイダーが付与していない可能性があり、その場合サーバーを信頼しても効果はありません。",
+    "description": "設定チェック項目"
+  },
+  "guided_check_host_invalid": {
+    "message": "「$host$」は有効なサーバー名ではありません。",
+    "description": "設定チェック項目",
+    "placeholders": { "host": { "content": "$1", "example": "bad host" } }
+  },
+  "guided_check_host_already_trusted": {
+    "message": "$host$ はすでに信頼済みです。確認するとこのアカウント用として記録されます。",
+    "description": "設定チェック項目",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_check_host_matches_mx": {
+    "message": "$host$ はこのアカウントのドメインの MX（受信メール）サーバーです。",
+    "description": "設定チェック項目",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_check_host_matches_hint": {
+    "message": "$host$ はこのアカウントのドメインから提示された候補と一致します。",
+    "description": "設定チェック項目",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "guided_check_host_related_domain": {
+    "message": "このサーバー名はアカウントと同じドメイン（$domain$）に属しています。",
+    "description": "設定チェック項目",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "guided_check_host_unrelated": {
+    "message": "$host$ はこのアカウントのドメインや MX ヒントと関係がありません。ホスティング型のメールサービスでは正しい場合もありますが、プロバイダーに確認してください。",
+    "description": "設定チェック項目",
+    "placeholders": { "host": { "content": "$1", "example": "mx.other.example" } }
+  },
+  "guided_check_host_seen": {
+    "message": "この名前はこのアカウントの直近 $total$ 件中 $seen$ 件のメールに現れました。ヘッダーは偽装できるため、補助的な確認としてのみ使ってください。",
+    "description": "設定チェック項目",
+    "placeholders": {
+      "seen":  { "content": "$1", "example": "18" },
+      "total": { "content": "$2", "example": "20" }
+    }
+  },
+  "guided_check_host_not_seen": {
+    "message": "$host$ はこのアカウントの最近のメールに現れていません。確認しても認証スコアリングが有効にならない可能性があります。",
+    "description": "設定チェック項目",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "guided_check_host_possibly_seen": {
+    "message": "$host$ は記録されたサーバー名に含まれていませんが、直近のメールのうち $count$ 件は記録上限を超える数のサーバーを含んでいたため、そこに現れていた可能性があります。",
+    "description": "設定チェック項目",
+    "placeholders": {
+      "host":  { "content": "$1", "example": "mail.example.com" },
+      "count": { "content": "$2", "example": "2" }
+    }
+  },
+
+  "activity_no_messages":{ "message": "まだメッセージは評価されていません。", "description": "最近のアクティビティの空状態" },
   "activity_counts": {
     "message": "$total$ 件のメッセージを評価済み — 正常: $normal$ 件、要確認: $review$ 件、高リスク: $highrisk$ 件。",
     "description": "最近のアクティビティの集計",
@@ -56,6 +253,12 @@
     }
   },
   "activity_most_recent": { "message": "最近のメッセージ:", "description": "最近のアクティビティで直近5件の上に表示される見出し" },
+  "activity_unknown_domain": { "message": "（不明）", "description": "最近のアクティビティで From ドメインが不明な場合の表示" },
+
+  "classification_normal":    { "message": "正常",     "description": "スコア 0〜49 の判定ラベル" },
+  "classification_review":    { "message": "要確認",   "description": "スコア 50〜99 の判定ラベル" },
+  "classification_high_risk": { "message": "高リスク", "description": "スコア 100 以上の判定ラベル" },
+  "classification_unknown":   { "message": "不明",     "description": "ログに判定が記録されていない場合のラベル" },
 
   "setup_hints_summary":        { "message": "アカウントドメインからの設定ヒント",      "description": "セットアップアシスタントの <details> サマリー要素" },
   "setup_use_dns":              { "message": "MX 設定ヒントに DNS ルックアップを使用する", "description": "DNS ルックアップオプションのチェックボックスラベル" },
@@ -63,11 +266,75 @@
   "setup_no_accounts":          { "message": "アカウントのメールドメインが見つかりません。", "description": "セットアップアシスタントでアカウントがない場合" },
   "setup_unable_load_accounts": { "message": "アカウント情報を読み込めません。",          "description": "アカウント一覧の取得エラー" },
   "setup_no_mx_records":        { "message": "MX レコードが見つかりません。",             "description": "DNS MX ルックアップで結果がない場合" },
+  "setup_assistant_desc": {
+    "message": "アカウントのメールドメインから推測したサーバー名の候補です。あくまでヒントであり、信頼済みの項目ではありません。「使用」で候補を下のフォームにコピーし、プロバイダーの実際のサーバー名と一致することを確認してから「追加」を押してください。",
+    "description": "設定ヒント <details> 内の説明"
+  },
+  "setup_assistant_guidance": {
+    "message": "正しいサーバー名は、メールプロバイダーのドキュメントか、最近のメッセージの Authentication-Results ヘッダーで確認してください。",
+    "description": "設定ヒント <details> 内の案内"
+  },
+  "setup_dns_note": {
+    "message": "MX 検索では、アカウントのメールドメインが設定した DNS リゾルバーに送信されます。DNS 検索は設定ヒントの作成にのみ使われます。信頼済みの項目が自動で追加されることはなく、明示的に追加する必要があります。",
+    "description": "DNS ルックアップのチェックボックス下のプライバシー注記"
+  },
+  "setup_source_heuristic":     { "message": "推測",                                     "description": "アカウントドメインから推測した候補のバッジ" },
+  "setup_source_mx":            { "message": "MX",                                       "description": "DNS MX レコードから得た候補のバッジ" },
 
   "no_trusted_msg": { "message": "信頼済みドメインが設定されていません。", "description": "信頼済みドメインリストが空の場合に表示" },
+  "trust_exact_match_label": {
+    "message": "$host$（完全一致）",
+    "description": "ホスト完全一致の信頼済み項目のラベル",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "trust_domain_label": {
+    "message": "$domain$（サブドメインを含む）",
+    "description": "登録可能ドメイン単位の信頼済み項目のラベル",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "trust_promote_btn": {
+    "message": "ドメイン単位で信頼（$domain$ とサブドメイン）",
+    "description": "完全一致の項目をドメイン単位の信頼に切り替えるボタン",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "trust_promote_title": {
+    "message": "$domain$ を登録可能ドメインとして信頼済みリストに追加します。$host$ だけでなく、$domain$ のすべてのサブドメインが信頼されます。",
+    "description": "ドメイン単位の信頼に切り替えるボタンのツールチップ",
+    "placeholders": {
+      "domain": { "content": "$1", "example": "example.com" },
+      "host":   { "content": "$2", "example": "mail.example.com" }
+    }
+  },
+  "trusted_servers_intro": {
+    "message": "受信メールサーバーは各メッセージに Authentication-Results ヘッダーを付け、自身をサーバー名（authserv-id）で示します。どの認証結果をスコアに使うかをこのアドオンが判断できるよう、その名前をここに追加してください。このリストにないサーバーの結果は無視されます。",
+    "description": "信頼済み認証サーバーセクションの説明文"
+  },
+  "add_trusted_placeholder":       { "message": "例: mail.example.com", "description": "信頼済みサーバー追加欄のプレースホルダー" },
+  "match_type_exact_host":         { "message": "ホスト完全一致",       "description": "ホスト完全一致で信頼するオプション" },
+  "match_type_registrable_domain": { "message": "登録可能ドメイン",     "description": "登録可能ドメイン単位で信頼するオプション" },
+  "add_trusted_hint_exact": {
+    "message": "このホストだけを信頼します。サブドメインは信頼しません。",
+    "description": "ホスト完全一致を選んだときのヒント"
+  },
+  "add_trusted_hint_domain": {
+    "message": "このドメインとすべてのサブドメインを信頼します。ホスト完全一致より範囲が広いため、慎重に使ってください。",
+    "description": "登録可能ドメインを選んだときのヒント"
+  },
+  "trusted_error_empty":         { "message": "値を入力してください。",                                                       "description": "信頼済み項目の検証エラー" },
+  "trusted_error_invalid_host":  { "message": "無効なホスト名です。英数字、ハイフン、ドットのみ使用できます。",                 "description": "信頼済み項目の検証エラー" },
+  "trusted_error_public_suffix": { "message": "この値はパブリックサフィックスのため、ドメイン単位の信頼には使えません。",           "description": "信頼済み項目の検証エラー" },
+  "trusted_error_not_registrable": {
+    "message": "登録可能ドメイン単位で信頼する場合は、登録可能ドメインそのものを入力してください（例: $value$ ではなく $registrable$）。",
+    "description": "信頼済み項目の検証エラー",
+    "placeholders": {
+      "registrable": { "content": "$1", "example": "example.com" },
+      "value":       { "content": "$2", "example": "mail.example.com" }
+    }
+  },
+  "trusted_error_duplicate":     { "message": "この項目はすでに信頼済みリストにあります。",                                   "description": "信頼済み項目の検証エラー" },
 
   "candidates_section_desc": {
-    "message": "セットアップアシスタントが見つけた、まだ信頼していないサーバー名です。ここにある項目はスコアリングに影響しません。スコアリングに使用するには、上の「信頼済み認証サーバー」に追加してください。",
+    "message": "セットアップアシスタントが見つけた、まだ信頼していないサーバー名です。ここにある項目はスコアリングに影響しません。スコアリングに使用するには、上の「信頼済み認証サーバー」に正しい名前を追加してください。",
     "description": "候補サーバーセクションの説明文"
   },
   "candidates_none": { "message": "未信頼の候補がまだありません。", "description": "候補サーバーセクションの空状態" },
@@ -76,19 +343,69 @@
     "description": "登録可能ドメインとそのサブドメインを信頼するチェックボックスラベル",
     "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
   },
+  "candidate_exact_match": {
+    "message": "$host$（完全一致）",
+    "description": "ホスト完全一致の候補のチェックボックスラベル",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
 
   "review_folder_no_accounts":        { "message": "アカウントが見つかりません。",       "description": "アカウント一覧が空の場合" },
   "review_folder_unable_load":        { "message": "アカウントを読み込めません。",       "description": "アカウント一覧の取得エラー" },
-  "review_folder_select_placeholder": { "message": "フォルダーを選択…",                  "description": "確認フォルダー選択のデフォルトオプション" },
+  "review_folder_select_placeholder": { "message": "フォルダーを選択…",                  "description": "要確認フォルダー選択のデフォルトオプション" },
 
-  "setting_move_to_review":      { "message": "不審なメールを確認フォルダに移動する",                   "description": "確認フォルダ移動設定のチェックボックス" },
-  "setting_move_junk":           { "message": "高リスクのメールを直接迷惑メールフォルダに移動する",      "description": "迷惑メール移動設定のチェックボックス" },
-  "setting_notify":              { "message": "評価に通過したメッセージを通知する（閾値以下のスコア）", "description": "評価後通知設定のチェックボックス" },
+  "setting_move_to_review":      { "message": "不審なメールを要確認フォルダーに移動する",                   "description": "要確認フォルダーへの移動設定のチェックボックス" },
+  "setting_move_junk":           { "message": "高リスクのメールを直接迷惑メールフォルダーに移動する",        "description": "迷惑メールフォルダーへの移動設定のチェックボックス" },
+  "setting_notify":              { "message": "判定を通過したメッセージを通知する（スコアが閾値以下の場合）", "description": "評価後通知設定のチェックボックス" },
   "setting_notify_caveat":       { "message": "Thunderbird 本体の新着通知も有効な場合、通知が重複することがあります。アドオン側の処理後通知だけを使う場合は、Thunderbird 本体の通知をオフにしてください。", "description": "通知チェックボックスの下に表示される補足説明" },
-  "setting_enable_diagnostics":  { "message": "診断タブを有効にする",                                  "description": "診断モード設定のチェックボックス" },
-  "setting_enable_address_book": { "message": "アドレス帳許可リストを有効にする",                       "description": "アドレス帳許可リスト設定のチェックボックス" },
+  "setting_enable_diagnostics":  { "message": "診断タブを有効にする",                                      "description": "診断モード設定のチェックボックス" },
+  "setting_enable_address_book": { "message": "アドレス帳許可リストによるスコア軽減を有効にする",            "description": "アドレス帳許可リスト設定のチェックボックス" },
+  "setting_notification_max_score":    { "message": "スコアが次の値以下の場合のみ通知:", "description": "通知するスコア上限の入力ラベル" },
+  "setting_notification_min_interval": { "message": "通知の最小間隔（ミリ秒）:",         "description": "通知間隔の入力ラベル" },
 
+  "score_col_result":       { "message": "結果",       "description": "認証スコア表の列見出し" },
+  "score_col_signal":       { "message": "シグナル",   "description": "Layer 2/3 スコア表の列見出し" },
+  "score_col_rule":         { "message": "ルール",     "description": "Layer 4 スコア表の列見出し" },
+  "score_col_score":        { "message": "スコア",     "description": "スコア表の列見出し" },
+  "score_col_default":      { "message": "デフォルト", "description": "スコア表の列見出し" },
   "score_mitigation_badge": { "message": "軽減",       "description": "スコア設定の軽減ルールに表示されるバッジ" },
+  "score_layer3_cap_warning": {
+    "message": "警告: Layer 3 の上限が要確認の閾値（50）以上です。Layer 3 のヒューリスティックだけでメッセージが要確認になる可能性があり、弱いシグナルとして扱う本来の設計から外れます。",
+    "description": "Layer 3 の上限が高すぎる場合の警告"
+  },
+  "score_settings_note": {
+    "message": "スコアの閾値は固定です: 0〜49 は正常、50〜99 は要確認、100 以上は高リスク。下の入力欄では、各シグナルがメッセージの合計スコアにどれだけ加算・減算されるかを設定します。認証スコアリング（Layer 1）は基本タブで設定した信頼済みサーバー名の結果だけを使い、認識していないサーバーの結果は無視します。",
+    "description": "スコア設定セクション冒頭の注記"
+  },
+  "score_layer1_summary": { "message": "メール認証結果（Layer 1）", "description": "スコア設定グループの見出し" },
+  "score_layer1_desc": {
+    "message": "DMARC、SPF、DKIM の結果ごとのスコアです。信頼済み認証サーバー（基本タブ）による結果だけが使われます。",
+    "description": "スコア設定グループの説明"
+  },
+  "score_layer2_summary": { "message": "送信者 ID の整合性（Layer 2）", "description": "スコア設定グループの見出し" },
+  "score_layer2_desc": {
+    "message": "表示される From アドレスと認証された ID の不一致に対するスコアです。これらは判断材料となるシグナルで、デフォルト値の合計（25）は要確認の閾値（50）を大きく下回ります。",
+    "description": "スコア設定グループの説明"
+  },
+  "score_layer3_summary": { "message": "アドレスパターンのヒューリスティック（Layer 3）", "description": "スコア設定グループの見出し" },
+  "score_layer3_desc": {
+    "message": "From アドレスが機械的に生成されたように見えるかどうかに基づく弱いシグナルで、Layer 4 ルールの判断材料になります。値は低く保ってください。上限によって Layer 3 の合計が制限されるため、これだけでメッセージが要確認になることはありません。",
+    "description": "スコア設定グループの説明"
+  },
+  "score_layer4_summary": { "message": "複合シグナルルール（Layer 4）", "description": "スコア設定グループの見出し" },
+  "score_layer4_desc": {
+    "message": "複数の独立したシグナルが重なった場合にのみ発動するルールで、要確認・迷惑メール判定の主な要因です。軽減ルール（負のスコア）は、問題がないと分かっている配信パターンの誤判定を減らします。",
+    "description": "スコア設定グループの説明"
+  },
+
+  "sender_rules_desc": {
+    "message": "特定の送信者ドメインに対するスコア調整を追加します。正の値は疑わしさを上げ、負の値は下げます。",
+    "description": "送信者ドメインルールセクションの説明"
+  },
+  "col_domain":        { "message": "ドメイン",   "description": "表の列見出し" },
+  "col_match":         { "message": "一致方法",   "description": "一致方法を示す表の列見出し" },
+  "col_address":       { "message": "アドレス",   "description": "表の列見出し" },
+  "match_type_exact":  { "message": "完全一致",   "description": "ルール・許可リストの表に表示される一致方法" },
+  "match_type_domain": { "message": "ドメイン",   "description": "ルール・許可リストの表に表示される一致方法" },
 
   "btn_add":              { "message": "追加",                           "description": "追加ボタン" },
   "btn_remove":           { "message": "削除",                           "description": "削除ボタン" },
@@ -100,31 +417,130 @@
   "btn_reset_layer2":     { "message": "Layer 2 をデフォルトにリセット",   "description": "Layer 2 スコアをリセットするボタン" },
   "btn_reset_layer3":     { "message": "Layer 3 をデフォルトにリセット",   "description": "Layer 3 スコアをリセットするボタン" },
   "btn_reset_layer4":     { "message": "Layer 4 をデフォルトにリセット",   "description": "Layer 4 スコアをリセットするボタン" },
-  "btn_move_to_inbox":    { "message": "受信トレイに移動",                 "description": "ポップアップの確認フォルダアクションボタン" },
-  "btn_whitelist_sender": { "message": "送信者を許可リストに追加",          "description": "ポップアップの確認フォルダアクションボタン" },
+  "btn_move_to_inbox":    { "message": "受信トレイに移動",                 "description": "ポップアップの要確認フォルダー用アクションボタン" },
+  "btn_whitelist_sender": { "message": "送信者を許可リストに追加",          "description": "ポップアップの要確認フォルダー用アクションボタン" },
   "btn_already_whitelisted": { "message": "許可リスト登録済み",            "description": "送信者が既に許可リストにある場合のボタン無効状態" },
   "btn_open_options":     { "message": "オプション / ログを開く",          "description": "ポップアップからオプションページを開くボタン" },
   "btn_confirm":          { "message": "確認",                            "description": "確認ボタン" },
   "btn_cancel":           { "message": "キャンセル",                      "description": "キャンセルボタン" },
+  "btn_show_older": {
+    "message": "古いエントリをさらに $count$ 件表示",
+    "description": "古いログエントリを読み込むボタン",
+    "placeholders": { "count": { "content": "$1", "example": "50" } }
+  },
 
   "whitelist_none":           { "message": "許可リストのエントリがありません。",                              "description": "手動許可リストセクションの空状態" },
   "whitelist_email_invalid":  { "message": "有効なメールアドレスを入力してください（例: user@example.com）。","description": "許可リスト追加フォームの検証エラー" },
   "whitelist_already_exists": { "message": "このアドレスはすでに許可リストにあります。",                      "description": "アドレスが既に登録されている場合のエラー" },
+  "whitelist_full": {
+    "message": "許可リストがいっぱいです（最大 $max$ 件）。新しく追加する前に既存のエントリを削除してください。",
+    "description": "許可リストが上限に達した場合のエラー",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
   "whitelist_ab_permission_note": {
     "message": "この機能を有効にすると、Thunderbird のアドレス帳へのアクセスが要求されます。",
     "description": "アドレス帳許可リストを有効にする際のメモ"
   },
+  "whitelist_desc": {
+    "message": "許可リストのエントリは、一致する送信者に対するこのアドオンのスパムスコアを下げます。メッセージを認証したり本物であることを証明したりするものではありません。知っている送信者の誤判定を減らすためにスコアを下げるだけです。",
+    "description": "手動許可リストセクションの説明"
+  },
+  "whitelist_mitigation_label": { "message": "送信者が一致した場合のスコア減算:", "description": "手動許可リストのスコア入力ラベル" },
+  "whitelist_mitigation_note": {
+    "message": "範囲: 0〜−100。デフォルト: −50。許可リストの送信者を要確認の閾値未満に抑えたい場合は −100 を使ってください。",
+    "description": "手動許可リストのスコア入力の注記"
+  },
+  "whitelist_email_placeholder": { "message": "例: user@example.com", "description": "許可リスト追加欄のプレースホルダー" },
+  "address_book_desc": {
+    "message": "有効にすると、Thunderbird のアドレス帳にある送信者のスコアが下がります。メッセージを認証するものではなく、知っている連絡先の誤判定を減らすためにスコアを下げるだけです。",
+    "description": "アドレス帳許可リストセクションの説明"
+  },
+  "address_book_mitigation_label": { "message": "送信者がアドレス帳にある場合のスコア減算:", "description": "アドレス帳のスコア入力ラベル" },
+  "address_book_mitigation_note":  { "message": "範囲: 0〜−100。デフォルト: −50。",           "description": "アドレス帳のスコア入力の注記" },
+  "diagnostics_desc": {
+    "message": "診断モードでは、生のスコア、スコア理由、ヒューリスティック指標、エクスポート機能を含む詳細な判定ログを表示します。トラブルシューティングや調整のための機能で、普段の利用には必要ありません。",
+    "description": "詳細タブの診断セクションの説明"
+  },
 
+  "metrics_alignment_summary": { "message": "整合性の指標",           "description": "整合性指標の <details> サマリー要素" },
+  "metrics_heuristic_summary": { "message": "ヒューリスティック指標", "description": "ヒューリスティック指標の <details> サマリー要素" },
+
+  "log_count_all": {
+    "message": "保存済みエントリ: $total$ / 1000",
+    "description": "判定ログのエントリ数（すべて表示中）",
+    "placeholders": { "total": { "content": "$1", "example": "42" } }
+  },
+  "log_count_showing": {
+    "message": "保存済みエントリ: $total$ / 1000 — 最新 $showing$ 件を表示中",
+    "description": "判定ログの一部だけを表示している場合のエントリ数",
+    "placeholders": {
+      "total":   { "content": "$1", "example": "1000" },
+      "showing": { "content": "$2", "example": "50" }
+    }
+  },
   "log_no_reasons":       { "message": "理由の詳細がありません。",  "description": "scoreReasons のないログエントリに表示" },
   "log_no_reasons_label": { "message": "理由なし",                  "description": "ログエントリに理由が0件の場合の <summary> テキスト" },
+  "log_reasons_one": {
+    "message": "理由 $count$ 件",
+    "description": "理由の件数（単数）",
+    "placeholders": { "count": { "content": "$1", "example": "1" } }
+  },
+  "log_reasons_many": {
+    "message": "理由 $count$ 件",
+    "description": "理由の件数（複数）",
+    "placeholders": { "count": { "content": "$1", "example": "5" } }
+  },
+  "decision_log_desc": {
+    "message": "最近受信した各メッセージがどのようにスコアリングされ、どの操作が行われたかをローカルに記録したものです。データはすべてこの端末内に保存されます。",
+    "description": "判定ログセクションの説明"
+  },
+  "log_col_time":        { "message": "日時",          "description": "判定ログの列見出し" },
+  "log_col_from_domain": { "message": "From ドメイン", "description": "判定ログの列見出し" },
+  "log_col_original":    { "message": "受信時",        "description": "判定ログの列見出し: 受信時のスコア" },
+  "log_col_current":     { "message": "現在の設定",    "description": "判定ログの列見出し: 現在の設定で再計算したスコア" },
+  "log_col_action":      { "message": "操作",          "description": "判定ログの列見出し" },
 
   "popup_no_message": {
     "message": "現在表示されているメッセージはありません。",
     "description": "メッセージが開いていない場合にポップアップに表示"
   },
+  "popup_status_inactive": {
+    "message": "このアカウントでは認証スコアリングが有効になっていません。",
+    "description": "表示中メッセージのアカウントで認証スコアリングが無効な場合のポップアップ通知"
+  },
+  "popup_btn_open_setup": { "message": "設定を開く", "description": "ポップアップからオプションページの設定を開くボタン" },
+  "popup_loading":        { "message": "読み込み中…", "description": "スコア詳細の読み込み中にポップアップに表示" },
+  "popup_protective_factors": { "message": "スコアを抑えている要因", "description": "スコアが高くならなかった要因を示すポップアップの見出し" },
+  "popup_fact_dkim_aligned":  { "message": "DKIM 署名が From ドメインと整合しています", "description": "ポップアップのスコアを抑えている要因" },
+  "popup_fact_no_trusted_auth": { "message": "信頼済みサーバーによる Authentication-Results ヘッダーが見つかりません", "description": "ポップアップのスコアを抑えている要因" },
+  "popup_fact_below_review": {
+    "message": "スコア（$score$）は要確認の閾値（$threshold$）未満です",
+    "description": "ポップアップのスコアを抑えている要因",
+    "placeholders": {
+      "score":     { "content": "$1", "example": "20" },
+      "threshold": { "content": "$2", "example": "50" }
+    }
+  },
+  "popup_fact_below_high_risk": {
+    "message": "スコア（$score$）は高リスクの閾値（$threshold$）未満です",
+    "description": "ポップアップのスコアを抑えている要因",
+    "placeholders": {
+      "score":     { "content": "$1", "example": "70" },
+      "threshold": { "content": "$2", "example": "100" }
+    }
+  },
+  "popup_identity_from":        { "message": "差出人",        "description": "ポップアップの識別情報表のラベル" },
+  "popup_identity_subject":     { "message": "件名",          "description": "ポップアップの識別情報表のラベル" },
+  "popup_identity_from_domain": { "message": "From ドメイン", "description": "ポップアップの識別情報表のラベル" },
+  "popup_identity_message_id":  { "message": "Message-ID",    "description": "ポップアップの識別情報表のラベル（ヘッダー名のため英語のまま）" },
   "popup_no_entry": {
     "message": "このメッセージのスコア詳細が見つかりません。アドオンはメッセージの受信時にスコアリングを行います。アドオンのインストール前に受信したメッセージか、Message-ID が一致しない可能性があります。",
     "description": "表示中のメッセージに一致するログエントリがない場合"
+  },
+  "popup_score": {
+    "message": "スコア: $score$",
+    "description": "ポップアップのスコアバッジ",
+    "placeholders": { "score": { "content": "$1", "example": "75" } }
   },
   "popup_score_details": { "message": "スコアの詳細",     "description": "スコア詳細折りたたみの <summary> ラベル" },
   "popup_all_reasons":   { "message": "すべてのスコア理由", "description": "ポップアップの全理由リスト上の見出し" },
@@ -132,27 +548,38 @@
   "popup_moved_to_inbox": { "message": "受信トレイに移動しました。",            "description": "受信トレイへの移動成功メッセージ" },
   "popup_move_failed":    { "message": "移動に失敗しました。もう一度お試しください。", "description": "移動失敗時のエラーメッセージ" },
   "popup_whitelist_confirm": {
-    "message": "\"$address$\" を手動許可リストに追加しますか？このアドレスからの今後のメッセージはスコアが下がります。",
+    "message": "「$address$」を手動許可リストに追加しますか？このアドレスからの今後のメッセージはスコアが下がります。",
     "description": "許可リスト追加前の確認テキスト",
     "placeholders": { "address": { "content": "$1", "example": "user@example.com" } }
   },
   "popup_whitelist_added": {
-    "message": "\"$address$\" を手動許可リストに追加しました。",
+    "message": "「$address$」を手動許可リストに追加しました。",
     "description": "許可リスト追加成功メッセージ",
     "placeholders": { "address": { "content": "$1", "example": "user@example.com" } }
+  },
+  "popup_whitelist_full": {
+    "message": "許可リストがいっぱいです（最大 $max$ 件）。新しく追加する前に既存のエントリを削除してください。",
+    "description": "ポップアップで許可リストが上限に達した場合のエラー",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
   },
   "popup_whitelist_save_failed":     { "message": "許可リストエントリの保存に失敗しました。もう一度お試しください。", "description": "許可リスト保存の汎用エラー" },
   "popup_no_sender_address":         { "message": "送信者のアドレスを特定できません。",            "description": "送信者が不明な場合の許可リストボタンツールチップ" },
   "popup_already_whitelisted_title": { "message": "この送信者はすでに手動許可リストに登録されています。", "description": "送信者が既に登録済みの場合のツールチップ" },
+  "popup_error": {
+    "message": "スコア詳細の読み込み中にエラーが発生しました: $error$",
+    "description": "ポップアップの初期化で例外が発生した場合のエラー",
+    "placeholders": { "error": { "content": "$1", "example": "NetworkError" } }
+  },
 
-  "action_classified_normal":   { "message": "受信トレイに残す",         "description": "classified-normal アクションラベル" },
-  "action_classified_review":   { "message": "要確認（操作なし）",       "description": "classified-review アクションラベル" },
-  "action_classified_high_risk":{ "message": "高リスク（操作なし）",     "description": "classified-high-risk アクションラベル" },
-  "action_moved_review":        { "message": "確認フォルダに移動",       "description": "moved-review アクションラベル" },
-  "action_moved_junk":          { "message": "迷惑メールに移動",         "description": "moved-junk アクションラベル" },
-  "action_move_review_failed":  { "message": "確認フォルダへの移動失敗", "description": "move-review-failed アクションラベル" },
-  "action_move_junk_failed":    { "message": "迷惑メールへの移動失敗",   "description": "move-junk-failed アクションラベル" },
-  "action_no_review_folder":    { "message": "確認フォルダ未設定",       "description": "no-review-folder-configured アクションラベル" },
+  "action_classified_normal":   { "message": "受信トレイのまま",                 "description": "classified-normal アクションラベル" },
+  "action_classified_review":   { "message": "要確認と判定（移動なし）",         "description": "classified-review アクションラベル" },
+  "action_classified_high_risk":{ "message": "高リスクと判定（移動なし）",       "description": "classified-high-risk アクションラベル" },
+  "action_moved_review":        { "message": "要確認フォルダーに移動",           "description": "moved-review アクションラベル" },
+  "action_moved_junk":          { "message": "迷惑メールフォルダーに移動",       "description": "moved-junk アクションラベル" },
+  "action_moved_junk_mark_failed": { "message": "迷惑メールフォルダーに移動（迷惑メールマークの設定に失敗）", "description": "moved-junk-mark-failed アクションラベル（移動は成功したが迷惑メールフラグの設定に失敗）" },
+  "action_move_review_failed":  { "message": "要確認フォルダーへの移動に失敗",   "description": "move-review-failed アクションラベル" },
+  "action_move_junk_failed":    { "message": "迷惑メールフォルダーへの移動に失敗", "description": "move-junk-failed アクションラベル" },
+  "action_no_review_folder":    { "message": "要確認フォルダー未設定",           "description": "no-review-folder-configured アクションラベル" },
 
   "section_custom_formulas": { "message": "カスタムスコアリング式（Layer 5）", "description": "カスタム式管理のセクション見出し（カスタム式タブ）" },
   "section_key_reference": { "message": "スコア理由キーリファレンス", "description": "カスタム式タブのキーリファレンステーブルのセクション見出し" },
@@ -161,7 +588,7 @@
     "description": "キーリファレンステーブル上の説明文"
   },
   "key_reference_layer_auth":      { "message": "L1 認証 (auth.*)",               "description": "キーリファレンスの Layer 1 認証結果キーグループ見出し" },
-  "key_reference_layer_identity":  { "message": "L2 送信者 ID (identity.*)",       "description": "キーリファレンスの Layer 2 送信者 ID アライメントキーグループ見出し" },
+  "key_reference_layer_identity":  { "message": "L2 送信者 ID (identity.*)",       "description": "キーリファレンスの Layer 2 送信者 ID 整合性キーグループ見出し" },
   "key_reference_layer_heuristic": { "message": "L3 ヒューリスティック (heuristic.*)", "description": "キーリファレンスの Layer 3 ヒューリスティックキーグループ見出し" },
   "key_reference_layer_composite": { "message": "L4 複合ルール (composite.*)",     "description": "キーリファレンスの Layer 4 複合ルールキーグループ見出し" },
   "key_reference_layer_l5":        { "message": "L5 / 許可リスト",                 "description": "キーリファレンスの Layer 5 許可リスト・送信者ルールキーグループ見出し" },
@@ -170,34 +597,94 @@
   "key_reference_col_default":     { "message": "デフォルト",                      "description": "キーリファレンステーブルの列見出し" },
   "key_reference_btn_insert_has": {
     "message": "has()",
-    "description": "スコア理由キーの has(\"key\") スニペットを挿入するボタン"
+    "description": "スコア理由キーの has(\"key\") スニペットを挿入するボタン（関数名のため英語のまま）"
   },
   "key_reference_btn_insert_scoreof": {
     "message": "scoreOf()",
-    "description": "スコア理由キーの scoreOf(\"key\") スニペットを挿入するボタン"
+    "description": "スコア理由キーの scoreOf(\"key\") スニペットを挿入するボタン（関数名のため英語のまま）"
   },
   "custom_formula_intro": {
     "message": "上級者向けの機能です。カスタム式は L1〜L4 のスコアリングが完了した後、Layer 5 として評価され、最終スコアを観察または調整できます。",
     "description": "カスタム式リスト上部の説明"
   },
+  "custom_formula_safety": {
+    "message": "式はローカルでのみ評価され、外部に送信されることはありません。スコアを変えずに式を試すには observe モードを使ってください。add モードでは、クランプされた結果（−100 〜 +100）がメッセージのスコアに加算されます。match() による正規表現マッチングは observe モードでのみ使用できます。個々の式のエラーはメッセージごとに捕捉され、無視されます。",
+    "description": "カスタム式セクションの安全性に関する説明"
+  },
   "custom_formula_none":       { "message": "カスタム式が設定されていません。",  "description": "カスタム式リストの空状態" },
   "custom_formula_add_title":  { "message": "式を追加",                         "description": "新しい式を追加する際の見出し" },
   "custom_formula_edit_title": { "message": "式を編集",                         "description": "既存の式を編集する際の見出し" },
-  "custom_formula_field_id":         { "message": "ID",         "description": "式 ID 入力のラベル" },
+  "custom_formula_field_id":         { "message": "ID",         "description": "式 ID 入力のラベル（識別子のため英語のまま）" },
   "custom_formula_field_name":       { "message": "名前",       "description": "式名入力のラベル" },
   "custom_formula_field_expression": { "message": "式",         "description": "式入力エリアのラベル" },
   "custom_formula_field_mode":       { "message": "モード",     "description": "式モード選択のラベル" },
+  "custom_formula_id_hint": {
+    "message": "スコアキー（custom.formula.<id>）で使われる固定の識別子です。英数字、ハイフン、アンダースコアのみ使用できます。保存後は変更できません。",
+    "description": "式 ID 入力の下に表示されるヒント"
+  },
+  "custom_formula_mode_hint": {
+    "message": "observe: 評価して記録しますが、スコアは変更しません。add: 結果をスコアに加算します。disabled: 式を評価しません。",
+    "description": "式モード選択の下に表示されるヒント"
+  },
+  "custom_formula_count_all": {
+    "message": "式: $count$ / 20",
+    "description": "保存されているカスタム式の数",
+    "placeholders": { "count": { "content": "$1", "example": "3" } }
+  },
   "btn_add_formula":    { "message": "式を追加", "description": "式追加フォームを開くボタン" },
   "btn_edit_formula":   { "message": "編集",     "description": "式行の編集フォームを開くボタン" },
   "btn_delete_formula": { "message": "削除",     "description": "式を削除するボタン" },
   "btn_save_formula":   { "message": "保存",     "description": "式フォームを保存するボタン" },
   "custom_formula_error_id_required":         { "message": "ID は必須です。",                                                        "description": "式 ID が空の場合の検証エラー" },
+  "custom_formula_error_id_too_long": {
+    "message": "ID が長すぎます（最大 $max$ 文字）。",
+    "description": "式 ID が長さ制限を超えた場合の検証エラー",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
   "custom_formula_error_id_invalid":          { "message": "ID には英数字・ハイフン・アンダースコアのみ使用できます。",              "description": "式 ID の文字が無効な場合の検証エラー" },
   "custom_formula_error_id_duplicate":        { "message": "この ID を持つ式は既に存在します。",                                    "description": "式 ID が重複している場合の検証エラー" },
+  "custom_formula_error_name_too_long": {
+    "message": "名前が長すぎます（最大 $max$ 文字）。",
+    "description": "式名が長さ制限を超えた場合の検証エラー",
+    "placeholders": { "max": { "content": "$1", "example": "200" } }
+  },
   "custom_formula_error_expression_required": { "message": "式は必須です。",                                                        "description": "式が空の場合の検証エラー" },
+  "custom_formula_error_expression_too_long": {
+    "message": "式が長すぎます（最大 $max$ 文字）。",
+    "description": "式が長さ制限を超えた場合の検証エラー",
+    "placeholders": { "max": { "content": "$1", "example": "1000" } }
+  },
+  "custom_formula_error_parse": {
+    "message": "構文エラー: $error$",
+    "description": "式の解析に失敗した場合の検証エラー",
+    "placeholders": { "error": { "content": "$1", "example": "Unexpected token" } }
+  },
   "custom_formula_error_invalid_mode":        { "message": "無効なモードです。",                                                    "description": "式モードが無効な場合の内部検証エラー" },
   "custom_formula_error_match_in_add_mode":  { "message": "match() は observe モードでのみ使用できます。observe に切り替えるか、match() の呼び出しを削除してください。", "description": "add モードの式で match() が使われている場合の検証エラー" },
   "custom_formula_diag_summary":              { "message": "L5 式の診断",                                                         "description": "ログの式診断 <details> のサマリー要素" },
+  "formula_diag_col_name":          { "message": "名前",           "description": "式診断表の列見出し" },
+  "formula_diag_col_mode":          { "message": "モード",         "description": "式診断表の列見出し" },
+  "formula_diag_col_value":         { "message": "値",             "description": "式診断表の列見出し" },
+  "formula_diag_col_applied":       { "message": "適用",           "description": "式診断表の列見出し" },
+  "formula_diag_col_would_score":   { "message": "変化後のスコア", "description": "式診断表の列見出し" },
+  "formula_diag_col_would_verdict": { "message": "変化後の判定",   "description": "式診断表の列見出し" },
+  "formula_diag_col_error":         { "message": "エラー",         "description": "式診断表の列見出し" },
+  "formula_last_result": {
+    "message": "前回の結果: $value$",
+    "description": "式の下に表示される前回の診断結果",
+    "placeholders": { "value": { "content": "$1", "example": "30" } }
+  },
+  "formula_last_result_error": {
+    "message": "前回の結果: エラー — $error$",
+    "description": "式の下に表示される前回の診断エラー",
+    "placeholders": { "error": { "content": "$1", "example": "ReferenceError" } }
+  },
+  "formula_last_result_applied": { "message": "適用済み", "description": "前回の式の結果がスコアに適用された場合の表示" },
+  "custom_formula_list_full": {
+    "message": "式の上限（$max$ 件）に達しました。新しく追加する前に既存の式を削除してください。",
+    "description": "式リストが上限に達した場合のエラー",
+    "placeholders": { "max": { "content": "$1", "example": "20" } }
+  },
   "custom_formula_template_label":   { "message": "テンプレート",                  "description": "式フォームのテンプレート選択行のラベル" },
   "custom_formula_template_choose":  { "message": "— テンプレートを選択 —",        "description": "テンプレート選択の空オプション" },
   "btn_insert_template":             { "message": "挿入",                          "description": "選択したテンプレートを式フォームに挿入するボタン" },
@@ -205,7 +692,7 @@
   "custom_formula_tpl_deep_subdomain": { "message": "ランダムな深いサブドメイン（実験）", "description": "テンプレート名：ランダムに見える深いサブドメインの実験" },
   "custom_formula_tpl_msgid_mismatch": { "message": "Message-ID の不一致（実験）", "description": "テンプレート名：Message-ID の不一致実験" },
   "custom_formula_tpl_dkim_mitigate":  { "message": "DKIM 整合時にスコアを軽減",   "description": "テンプレート名：DKIM が整合している場合にスコアを軽減" },
-  "custom_formula_expr_placeholder": { "message": "has(\"composite.authAlignedRandomDomain\") ? 30 : 0", "description": "式入力欄が空のときに表示されるプレースホルダー" },
+  "custom_formula_expr_placeholder": { "message": "has(\"composite.authAlignedRandomDomain\") ? 30 : 0", "description": "式入力欄が空のときに表示されるプレースホルダー（コードのため英語のまま）" },
   "custom_formula_help_summary":     { "message": "L5 式のリファレンス",            "description": "式ヘルプパネルの折りたたみラベル" },
   "custom_formula_help_expression_only": {
     "message": "式は単一の式です — JavaScript プログラムではありません。if、let、for、return などのステートメントは使用できません。",
@@ -230,9 +717,9 @@
   "formula_chips_label":            { "message": "フィールド・関数を挿入:",                                                                                      "description": "式挿入チップ上部のヘッダー" },
   "formula_chip_insert_title":      { "message": "カーソル位置に挿入",                                                                                             "description": "式チップボタンのツールチップ" },
   "formula_chips_group_functions":  { "message": "関数",                                                                                                           "description": "関数チップグループのラベル" },
-  "formula_chips_group_from":       { "message": "From",                                                                                                           "description": "From フィールドチップグループのラベル" },
-  "formula_chips_group_alignment":  { "message": "アライメント",                                                                                                   "description": "Alignment フィールドチップグループのラベル" },
-  "formula_chips_group_message_id": { "message": "Message-ID",                                                                                                    "description": "Message-ID フィールドチップグループのラベル" },
+  "formula_chips_group_from":       { "message": "From",                                                                                                           "description": "From フィールドチップグループのラベル（フィールド名のため英語のまま）" },
+  "formula_chips_group_alignment":  { "message": "整合性",                                                                                                         "description": "Alignment フィールドチップグループのラベル" },
+  "formula_chips_group_message_id": { "message": "Message-ID",                                                                                                    "description": "Message-ID フィールドチップグループのラベル（ヘッダー名のため英語のまま）" },
   "formula_chips_group_headers":    { "message": "ヘッダー",                                                                                                       "description": "Headers フィールドチップグループのラベル" },
   "formula_chips_group_general":    { "message": "一般",                                                                                                           "description": "General フィールドチップグループのラベル" },
   "formula_chips_ref_note":         { "message": "これらは v1 式 DSL でサポートされているフィールドと関数です。チップをクリックするとカーソル位置に挿入されます。",  "description": "式挿入チップ下部の参照注記" },
@@ -244,8 +731,120 @@
   "dns_error_dns":              { "message": "DNS サーバーがエラーを返しました。",               "description": "dns_error エラーコードの DNS エラー" },
   "dns_error_generic":          { "message": "DNS ルックアップに失敗しました。",                 "description": "汎用 DNS エラーフォールバック" },
 
+  "rule_authserv_untrusted_title":   { "message": "未信頼の authserv-id",                                                    "description": "ルールのタイトル" },
+  "rule_authserv_untrusted_summary": { "message": "信頼済みに登録していないサーバーによる Authentication-Results ヘッダーです。", "description": "ルールの概要" },
+  "rule_sender_rule_title":          { "message": "送信者ドメインルール",                                                    "description": "ルールのタイトル" },
+  "rule_sender_rule_summary":        { "message": "ユーザー定義の送信者ドメインルールがこのメッセージに一致しました。",           "description": "ルールの概要" },
+  "rule_whitelist_manual_title":     { "message": "手動許可リスト",                                                          "description": "ルールのタイトル" },
+  "rule_whitelist_manual_summary":   { "message": "送信者のアドレスが手動許可リストに登録されています。",                       "description": "ルールの概要" },
+  "rule_whitelist_addressBook_title":  { "message": "アドレス帳の連絡先",                                                    "description": "ルールのタイトル" },
+  "rule_whitelist_addressBook_summary":{ "message": "送信者が Thunderbird のアドレス帳に登録されています。",                    "description": "ルールの概要" },
+
+  "rule_identity_spfMailFromMismatch_title":          { "message": "SPF の MAIL FROM が From と異なる",                     "description": "ルールのタイトル" },
+  "rule_identity_spfMailFromMismatch_summary":        { "message": "SPF は、表示上の From アドレスとは別のドメインで成功しています。", "description": "ルールの概要" },
+  "rule_identity_dkimDomainMismatch_title":           { "message": "DKIM 署名ドメインが From と異なる",                     "description": "ルールのタイトル" },
+  "rule_identity_dkimDomainMismatch_summary":         { "message": "成功した DKIM 署名が、すべて From アドレスと無関係なドメインのものです。", "description": "ルールの概要" },
+  "rule_identity_dmarcNoneWithThirdPartyAuth_title":  { "message": "DMARC なしで第三者の認証のみ",                         "description": "ルールのタイトル" },
+  "rule_identity_dmarcNoneWithThirdPartyAuth_summary":{ "message": "DMARC ポリシーがなく、成功した SPF/DKIM がすべて無関係なドメインのものです。", "description": "ルールの概要" },
+
+  "rule_heuristic_randomFromDomainLabel_title":   { "message": "ランダムに見える From ドメインのラベル",                                     "description": "ルールのタイトル" },
+  "rule_heuristic_randomFromDomainLabel_summary": { "message": "From ドメインのラベルが機械的に生成されたように見えます（エントロピーが高く、母音が少ない）。", "description": "ルールの概要" },
+  "rule_heuristic_randomFromLocalPart_title":     { "message": "ランダムに見える From のローカル部",                                         "description": "ルールのタイトル" },
+  "rule_heuristic_randomFromLocalPart_summary":   { "message": "From アドレスのローカル部（@ の前）が機械的に生成されたように見えます。",       "description": "ルールの概要" },
+
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_title":   { "message": "SPF 整合・DKIM 非整合・ランダムなローカル部",            "description": "ルールのタイトル" },
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_summary": { "message": "SPF は整合していますが DKIM は整合しておらず、ローカル部がランダムに見えます。", "description": "ルールの概要" },
+  "rule_composite_authAlignedRandomDomain_title":              { "message": "認証は整合しているがドメインがランダムに見える送信者",   "description": "ルールのタイトル" },
+  "rule_composite_authAlignedRandomDomain_summary":            { "message": "認証は整合していますが、From ドメイン自体が機械的に生成されたように見えます。", "description": "ルールの概要" },
+  "rule_composite_thirdPartyAuthRandomLocal_title":            { "message": "第三者の認証のみ成功・ランダムなローカル部・整合なし",   "description": "ルールのタイトル" },
+  "rule_composite_thirdPartyAuthRandomLocal_summary":          { "message": "第三者による認証だけが成功し、整合がなく、ローカル部がランダムに見えます。", "description": "ルールの概要" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_title":   { "message": "Message-ID ドメインの不一致と非整合の認証",              "description": "ルールのタイトル" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_summary": { "message": "Message-ID のドメインが From ドメインと異なり、認証も整合していません。", "description": "ルールの概要" },
+  "rule_composite_messageIdUnregistrableMismatch_title":       { "message": "Message-ID ドメインが登録不可または From と不一致",      "description": "ルールのタイトル" },
+  "rule_composite_messageIdUnregistrableMismatch_summary":     { "message": "Message-ID のドメインが登録できないもの（TLD のみなど）か、有効な登録可能ドメインを持ちません。", "description": "ルールの概要" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_title":  { "message": "From と Sender の不一致と非整合の認証",                  "description": "ルールのタイトル" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_summary":{ "message": "From ヘッダーと Sender ヘッダーが別のドメインを示しており、認証も整合していません。", "description": "ルールの概要" },
+  "rule_composite_deepRandomFromSubdomain_title":              { "message": "ランダムに見える深い From サブドメイン",                 "description": "ルールのタイトル" },
+  "rule_composite_deepRandomFromSubdomain_summary":            { "message": "From アドレスが、ランダムに見えるラベルを含む深いサブドメインを使っています。", "description": "ルールの概要" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_title":  { "message": "委託配信のニュースレター: DKIM 整合・経路に矛盾なし",     "description": "ルールのタイトル" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_summary":{ "message": "DKIM が整合しており、配信経路が正規のメール配信サービス（ESP）と矛盾しません。", "description": "ルールの概要" },
+  "rule_composite_spfPassDkimFailRandomLocal_title":           { "message": "SPF 成功・DKIM 失敗・ランダムなローカル部",               "description": "ルールのタイトル" },
+  "rule_composite_spfPassDkimFailRandomLocal_summary":         { "message": "SPF は成功していますが DKIM が失敗しており、ローカル部がランダムに見えます。", "description": "ルールの概要" },
+  "rule_composite_dkimAlignedLexicalMitigation_title":         { "message": "DKIM 整合による文字列ヒューリスティックの誤判定軽減",      "description": "ルールのタイトル" },
+  "rule_composite_dkimAlignedLexicalMitigation_summary":       { "message": "DKIM が整合しているため、ランダムに見える名前に対するヒューリスティックの加点を減らします。", "description": "ルールの概要" },
+  "rule_composite_ownDomainAuthFail_title":                    { "message": "自分のアカウントのドメインで認証失敗",                    "description": "ルールのタイトル" },
+  "rule_composite_ownDomainAuthFail_summary":                  { "message": "あなたのアカウントのドメインから送信されたと称していますが、認証に失敗しています。", "description": "ルールの概要" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_title":   { "message": "解析できない From と送信基盤の不一致",           "description": "ルールのタイトル" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_summary": { "message": "From ヘッダーを有効なアドレスとして解析できず、送信基盤のシグナルも一致しません。", "description": "ルールの概要" },
+  "rule_composite_geoTokenCompoundDomain_title":               { "message": "地名・トークンを組み合わせた登録可能ドメイン",            "description": "ルールのタイトル" },
+  "rule_composite_geoTokenCompoundDomain_summary":             { "message": "登録可能ドメインが、スパムでよく使われる地名やトークンを含むハイフン区切りの複合語で、認証も整合していません。", "description": "ルールの概要" },
+  "rule_composite_deepServiceWordSubdomain_title":             { "message": "サービス風の語を含む深いサブドメイン",                    "description": "ルールのタイトル" },
+  "rule_composite_deepServiceWordSubdomain_summary":           { "message": "深いサブドメインに、使い捨てドメインのスパムでよく見られるサービス風の語（例: mail-01）が含まれています。", "description": "ルールの概要" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_title":   { "message": "DMARC 失敗の軽減: DKIM 整合かつリストヘッダーあり",       "description": "ルールのタイトル" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_summary": { "message": "DMARC は失敗していますが、DKIM が整合しており List ヘッダーもあるため、メーリングリスト経由の可能性があります。", "description": "ルールの概要" },
+  "rule_composite_dkimFailWithAlignedPass_title":              { "message": "DKIM 失敗と整合した DKIM 成功の混在",                     "description": "ルールのタイトル" },
+  "rule_composite_dkimFailWithAlignedPass_summary":            { "message": "DKIM 署名の少なくとも 1 つが失敗していますが、整合した別の署名は成功しています。", "description": "ルールの概要" },
+  "rule_composite_brandDivergencePhishing_title":              { "message": "表示名のブランドとドメインの不一致（フィッシングの疑い）", "description": "ルールのタイトル" },
+  "rule_composite_brandDivergencePhishing_summary":            { "message": "From の表示名は有名ブランドと一致していますが、From ドメインはそのブランドと関係がありません。", "description": "ルールの概要" },
+  "rule_composite_unsecuredDeepSubdomain_title":               { "message": "DMARC 未適用ドメインの深いサブドメイン",                  "description": "ルールのタイトル" },
+  "rule_composite_unsecuredDeepSubdomain_summary":             { "message": "From アドレスが、DMARC の強制ポリシーも整合した認証もないドメインの深いサブドメインを使っています。", "description": "ルールの概要" },
+  "rule_composite_unauthenticatedFromSpoof_title":             { "message": "未認証の From と送信者情報の不一致",                      "description": "ルールのタイトル" },
+  "rule_composite_unauthenticatedFromSpoof_summary":           { "message": "表示上の From ドメインに整合した信頼済みの認証がなく、別の送信者識別子とも一致しません。", "description": "ルールの概要" },
+  "rule_composite_authenticatedDisplayNameSpoof_title":        { "message": "認証済み送信者の表示名に別ドメインのアドレス",            "description": "ルールのタイトル" },
+  "rule_composite_authenticatedDisplayNameSpoof_summary":      { "message": "From ドメインとしては認証されていますが、表示名に別のドメインを示すメールアドレスが含まれています。", "description": "ルールの概要" },
+  "rule_composite_alignedAuthenticationConfirmed_title":       { "message": "整合した認証あり",                                        "description": "ルールのタイトル" },
+  "rule_composite_alignedAuthenticationConfirmed_summary":     { "message": "表示上の From ドメインに整合した信頼済みの認証があり、矛盾するシグナルはありません。", "description": "ルールの概要" },
+  "rule_composite_publicDomainSpoofing_title":                 { "message": "大手メールサービスのドメインで認証失敗",                  "description": "ルールのタイトル" },
+  "rule_composite_publicDomainSpoofing_summary":               { "message": "表示上の From ドメインは大手の公開メールサービスのものですが、認証に失敗しており、送信基盤も一致しません。", "description": "ルールの概要" },
+
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_tooltip":   { "message": "MAIL FROM のドメインだけを管理して SPF を通過させ、使い捨てのローカル部を使うスパムのパターンです。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_authAlignedRandomDomain_tooltip":              { "message": "攻撃者がランダムな文字列のドメインを所有し、実在の ESP を使って整合した認証を得るパターンです。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_thirdPartyAuthRandomLocal_tooltip":            { "message": "使い捨ての From アドレスを使い、第三者経由で中継されるスパムのパターンです。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_tooltip":   { "message": "偽装されたメッセージでは、認証基盤が無関係な場合に Message-ID のドメインが一致しないことがよくあります。注: 転送やエイリアス経由のメールでは、元の送信元ドメインの Message-ID が残ることがあります。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_messageIdUnregistrableMismatch_tooltip":       { "message": "正規のメールは通常、有効な Message-ID ドメインを持つため、偽装の強い兆候です。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_tooltip":  { "message": "From と Sender の不一致は、再送信やなりすましで見られるパターンです。注: メーリングリストや転送サービスは Sender を自身のドメインにすることがあります。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_deepRandomFromSubdomain_tooltip":              { "message": "スパム送信者は 1 つのドメインを登録し、多数のランダムなサブドメインから送信してドメイン単位のブロックを回避することがあります。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_tooltip":  { "message": "DKIM 署名を委託した ESP 経由で送られる一斉配信メールの誤判定を減らします。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_spfPassDkimFailRandomLocal_tooltip":           { "message": "SPF だけに頼り、使い捨てのローカル部を使う一斉送信者の兆候です。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_dkimAlignedLexicalMitigation_tooltip":         { "message": "整合した有効な DKIM 署名は From ドメインが署名したことを示すため、ランダムに見えるローカル部の疑わしさは下がります。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_ownDomainAuthFail_tooltip":                    { "message": "なりすましの可能性が高いシグナルです。自分のドメインから正しく送られたメールは、通常は認証に成功します。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_tooltip": { "message": "不正な形式の From ヘッダーと一致しない送信基盤の組み合わせは、偽装の強い兆候です。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_geoTokenCompoundDomain_tooltip":               { "message": "地名やキーワードのトークンを使った、使い捨てドメインによるスパムでよく見られるパターンです。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_deepServiceWordSubdomain_tooltip":             { "message": "スパム送信者は mail-01.random-domain.tld のようなパターンを使い回して、ドメイン単位の評判を回避することがあります。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_tooltip":   { "message": "メーリングリストは DKIM を保ったまま DMARC を失敗させることが多く、これを高リスクと扱うと誤判定につながります。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_dkimFailWithAlignedPass_tooltip":              { "message": "整合した DKIM 署名に成功と失敗が混在するのは珍しく、メッセージの改変と関連することがあります。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_brandDivergencePhishing_tooltip":              { "message": "フィッシング送信者は、無関係なドメインを管理して正しく認証させつつ、表示上の From に有名ブランド名を使って受信者をだますことがあります。注: ブランドの公式エイリアス（例: American Express の aexp.com）や、上位ドメイン一覧にない地域別のブランドドメインも不一致と判定されることがあります。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_unsecuredDeepSubdomain_tooltip":               { "message": "使い捨てドメインでは、DMARC を未設定のまま、サービス風の深いサブドメイン（例: sivakeso.support.sn5799.com）を設定して、ラベル単位の検査や認証の強制を回避することがあります。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_unauthenticatedFromSpoof_tooltip":             { "message": "偽装されたメッセージは、整合した認証がない一方で、実際の送信基盤を示す一致しないヘッダー（Message-ID、Return-Path、Reply-To）を持つことがよくあります。注: アドオンの PSL を考慮した整合判定で認証が整合していると見なされる場合（例: From が news.example.com で example.com の SPF が成功）は発動しません。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_authenticatedDisplayNameSpoof_tooltip":        { "message": "攻撃者は、認証済みだが無関係なドメインから送信しつつ、「user@victim.com」のような表示名を作り、表示名だけを見る利用者をだますことがあります。注: 正規のメールクライアントやメーリングリストが表示名にメールアドレスを埋め込むことはまれで、このパターンは主にフィッシングで使われます。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_alignedAuthenticationConfirmed_tooltip":       { "message": "送信者ドメインが適切に認証されていることを示すシグナルで、判定ログ用の診断情報として記録されます。", "description": "ルールのツールチップ（理由と注意点）" },
+  "rule_composite_publicDomainSpoofing_tooltip":                 { "message": "Outlook、iCloud、Yahoo などのサービスから送られた正規のメッセージは通常認証されるため、これらのドメインを名乗りながら認証に失敗したメッセージは From が偽装されている可能性が高いです。注: アドオンの PSL を考慮した整合判定で送信者が認証済みと見なされる場合（例: bounce.mail.outlook.com のようなプロバイダーのサブドメインからの SPF 成功）は発動しません。", "description": "ルールのツールチップ（理由と注意点）" },
+
+  "rule_template_auth_title": {
+    "message": "$method$ 認証結果: $result$",
+    "description": "auth.<method>.<result> スコアキーのタイトル",
+    "placeholders": {
+      "method": { "content": "$1", "example": "DMARC" },
+      "result": { "content": "$2", "example": "fail" }
+    }
+  },
+  "rule_template_auth_summary": {
+    "message": "$method$ の認証結果: $result$",
+    "description": "auth.<method>.<result> スコアキーの概要",
+    "placeholders": {
+      "method": { "content": "$1", "example": "DMARC" },
+      "result": { "content": "$2", "example": "fail" }
+    }
+  },
+  "rule_template_custom_formula_title": {
+    "message": "カスタム式: $id$",
+    "description": "custom.formula.<id> スコアキーのタイトル",
+    "placeholders": { "id": { "content": "$1", "example": "my-formula" } }
+  },
+  "rule_template_custom_formula_summary": { "message": "ユーザー定義のカスタムスコアリング式（L5 上級者向け機能）。", "description": "custom.formula.<id> スコアキーの概要" },
+
   "notification_single_account": {
-    "message": "$account$ に 1通の新着メッセージを受信しました。",
+    "message": "$account$: 新着メッセージ 1 通",
     "description": "単一の新着メッセージの通知タイトル。$account$ は受信アカウントのメールアドレス",
     "placeholders": { "account": { "content": "$1", "example": "user@example.com" } }
   },
@@ -256,12 +855,12 @@
   },
   "notification_multi_title":   { "message": "新着メッセージ",                            "description": "複数の新着メッセージをまとめた通知のタイトル" },
   "notification_multi_body": {
-    "message": "$count$通の新着メッセージがあります。",
+    "message": "$count$ 通の新着メッセージがあります。",
     "description": "複数の新着メッセージの通知本文の最初の行",
     "placeholders": { "count": { "content": "$1", "example": "3" } }
   },
   "notification_more_messages": {
-    "message": "+$count$ 件のメッセージ",
+    "message": "ほか $count$ 通",
     "description": "通知本文に追加される残りのメッセージ数の表示",
     "placeholders": { "count": { "content": "$1", "example": "2" } }
   },

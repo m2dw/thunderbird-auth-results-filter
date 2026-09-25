@@ -147,6 +147,8 @@ such ignored file exists under `src/`.
 - `docs/architecture-extraction-boundary.md`, `docs/release-readiness.md`,
   `docs/store-listing.md`, `docs/public-release.md`.
 - `.github/workflows/ci.yml` — public CI (test + package).
+- `.github/ISSUE_TEMPLATE/` — the public early-user feedback issue template
+  and its contact-links config.
 - `package.json`, `package-lock.json`, `.gitignore`. `package.json` is sanitized
   on export to drop npm scripts that invoke non-exported private scripts.
 - `README.md`, `LICENSE`, `PRIVACY.md`, `SECURITY.md`. `README.md` is sanitized on

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Official Thunderbird Add-ons listing
+    url: https://addons.thunderbird.net/thunderbird/addon/auth-results-filter/
+    about: Install the reviewed, auto-updating build — the recommended way to get the add-on.
+  - name: Privacy policy / プライバシーポリシー
+    url: https://github.com/m2dw/thunderbird-auth-results-filter/blob/main/PRIVACY.md
+    about: What the add-on stores and why, before you report data-related feedback.

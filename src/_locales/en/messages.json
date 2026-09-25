@@ -23,27 +23,224 @@
   "section_decision_log":           { "message": "Decision Log",                   "description": "Section heading" },
 
   "status_no_trusted_servers": {
-    "message": "No trusted authentication servers configured. DMARC, SPF, and DKIM scoring is disabled until you add a trusted server above.",
-    "description": "Warning shown in Basic tab when no trusted servers are set up"
+    "message": "No trusted authentication servers configured. DMARC, SPF, and DKIM scoring is disabled until you confirm a trusted server.",
+    "description": "Warning shown in Basic tab when no trusted servers are set up and account status is unavailable"
   },
   "firstrun_callout": {
-    "message": "First setup step: add the authentication server name (authserv-id) used by your incoming mail server. Until you add one, DMARC/SPF/DKIM results are not used for scoring. Setup hints can suggest names, but you must verify and add the correct one yourself.",
+    "message": "First setup step: tell the add-on which server your mail provider uses to check incoming mail. Until you confirm one, sender authentication checks (DMARC/SPF/DKIM) are not used for scoring. Use the guided setup below — it suggests names from your account, but nothing is trusted until you confirm it.",
     "description": "First-run callout shown when no trusted servers are configured, explaining what to do next"
   },
-  "status_protection_active": {
-    "message": "Protection active — $count$ trusted server$plural$ configured.",
-    "description": "Shown in Basic tab when at least one trusted server is configured",
+  "status_accounts_unavailable": {
+    "message": "$count$ trusted server$plural$ configured. Per-account status is unavailable because account information could not be loaded.",
+    "description": "Shown when accounts cannot be listed but trusted servers exist",
     "placeholders": {
-      "count":  { "content": "$1", "example": "3" },
+      "count":  { "content": "$1", "example": "2" },
       "plural": { "content": "$2", "example": "s" }
     }
   },
-  "status_recent_no_trusted_ar": {
-    "message": "Recent messages had no scoring from trusted authentication results. Verify that your trusted server names match the Authentication-Results headers in your mail.",
-    "description": "Hint shown when recent log entries have no trusted AR results"
+  "status_overall_all_active": {
+    "message": "Authentication scoring is active for all $total$ account$plural$.",
+    "description": "Overall status when every account has active authentication scoring",
+    "placeholders": {
+      "total":  { "content": "$1", "example": "2" },
+      "plural": { "content": "$2", "example": "s" }
+    }
+  },
+  "status_overall_partial": {
+    "message": "Authentication scoring is not active for $inactive$ of $total$ account$plural$. Protection is partial until setup is complete.",
+    "description": "Overall status when one or more accounts do not have active authentication scoring",
+    "placeholders": {
+      "inactive": { "content": "$1", "example": "1" },
+      "total":    { "content": "$2", "example": "2" },
+      "plural":   { "content": "$3", "example": "s" }
+    }
+  },
+  "status_state_active":             { "message": "Authentication scoring active",                      "description": "Per-account protection state label" },
+  "status_state_not_configured":     { "message": "Trusted authentication server not configured",       "description": "Per-account protection state label" },
+  "status_state_awaiting_mail":      { "message": "Configured — waiting for new mail to verify",        "description": "Per-account protection state label" },
+  "status_state_needs_confirmation": { "message": "Setup requires confirmation",                        "description": "Per-account protection state label" },
+  "status_state_no_usable_ar":       { "message": "Provider does not appear to supply usable authentication results", "description": "Per-account protection state label" },
+  "status_state_active_detail": {
+    "message": "Recent mail for this account was checked by a server you trust, so DMARC, SPF, and DKIM results are used for scoring.",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_not_configured_detail": {
+    "message": "Sender authentication checks (DMARC, SPF, DKIM) are not used for this account yet. Only weaker signals are scored until you confirm your provider's server.",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_awaiting_mail_detail": {
+    "message": "A trusted server is configured, but no recent mail for this account has been checked by it yet. Authentication scoring is not verified for this account.",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_needs_confirmation_detail": {
+    "message": "Recent mail for this account carries authentication results from a server you have not confirmed. Those results are ignored until you confirm your provider's server.",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_mismatch_detail": {
+    "message": "A trusted server is configured, but recent mail for this account was checked by a different server. Authentication scoring is not working for this account — review the setup.",
+    "description": "Per-account explanation when trusted servers exist but do not match this account's mail"
+  },
+  "status_state_no_usable_ar_detail": {
+    "message": "None of the last $count$ messages for this account had an Authentication-Results header, so authentication scoring cannot work for it. Other signals are still scored.",
+    "description": "Per-account protection state explanation",
+    "placeholders": { "count": { "content": "$1", "example": "5" } }
+  },
+  "status_confirmed_host": {
+    "message": "Confirmed server: $host$",
+    "description": "Per-account line showing the server confirmed in guided setup",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "status_mail_counts": {
+    "message": "Last $total$ message(s): $trusted$ checked by a trusted server, $untrusted$ by an unconfirmed server, $none$ without authentication results.",
+    "description": "Per-account recent mail summary",
+    "placeholders": {
+      "total":     { "content": "$1", "example": "20" },
+      "trusted":   { "content": "$2", "example": "18" },
+      "untrusted": { "content": "$3", "example": "1" },
+      "none":      { "content": "$4", "example": "1" }
+    }
+  },
+  "status_mail_unrecorded": {
+    "message": "$count$ message(s) listed more checking servers than are recorded, so they are not counted either way.",
+    "description": "Per-account note for log entries whose authserv-id list was truncated",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "btn_setup_start":       { "message": "Set up",               "description": "Per-account button opening the guided setup" },
+  "btn_setup_change":       { "message": "Review / change",      "description": "Per-account button reopening the guided setup" },
+  "btn_start_guided_setup": { "message": "Start guided setup",   "description": "Button opening the guided setup" },
+
+  "authserv_explainer_summary": { "message": "What is a trusted authentication server?", "description": "Summary of the authserv-id explainer" },
+  "authserv_explainer_body": {
+    "message": "When a message arrives, your mail provider checks whether the sender is genuine (SPF, DKIM, DMARC) and writes the verdict into a hidden header. Each verdict is labelled with the name of the server that made it. Because anyone can write such a header — including spammers — this add-on only uses verdicts labelled with a server name you have confirmed. Nothing is ever trusted automatically.",
+    "description": "Plain-language explanation of authserv-id"
+  },
+  "authserv_explainer_advanced": {
+    "message": "Technical details: the header is Authentication-Results (RFC 8601) and the server name is its authserv-id. The trusted list below stores authserv-id values.",
+    "description": "Raw technical terms for advanced users"
   },
 
-  "activity_no_messages": { "message": "No messages assessed yet.", "description": "Empty state for Recent Activity section" },
+  "guided_setup_title":            { "message": "Guided setup: trusted authentication server", "description": "Guided setup heading" },
+  "guided_setup_step_account":     { "message": "1. Choose the account to set up",              "description": "Guided setup step" },
+  "guided_setup_step_server":      { "message": "2. Choose your provider's checking server",    "description": "Guided setup step" },
+  "guided_setup_step_server_desc": {
+    "message": "Suggestions come from this account's email domain (and from DNS MX records if you use that option). They are guesses only — none is trusted until you confirm it below. Your provider's help pages usually list the right name.",
+    "description": "Guided setup step description"
+  },
+  "guided_setup_other":            { "message": "Other:",                                        "description": "Label for typed server name" },
+  "guided_setup_other_placeholder": { "message": "e.g. mx.example.com",                         "description": "Placeholder for the typed server name input" },
+  "guided_setup_mx_btn":           { "message": "Look up MX hints (DNS)",                        "description": "Button that runs an opt-in MX lookup" },
+  "guided_setup_mx_disabled": {
+    "message": "DNS-based hints are off. You can turn them on under \"Setup hints from account domains\" below; doing so sends account email domains to a public DNS resolver.",
+    "description": "Shown when opt-in DNS lookup is disabled"
+  },
+  "guided_setup_mx_hint": {
+    "message": "Clicking the button sends $domains$ to the DNS resolver $resolver$.",
+    "description": "Privacy note before MX lookup",
+    "placeholders": {
+      "domains":  { "content": "$1", "example": "example.com" },
+      "resolver": { "content": "$2", "example": "8.8.8.8" }
+    }
+  },
+  "guided_setup_mx_running":       { "message": "Looking up MX records…",                        "description": "Shown while the MX lookup runs" },
+  "guided_setup_step_check":       { "message": "3. Configuration check",                        "description": "Guided setup step" },
+  "guided_setup_step_confirm":     { "message": "4. Confirm",                                     "description": "Guided setup step" },
+  "guided_setup_confirm_label": {
+    "message": "I have checked that $host$ is the server name my mail provider uses to check incoming mail, and I want to trust its results.",
+    "description": "Explicit confirmation checkbox label",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_setup_confirm_label_empty": { "message": "Choose or enter a server name first.",       "description": "Confirmation label when no host is selected" },
+  "guided_setup_confirm_btn":      { "message": "Confirm and trust",                              "description": "Guided setup confirm button" },
+  "guided_setup_close_btn":        { "message": "Close",                                          "description": "Guided setup close button" },
+  "guided_setup_success": {
+    "message": "Saved. $host$ is now trusted. The status above updates as new mail arrives; you can reopen this setup at any time.",
+    "description": "Shown after a successful confirmation",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_setup_error_confirmation_required": { "message": "Tick the confirmation box to trust this server.", "description": "Guided setup error" },
+  "guided_setup_error_missing_account":       { "message": "Choose an account.",                            "description": "Guided setup error" },
+  "guided_setup_error_missing_host":          { "message": "Choose or enter a server name.",                "description": "Guided setup error" },
+  "guided_setup_error_invalid_host":          { "message": "Invalid server name: use letters, digits, hyphens, and dots only.", "description": "Guided setup error" },
+
+  "guided_check_account_domains": {
+    "message": "Account email domain: $domains$",
+    "description": "Configuration check item",
+    "placeholders": { "domains": { "content": "$1", "example": "example.com" } }
+  },
+  "guided_check_account_domains_none": { "message": "This account has no email address, so no suggestions can be made.", "description": "Configuration check item" },
+  "guided_check_mail_none_yet":        { "message": "No mail for this account has been assessed yet. The status is verified when new mail arrives.", "description": "Configuration check item" },
+  "guided_check_mail_summary": {
+    "message": "Last $total$ message(s): $trusted$ checked by a trusted server, $untrusted$ by an unconfirmed server, $none$ without authentication results.",
+    "description": "Configuration check item",
+    "placeholders": {
+      "total":     { "content": "$1", "example": "20" },
+      "trusted":   { "content": "$2", "example": "0" },
+      "untrusted": { "content": "$3", "example": "19" },
+      "none":      { "content": "$4", "example": "1" }
+    }
+  },
+  "guided_check_mail_unrecorded": {
+    "message": "$count$ recent message(s) listed more checking servers than are recorded, so they are not counted either way.",
+    "description": "Configuration check item",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "guided_check_mail_no_ar": {
+    "message": "Recent mail for this account has no authentication results. Your provider may not supply them; trusting a server has no effect until it does.",
+    "description": "Configuration check item"
+  },
+  "guided_check_host_invalid": {
+    "message": "\"$host$\" is not a valid server name.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "bad host" } }
+  },
+  "guided_check_host_already_trusted": {
+    "message": "$host$ is already trusted. Confirming records it for this account.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_check_host_matches_mx": {
+    "message": "$host$ is an MX (incoming mail) server of this account's domain.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_check_host_matches_hint": {
+    "message": "$host$ matches a name suggested from this account's domain.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "guided_check_host_related_domain": {
+    "message": "The server name belongs to the same domain as this account ($domain$).",
+    "description": "Configuration check item",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "guided_check_host_unrelated": {
+    "message": "$host$ is not related to this account's domain or MX hints. That can be correct for hosted mail services, but double-check it with your provider.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mx.other.example" } }
+  },
+  "guided_check_host_seen": {
+    "message": "This name appeared in $seen$ of the last $total$ message(s) for this account. Headers can be forged, so use this only as a cross-check.",
+    "description": "Configuration check item",
+    "placeholders": {
+      "seen":  { "content": "$1", "example": "18" },
+      "total": { "content": "$2", "example": "20" }
+    }
+  },
+  "guided_check_host_not_seen": {
+    "message": "$host$ did not appear in recent mail for this account. If you confirm it, authentication scoring may stay inactive.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "guided_check_host_possibly_seen": {
+    "message": "$host$ is not among the recorded server names, but $count$ recent message(s) listed more servers than are recorded, so it may have appeared there.",
+    "description": "Configuration check item",
+    "placeholders": {
+      "host":  { "content": "$1", "example": "mail.example.com" },
+      "count": { "content": "$2", "example": "2" }
+    }
+  },
+
+  "activity_no_messages":{ "message": "No messages assessed yet.", "description": "Empty state for Recent Activity section" },
   "activity_counts": {
     "message": "$total$ message$plural$ assessed — $normal$ normal, $review$ review, $highrisk$ high-risk.",
     "description": "Summary counts in Recent Activity section",
@@ -56,6 +253,12 @@
     }
   },
   "activity_most_recent": { "message": "Most recent:", "description": "Heading above last 5 entries in Recent Activity" },
+  "activity_unknown_domain": { "message": "(unknown)", "description": "Recent Activity fallback when the From domain is unknown" },
+
+  "classification_normal":    { "message": "normal",    "description": "Classification label for scores 0-49" },
+  "classification_review":    { "message": "review",    "description": "Classification label for scores 50-99" },
+  "classification_high_risk": { "message": "high-risk", "description": "Classification label for scores 100+" },
+  "classification_unknown":   { "message": "unknown",   "description": "Classification label when the log entry has no classification" },
 
   "setup_hints_summary":         { "message": "Setup hints from account domains",            "description": "Summary element for setup assistant <details>" },
   "setup_use_dns":               { "message": "Use DNS lookup for MX setup hints",          "description": "Checkbox label for DNS lookup option" },
@@ -63,6 +266,20 @@
   "setup_no_accounts":           { "message": "No account email domains found.",             "description": "Shown when no accounts are available in setup assistant" },
   "setup_unable_load_accounts":  { "message": "Unable to load account information.",         "description": "Error when account list cannot be fetched" },
   "setup_no_mx_records":         { "message": "No MX records found.",                        "description": "Shown when DNS MX lookup returns no records" },
+  "setup_assistant_desc": {
+    "message": "These are suggested server names derived from your account email domains. They are hints only, not trusted entries. Click Use to copy a suggestion to the form below, verify it matches your provider's actual server name, then click Add.",
+    "description": "Description inside the setup hints <details>"
+  },
+  "setup_assistant_guidance": {
+    "message": "To confirm the correct server name, check your mail provider's documentation or inspect a recent message's Authentication-Results header.",
+    "description": "Guidance inside the setup hints <details>"
+  },
+  "setup_dns_note": {
+    "message": "MX lookup sends account email domains to the configured DNS resolver. DNS lookup is used only to generate setup hints. Trusted entries are not added automatically — you must explicitly add them.",
+    "description": "Privacy note below the DNS lookup checkbox"
+  },
+  "setup_source_heuristic":      { "message": "heuristic",                                   "description": "Badge for a setup suggestion derived from the account domain" },
+  "setup_source_mx":             { "message": "mx",                                          "description": "Badge for a setup suggestion derived from DNS MX records" },
 
   "no_trusted_msg":       { "message": "No trusted domains configured.",            "description": "Shown when trusted domain list is empty" },
   "trust_exact_match_label": {
@@ -80,6 +297,41 @@
     "description": "Button to promote an exact entry to domain trust",
     "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
   },
+  "trust_promote_title": {
+    "message": "Add $domain$ as a registrable-domain trust entry. This will trust all subdomains of $domain$, not just $host$.",
+    "description": "Tooltip for the promote-to-domain-trust button",
+    "placeholders": {
+      "domain": { "content": "$1", "example": "example.com" },
+      "host":   { "content": "$2", "example": "mail.example.com" }
+    }
+  },
+  "trusted_servers_intro": {
+    "message": "Your incoming mail server stamps each message with an Authentication-Results header that identifies itself by a server name (the authserv-id). Add that name here so this add-on knows which authentication results to use for scoring. Results from servers not on this list are ignored.",
+    "description": "Introductory paragraph of the Trusted Authentication Servers section"
+  },
+  "add_trusted_placeholder":       { "message": "e.g. mail.example.com", "description": "Placeholder for the add-trusted-server input" },
+  "match_type_exact_host":         { "message": "Exact host",            "description": "Option label for exact-host trust" },
+  "match_type_registrable_domain": { "message": "Registrable domain",    "description": "Option label for registrable-domain trust" },
+  "add_trusted_hint_exact": {
+    "message": "Trusts only this specific host. Subdomains are not trusted.",
+    "description": "Hint below the add-trusted form for exact-host trust"
+  },
+  "add_trusted_hint_domain": {
+    "message": "Trusts this domain and all its subdomains. Use with care — this is broader than exact-host trust.",
+    "description": "Hint below the add-trusted form for registrable-domain trust"
+  },
+  "trusted_error_empty":         { "message": "Value cannot be empty.",                                         "description": "Trusted entry validation error" },
+  "trusted_error_invalid_host":  { "message": "Invalid hostname: use letters, digits, hyphens, and dots only.", "description": "Trusted entry validation error" },
+  "trusted_error_public_suffix": { "message": "This value is a public suffix and cannot be used for domain trust.", "description": "Trusted entry validation error" },
+  "trusted_error_not_registrable": {
+    "message": "For registrable-domain trust, enter the registrable domain itself (e.g. $registrable$, not $value$).",
+    "description": "Trusted entry validation error",
+    "placeholders": {
+      "registrable": { "content": "$1", "example": "example.com" },
+      "value":       { "content": "$2", "example": "mail.example.com" }
+    }
+  },
+  "trusted_error_duplicate":     { "message": "This entry already exists in the trusted list.",                  "description": "Trusted entry validation error" },
 
   "candidates_section_desc": {
     "message": "Authentication server names identified by the setup assistant that you have not yet trusted. These are not active — add the correct name to Trusted Authentication Servers above to enable scoring.",
@@ -107,6 +359,8 @@
   "setting_notify_caveat":      { "message": "If Thunderbird's built-in new-mail notification is also enabled, you may see duplicate notifications. Disable Thunderbird's notification if you want only the add-on's post-filter notification.", "description": "Explanatory note shown below the notify-after-assessment checkbox" },
   "setting_enable_diagnostics": { "message": "Enable Diagnostics tab",                                                "description": "Checkbox label for diagnostics mode setting" },
   "setting_enable_address_book":{ "message": "Enable address book whitelist mitigation",                              "description": "Checkbox label for address-book whitelist" },
+  "setting_notification_max_score":    { "message": "Notify only if score is at or below:",         "description": "Label for the notification score limit input" },
+  "setting_notification_min_interval": { "message": "Minimum interval between notifications (ms):", "description": "Label for the notification interval input" },
 
   "score_col_result":          { "message": "Result",   "description": "Column header in auth score table" },
   "score_col_signal":          { "message": "Signal",   "description": "Column header in Layer 2/3 score table" },
@@ -118,6 +372,40 @@
     "message": "Warning: the Layer 3 cap is at or above the Review threshold (50). Layer 3 heuristics alone could push a message into Review — this is outside the intended low-pass design.",
     "description": "Warning shown when Layer 3 cap is too high"
   },
+  "score_settings_note": {
+    "message": "Score thresholds are fixed: 0–49 normal, 50–99 review, 100+ high risk. The inputs below control how much each signal adds to or subtracts from a message's total score. Authentication scoring (Layer 1) only uses results from the trusted server names you configure in the Basic tab; results from unrecognised servers are ignored.",
+    "description": "Note at the top of the Score Settings section"
+  },
+  "score_layer1_summary": { "message": "Email authentication results (Layer 1)", "description": "Score settings group heading" },
+  "score_layer1_desc": {
+    "message": "DMARC, SPF, and DKIM result scores. Only results from your trusted authentication servers (Basic tab) are used.",
+    "description": "Score settings group description"
+  },
+  "score_layer2_summary": { "message": "Sender identity alignment (Layer 2)", "description": "Score settings group heading" },
+  "score_layer2_desc": {
+    "message": "Scores for mismatches between the visible From address and the authenticated identity. These are evidence signals; their combined default (25) stays well below the Review threshold (50).",
+    "description": "Score settings group description"
+  },
+  "score_layer3_summary": { "message": "Address pattern heuristics (Layer 3)", "description": "Score settings group heading" },
+  "score_layer3_desc": {
+    "message": "Weak signals based on whether the From address looks machine-generated. These are evidence for Layer 4 rules. Keep these values low — the cap limits total Layer 3 contribution so it cannot push a message into Review on its own.",
+    "description": "Score settings group description"
+  },
+  "score_layer4_summary": { "message": "Combined signal rules (Layer 4)", "description": "Score settings group heading" },
+  "score_layer4_desc": {
+    "message": "Rules that fire only when multiple independent signals converge. These are the primary Review/Junk drivers. Mitigation rules (negative scores) reduce false positives for known-good delivery patterns.",
+    "description": "Score settings group description"
+  },
+
+  "sender_rules_desc": {
+    "message": "Add score adjustments for specific sender domains. Positive values increase suspicion; negative values reduce it.",
+    "description": "Description of the Sender Domain Rules section"
+  },
+  "col_domain":        { "message": "Domain",  "description": "Table column header" },
+  "col_match":         { "message": "Match",   "description": "Table column header for the match type" },
+  "col_address":       { "message": "Address", "description": "Table column header" },
+  "match_type_exact":  { "message": "exact",   "description": "Match type shown in rule and whitelist tables" },
+  "match_type_domain": { "message": "domain",  "description": "Match type shown in rule and whitelist tables" },
 
   "btn_add":              { "message": "Add",                         "description": "Button label" },
   "btn_remove":           { "message": "Remove",                      "description": "Button label" },
@@ -153,6 +441,26 @@
     "message": "Enabling this feature will request access to your Thunderbird address books.",
     "description": "Note shown when address book whitelist is about to be enabled"
   },
+  "whitelist_desc": {
+    "message": "Whitelist entries reduce this add-on's spam score for matching senders. They do not authenticate the message or prove it is genuine — they lower the score to reduce false positives for senders you recognise.",
+    "description": "Description of the Manual Whitelist section"
+  },
+  "whitelist_mitigation_label": { "message": "Score reduction when a sender matches:", "description": "Label for the manual whitelist score input" },
+  "whitelist_mitigation_note": {
+    "message": "Range: 0 to −100. Default: −50. Use −100 to keep whitelisted senders below the Review threshold.",
+    "description": "Note below the manual whitelist score input"
+  },
+  "whitelist_email_placeholder": { "message": "e.g. user@example.com", "description": "Placeholder for the add-whitelist input" },
+  "address_book_desc": {
+    "message": "When enabled, senders found in your Thunderbird address books receive a score reduction. This does not authenticate the message — it lowers the score to reduce false positives for known contacts.",
+    "description": "Description of the Address Book Whitelist section"
+  },
+  "address_book_mitigation_label": { "message": "Score reduction when sender is in your address books:", "description": "Label for the address book score input" },
+  "address_book_mitigation_note":  { "message": "Range: 0 to −100. Default: −50.",                        "description": "Note below the address book score input" },
+  "diagnostics_desc": {
+    "message": "Diagnostics mode shows a detailed decision log with raw scores, score reasons, heuristic metrics, and export tools. This is intended for troubleshooting and tuning — not needed for day-to-day use.",
+    "description": "Description of the Diagnostics section in the Advanced tab"
+  },
 
   "metrics_alignment_summary": { "message": "Alignment metrics", "description": "Summary element for alignment metrics <details>" },
   "metrics_heuristic_summary": { "message": "Heuristic metrics", "description": "Summary element for heuristic metrics <details>" },
@@ -182,11 +490,49 @@
     "description": "Plural reason count",
     "placeholders": { "count": { "content": "$1", "example": "5" } }
   },
+  "decision_log_desc": {
+    "message": "A local record of how each recently received message was scored and what action was taken. All data stays on your device.",
+    "description": "Description of the Decision Log section"
+  },
+  "log_col_time":        { "message": "Time",        "description": "Decision log column header" },
+  "log_col_from_domain": { "message": "From domain", "description": "Decision log column header" },
+  "log_col_original":    { "message": "Original",    "description": "Decision log column header: score when the message arrived" },
+  "log_col_current":     { "message": "Current",     "description": "Decision log column header: score recalculated with current settings" },
+  "log_col_action":      { "message": "Action",      "description": "Decision log column header" },
 
   "popup_no_message": {
     "message": "No message is currently displayed.",
     "description": "Shown in popup when no message is open"
   },
+  "popup_status_inactive": {
+    "message": "Authentication scoring is not active for this account.",
+    "description": "Popup notice when the displayed message's account has no active authentication scoring"
+  },
+  "popup_btn_open_setup": { "message": "Open setup", "description": "Popup button opening the options page setup" },
+  "popup_loading":        { "message": "Loading…",   "description": "Popup placeholder while score details load" },
+  "popup_protective_factors": { "message": "Protective factors", "description": "Popup heading for factors that kept the score lower" },
+  "popup_fact_dkim_aligned":  { "message": "DKIM signature aligned with From domain", "description": "Popup protective factor" },
+  "popup_fact_no_trusted_auth": { "message": "No trusted Authentication-Results headers found", "description": "Popup protective factor" },
+  "popup_fact_below_review": {
+    "message": "Score ($score$) is below the Review threshold ($threshold$)",
+    "description": "Popup protective factor",
+    "placeholders": {
+      "score":     { "content": "$1", "example": "20" },
+      "threshold": { "content": "$2", "example": "50" }
+    }
+  },
+  "popup_fact_below_high_risk": {
+    "message": "Score ($score$) is below the High-risk threshold ($threshold$)",
+    "description": "Popup protective factor",
+    "placeholders": {
+      "score":     { "content": "$1", "example": "70" },
+      "threshold": { "content": "$2", "example": "100" }
+    }
+  },
+  "popup_identity_from":        { "message": "From",        "description": "Popup identity table label" },
+  "popup_identity_subject":     { "message": "Subject",     "description": "Popup identity table label" },
+  "popup_identity_from_domain": { "message": "From domain", "description": "Popup identity table label" },
+  "popup_identity_message_id":  { "message": "Message-ID",  "description": "Popup identity table label" },
   "popup_no_entry": {
     "message": "No score details found for this message. The add-on scores messages when they arrive; this message may have been received before the add-on was installed, or its Message-ID could not be matched.",
     "description": "Shown in popup when no log entry matches the displayed message"
@@ -229,7 +575,8 @@
   "action_classified_review":   { "message": "Scored review (no action)",   "description": "Action label for classified-review" },
   "action_classified_high_risk":{ "message": "Scored high-risk (no action)","description": "Action label for classified-high-risk" },
   "action_moved_review":        { "message": "Moved to review folder",       "description": "Action label for moved-review" },
-  "action_moved_junk":          { "message": "Moved to Junk",                "description": "Action label for moved-junk or moved-junk-mark-failed" },
+  "action_moved_junk":          { "message": "Moved to Junk",                "description": "Action label for moved-junk" },
+  "action_moved_junk_mark_failed": { "message": "Moved to Junk (marking as junk failed)", "description": "Action label for moved-junk-mark-failed: the message was moved to Junk but setting the junk flag failed" },
   "action_move_review_failed":  { "message": "Move to review failed",        "description": "Action label for move-review-failed" },
   "action_move_junk_failed":    { "message": "Move to Junk failed",          "description": "Action label for move-junk-failed" },
   "action_no_review_folder":    { "message": "No review folder configured",  "description": "Action label for no-review-folder-configured" },
@@ -315,6 +662,24 @@
   "custom_formula_error_invalid_mode":  { "message": "Invalid mode.",                   "description": "Internal validation error for formula mode" },
   "custom_formula_error_match_in_add_mode": { "message": "match() is only available in observe mode. Switch to observe or remove the match() call.", "description": "Validation error when match() is used in add-mode formula" },
   "custom_formula_diag_summary":        { "message": "L5 formula diagnostics",          "description": "Summary element for formula diagnostics <details> in log" },
+  "formula_diag_col_name":          { "message": "Name",                 "description": "Formula diagnostics column header" },
+  "formula_diag_col_mode":          { "message": "Mode",                 "description": "Formula diagnostics column header" },
+  "formula_diag_col_value":         { "message": "Value",                "description": "Formula diagnostics column header" },
+  "formula_diag_col_applied":       { "message": "Applied",              "description": "Formula diagnostics column header" },
+  "formula_diag_col_would_score":   { "message": "Would-change score",   "description": "Formula diagnostics column header" },
+  "formula_diag_col_would_verdict": { "message": "Would-change verdict", "description": "Formula diagnostics column header" },
+  "formula_diag_col_error":         { "message": "Error",                "description": "Formula diagnostics column header" },
+  "formula_last_result": {
+    "message": "Last result: $value$",
+    "description": "Last diagnostic result shown under a formula",
+    "placeholders": { "value": { "content": "$1", "example": "30" } }
+  },
+  "formula_last_result_error": {
+    "message": "Last result: error — $error$",
+    "description": "Last diagnostic error shown under a formula",
+    "placeholders": { "error": { "content": "$1", "example": "ReferenceError" } }
+  },
+  "formula_last_result_applied": { "message": "applied", "description": "Marker shown when the last formula result was applied to the score" },
   "custom_formula_list_full": {
     "message": "Formula limit reached ($max$). Remove a formula before adding a new one.",
     "description": "Error when the formula list is at capacity",
@@ -419,6 +784,64 @@
   "rule_composite_dmarcFailDkimAlignedListMitigation_summary": { "message": "DMARC failed but DKIM is aligned and List headers are present — likely a mailing list.", "description": "Rule registry summary" },
   "rule_composite_dkimFailWithAlignedPass_title":              { "message": "DKIM fail with aligned DKIM pass",                          "description": "Rule registry title" },
   "rule_composite_dkimFailWithAlignedPass_summary":            { "message": "At least one DKIM signature failed but another aligned signature passed.", "description": "Rule registry summary" },
+  "rule_composite_brandDivergencePhishing_title":              { "message": "Display-name brand divergence phishing",                    "description": "Rule registry title" },
+  "rule_composite_brandDivergencePhishing_summary":            { "message": "The From display name matches a well-known brand but the From domain is unrelated to that brand.", "description": "Rule registry summary" },
+  "rule_composite_unsecuredDeepSubdomain_title":               { "message": "DMARC-none deep subdomain",                                 "description": "Rule registry title" },
+  "rule_composite_unsecuredDeepSubdomain_summary":             { "message": "The From address uses a deep subdomain on a domain with no DMARC enforcement policy and no aligned authentication.", "description": "Rule registry summary" },
+  "rule_composite_unauthenticatedFromSpoof_title":             { "message": "Unauthenticated From with sender inconsistency",            "description": "Rule registry title" },
+  "rule_composite_unauthenticatedFromSpoof_summary":           { "message": "The visible From domain has no aligned, trusted authentication and another sender identifier disagrees with it.", "description": "Rule registry summary" },
+  "rule_composite_authenticatedDisplayNameSpoof_title":        { "message": "Authenticated sender with spoofed display-name email",      "description": "Rule registry title" },
+  "rule_composite_authenticatedDisplayNameSpoof_summary":      { "message": "The message authenticates for its From domain but the display name contains an email address pointing to a different domain.", "description": "Rule registry summary" },
+  "rule_composite_alignedAuthenticationConfirmed_title":       { "message": "Aligned authentication confirmed",                          "description": "Rule registry title" },
+  "rule_composite_alignedAuthenticationConfirmed_summary":     { "message": "The visible From domain has aligned, trusted authentication with no conflicting signal.", "description": "Rule registry summary" },
+  "rule_composite_publicDomainSpoofing_title":                 { "message": "Public mailbox provider domain with failed authentication", "description": "Rule registry title" },
+  "rule_composite_publicDomainSpoofing_summary":               { "message": "The visible From domain is a major public mailbox provider but authentication failed and the sending infrastructure is inconsistent.", "description": "Rule registry summary" },
+
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_tooltip":   { "message": "Spam that controls only the MAIL FROM domain to pass SPF while using throwaway local parts.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_authAlignedRandomDomain_tooltip":              { "message": "Attacker owns a random-string domain and uses a real ESP to get aligned auth.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_thirdPartyAuthRandomLocal_tooltip":            { "message": "Spam relayed through a third party with throwaway From addresses.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_tooltip":   { "message": "Forged messages often have mismatched Message-ID domains when the auth infrastructure is unrelated. Note: Forwarded or aliased mail may show a Message-ID from the original originating domain.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_messageIdUnregistrableMismatch_tooltip":       { "message": "A strong forgery indicator; legitimate mail always has a valid Message-ID domain.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_tooltip":  { "message": "Mismatch between From and Sender is a resend or impersonation pattern. Note: Mailing lists and forwarding services may set Sender to their own domain.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_deepRandomFromSubdomain_tooltip":              { "message": "Spam campaigns register one domain and send from many random sub-paths to evade per-domain blocking.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_tooltip":  { "message": "Reduces false positives for bulk mail sent via delegated DKIM-signing ESPs.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_spfPassDkimFailRandomLocal_tooltip":           { "message": "Indicates a bulk sender relying only on SPF with throwaway local parts.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_dkimAlignedLexicalMitigation_tooltip":         { "message": "A valid aligned DKIM signature means the From domain signed the message, making random local parts less suspicious.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_ownDomainAuthFail_tooltip":                    { "message": "A high-confidence impersonation signal: your own domain should always authenticate successfully.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_tooltip": { "message": "Malformed From headers with mismatched infrastructure are a strong forgery indicator.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_geoTokenCompoundDomain_tooltip":               { "message": "A common disposable-domain spam pattern using geographic or keyword tokens.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_deepServiceWordSubdomain_tooltip":             { "message": "Spammers reuse patterns like mail-01.random-domain.tld to evade per-domain reputation.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_tooltip":   { "message": "Mailing lists often break DMARC while preserving DKIM; treating this as high-risk causes false positives.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_dkimFailWithAlignedPass_tooltip":              { "message": "Having both a passing and failing aligned DKIM signature is unusual and associated with message manipulation.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_brandDivergencePhishing_tooltip":              { "message": "A phishing sender controls an unrelated domain and authenticates it correctly, while using a famous brand name in the visible From field to deceive the recipient. Note: Official brand aliases (e.g. aexp.com for American Express) and regional brand domains not in the top-domain list may appear as mismatches.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_unsecuredDeepSubdomain_tooltip":               { "message": "Disposable domains often configure deep service-looking subdomains (e.g. sivakeso.support.sn5799.com) while leaving DMARC unset, evading per-label and auth-enforcement checks.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_unauthenticatedFromSpoof_tooltip":             { "message": "Forged messages typically lack aligned authentication while carrying mismatched infrastructure headers (Message-ID, Return-Path, Reply-To) that reveal the true sending infrastructure. Note: Suppressed when the add-on's PSL-aware alignment considers auth aligned (e.g. SPF pass for example.com when From is news.example.com).", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_authenticatedDisplayNameSpoof_tooltip":        { "message": "Attackers craft display names like \"user@victim.com\" while sending from an authenticated but unrelated domain, deceiving users who only see the display name. Note: Legitimate mail clients and mailing lists rarely embed email addresses in display names; this pattern is almost exclusively a phishing technique.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_alignedAuthenticationConfirmed_tooltip":       { "message": "Positive confirmation that the sender domain is properly authenticated; logged as a diagnostic signal for the decision log.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_publicDomainSpoofing_tooltip":                 { "message": "Legitimate messages from providers such as Outlook, iCloud, and Yahoo are always authenticated; a failed-auth message claiming to originate from these domains almost certainly has a spoofed From. Note: Suppressed when the add-on's PSL-aware alignment considers the sender authenticated (e.g. SPF pass from a subdomain of the provider domain such as bounce.mail.outlook.com).", "description": "Rule registry tooltip (why + caveat)" },
+
+  "rule_template_auth_title": {
+    "message": "$method$ $result$",
+    "description": "Title for auth.<method>.<result> score keys",
+    "placeholders": {
+      "method": { "content": "$1", "example": "DMARC" },
+      "result": { "content": "$2", "example": "fail" }
+    }
+  },
+  "rule_template_auth_summary": {
+    "message": "$method$ authentication result: $result$.",
+    "description": "Summary for auth.<method>.<result> score keys",
+    "placeholders": {
+      "method": { "content": "$1", "example": "DMARC" },
+      "result": { "content": "$2", "example": "fail" }
+    }
+  },
+  "rule_template_custom_formula_title": {
+    "message": "Custom formula: $id$",
+    "description": "Title for custom.formula.<id> score keys",
+    "placeholders": { "id": { "content": "$1", "example": "my-formula" } }
+  },
+  "rule_template_custom_formula_summary": { "message": "User-defined custom scoring formula (L5 advanced feature).", "description": "Summary for custom.formula.<id> score keys" },
 
   "notification_single_account": {
     "message": "$account$: 1 new message",

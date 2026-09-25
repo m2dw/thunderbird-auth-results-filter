@@ -1,4 +1,4 @@
-import { DEFAULTS, getStorage } from '../src/modules/storage.js';
+import { DEFAULTS, getStorage, saveStorage } from '../src/modules/storage.js';
 
 function makeBrowserMock(stored) {
   return {
@@ -117,5 +117,68 @@ describe('getStorage — settings deep merge', () => {
     expect(data.settings.layer2Scores).toEqual(DEFAULTS.settings.layer2Scores);
     expect(data.settings.authScores).toEqual(DEFAULTS.settings.authScores);
     expect(data.settings.scoreDefaultsVersion).toBe('v3');
+  });
+});
+
+describe('getStorage / saveStorage — trusted-server setup migration', () => {
+  afterEach(() => {
+    delete globalThis.browser;
+  });
+
+  test('existing trusted servers are preserved and accountSetup defaults to empty', async () => {
+    globalThis.browser = makeBrowserMock({
+      trustedDomains: ['mx.example.com', { value: 'example.org', matchType: 'domain' }],
+      settings: { scoreDefaultsVersion: 'v3', moveToReview: false },
+    });
+    const data = await getStorage();
+    expect(data.trustedDomains).toEqual([
+      { value: 'mx.example.com', matchType: 'exact' },
+      { value: 'example.org', matchType: 'domain' },
+    ]);
+    expect(data.settings.accountSetup).toEqual({});
+    expect(data.settings.moveToReview).toBe(false);
+  });
+
+  test('legacy installation without scoreDefaultsVersion keeps trusted servers through migration', async () => {
+    globalThis.browser = makeBrowserMock({
+      trustedDomains: [{ value: 'mx.example.com', matchType: 'exact' }],
+      settings: {},
+    });
+    const data = await getStorage();
+    expect(data.trustedDomains).toEqual([{ value: 'mx.example.com', matchType: 'exact' }]);
+    expect(data.settings.accountSetup).toEqual({});
+  });
+
+  test('stored accountSetup records survive a load', async () => {
+    globalThis.browser = makeBrowserMock({
+      trustedDomains: [{ value: 'mx.example.com', matchType: 'exact' }],
+      settings: {
+        scoreDefaultsVersion: 'v3',
+        accountSetup: { account1: { host: 'mx.example.com', confirmedAt: 10 } },
+      },
+    });
+    const data = await getStorage();
+    expect(data.settings.accountSetup).toEqual({ account1: { host: 'mx.example.com', confirmedAt: 10 } });
+  });
+
+  test('malformed accountSetup is sanitized on load', async () => {
+    globalThis.browser = makeBrowserMock({
+      settings: { scoreDefaultsVersion: 'v3', accountSetup: { a: { host: 'bad host' }, b: 'x' } },
+    });
+    const data = await getStorage();
+    expect(data.settings.accountSetup).toEqual({});
+  });
+
+  test('saveStorage keeps accountSetup bounded', async () => {
+    const writes = [];
+    globalThis.browser = {
+      storage: { local: { set: async obj => { writes.push(obj.authResultsFilter); } } },
+    };
+    const accountSetup = {};
+    for (let i = 0; i < 80; i++) {
+      accountSetup[`account${i}`] = { host: `mx${i}.example.com`, confirmedAt: i };
+    }
+    await saveStorage({ ...DEFAULTS, settings: { ...DEFAULTS.settings, accountSetup } });
+    expect(Object.keys(writes[0].settings.accountSetup)).toHaveLength(50);
   });
 });

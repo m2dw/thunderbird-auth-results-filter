@@ -1,4 +1,5 @@
 import { extractRegistrableDomain } from '../core/psl.js';
+import { getMessage } from '../modules/i18n.js';
 
 const HOSTNAME_RE = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*$/i;
 
@@ -39,15 +40,15 @@ export function getPromotableRegistrableDomain(exactHostValue, trustedDomains) {
 
 export function validateTrustedEntry(value, matchType, existingEntries) {
   const trimmed = (value ?? '').trim();
-  if (!trimmed) return 'Value cannot be empty.';
+  if (!trimmed) return getMessage('trusted_error_empty');
   if (!isValidHostname(trimmed)) {
-    return 'Invalid hostname: use letters, digits, hyphens, and dots only.';
+    return getMessage('trusted_error_invalid_host');
   }
   const lower = trimmed.toLowerCase();
   if (matchType === 'domain') {
     const reg = extractRegistrableDomain(lower);
-    if (!reg) return 'This value is a public suffix and cannot be used for domain trust.';
-    if (reg !== lower) return `For registrable-domain trust, enter the registrable domain itself (e.g. ${reg}, not ${lower}).`;
+    if (!reg) return getMessage('trusted_error_public_suffix');
+    if (reg !== lower) return getMessage('trusted_error_not_registrable', [reg, lower]);
   }
   const duplicate = existingEntries.some(
     e => e && typeof e === 'object'
@@ -55,6 +56,6 @@ export function validateTrustedEntry(value, matchType, existingEntries) {
       && e.value.toLowerCase() === lower
       && e.matchType === matchType,
   );
-  if (duplicate) return 'This entry already exists in the trusted list.';
+  if (duplicate) return getMessage('trusted_error_duplicate');
   return null;
 }

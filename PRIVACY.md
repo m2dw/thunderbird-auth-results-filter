@@ -11,10 +11,18 @@ The add-on needs access to message headers and selected message metadata to eval
 The add-on may store:
 
 - Trusted authentication service domains selected by the user.
+- Guided-setup confirmations (`settings.accountSetup`): for each Thunderbird
+  account the user explicitly set up, the internal account ID, the confirmed
+  server name, and the confirmation time. Capped at 50 entries. These are
+  created only by the user's explicit confirmation, never from received mail.
 - Untrusted `authserv-id` candidates, capped at 50 entries.
 - Sender-domain scoring rules created by the user.
 - Manual whitelist entries (sender email addresses) created by the user.
 - Recent decision log entries, capped at 1000 entries. Each entry includes
+  the internal Thunderbird account ID that received the message and up to 5
+  `authserv-id` names from its `Authentication-Results` headers, plus a flag
+  recording whether more names were present (used only to show per-account
+  protection status). Each entry also includes
   identity header metrics: parsed Sender, Reply-To, and Return-Path addresses
   (truncated to 200 characters each), extracted domain names, and List-Id /
   List-Unsubscribe header values (truncated to 200 characters). When the
@@ -58,7 +66,7 @@ The setup assistant includes an optional MX lookup feature that is disabled by d
 
 - The feature is opt-in and off by default.
 - Only account email domains (not message data) are sent.
-- Lookups are performed only when the user opens the setup assistant.
+- Lookups are performed only when the user opens the setup assistant, or clicks "Look up MX hints" in the guided setup (which sends only the selected account's email domains).
 - The resolver is restricted to a fixed list of permitted endpoints (Google Public DNS and Cloudflare).
 - The user may change the resolver or disable the feature at any time.
 - No MX results are trusted or stored automatically; the user must explicitly add any entry.

@@ -4,19 +4,20 @@
  * ## How to add a new locale
  *
  *   1. Create src/_locales/<code>/messages.json
- *      Use src/_locales/en/messages.json as the template.
- *      Translate only the "message" values you need; keys without translations
- *      fall back to English automatically via the default_locale in manifest.json.
+ *      Use src/_locales/en/messages.json as the template and translate every
+ *      key. Missing keys fall back to English via default_locale, but
+ *      test/locales.test.js requires every locale to match the English key set
+ *      and placeholders.
  *
- *   2. Rule titles (rule_*_title) and summaries (rule_*_summary) are optional
- *      — they fall back to the English rule registry when missing.
+ *   2. Rule titles (rule_*_title), summaries (rule_*_summary) and composite
+ *      tooltips (rule_composite_*_tooltip) are included; the English values
+ *      must stay identical to src/core/ruleRegistry.js.
  *
  *   3. Keep technical protocol names (DMARC, SPF, DKIM, Message-ID) unchanged
- *      unless your locale explicitly needs surrounding explanation.
+ *      unless your locale explicitly needs surrounding explanation. Values that
+ *      intentionally match English must be listed in test/locales.test.js.
  *
  *   4. Test by switching Thunderbird to your locale and opening the add-on options.
- *
- * See also: docs/localization.md
  */
 
 import { titleForKey, summaryForKey, tooltipForKey } from '../core/ruleRegistry.js';
@@ -51,16 +52,33 @@ export const FALLBACK_EN = {
   // ── Protection status messages ────────────────────────────────────────────
   status_no_trusted_servers:
     'No trusted authentication servers configured. '
-    + 'DMARC, SPF, and DKIM scoring is disabled until you add a trusted server above.',
-  status_protection_active: 'Protection active — $1 trusted server$2 configured.',
-  status_recent_no_trusted_ar:
-    'Recent messages had no scoring from trusted authentication results. '
-    + 'Verify that your trusted server names match the Authentication-Results headers in your mail.',
+    + 'DMARC, SPF, and DKIM scoring is disabled until you confirm a trusted server.',
+  status_overall_all_active: 'Authentication scoring is active for all $1 account$2.',
+  status_overall_partial:
+    'Authentication scoring is not active for $1 of $2 account$3. '
+    + 'Protection is partial until setup is complete.',
+  status_state_active: 'Authentication scoring active',
+  status_state_not_configured: 'Trusted authentication server not configured',
+  status_state_awaiting_mail: 'Configured — waiting for new mail to verify',
+  status_state_needs_confirmation: 'Setup requires confirmation',
+  status_state_no_usable_ar: 'Provider does not appear to supply usable authentication results',
+  btn_setup_start: 'Set up',
+  btn_setup_change: 'Review / change',
+  btn_start_guided_setup: 'Start guided setup',
+  popup_status_inactive: 'Authentication scoring is not active for this account.',
+  popup_btn_open_setup: 'Open setup',
 
   // ── Recent activity ───────────────────────────────────────────────────────
   activity_no_messages: 'No messages assessed yet.',
   activity_counts: '$1 message$2 assessed — $3 normal, $4 review, $5 high-risk.',
   activity_most_recent: 'Most recent:',
+  activity_unknown_domain: '(unknown)',
+
+  // ── Classification labels ─────────────────────────────────────────────────
+  classification_normal: 'normal',
+  classification_review: 'review',
+  classification_high_risk: 'high-risk',
+  classification_unknown: 'unknown',
 
   // ── Setup assistant ───────────────────────────────────────────────────────
   setup_hints_summary: 'Setup hints from account domains',
@@ -75,6 +93,21 @@ export const FALLBACK_EN = {
   trust_exact_match_label: '$1 (exact match)',
   trust_domain_label: '$1 (and subdomains)',
   trust_promote_btn: 'Trust domain ($1 and subdomains)',
+  trust_promote_title:
+    'Add $1 as a registrable-domain trust entry. '
+    + 'This will trust all subdomains of $1, not just $2.',
+  add_trusted_hint_exact: 'Trusts only this specific host. Subdomains are not trusted.',
+  add_trusted_hint_domain:
+    'Trusts this domain and all its subdomains. '
+    + 'Use with care — this is broader than exact-host trust.',
+  trusted_error_empty: 'Value cannot be empty.',
+  trusted_error_invalid_host: 'Invalid hostname: use letters, digits, hyphens, and dots only.',
+  trusted_error_public_suffix: 'This value is a public suffix and cannot be used for domain trust.',
+  trusted_error_not_registrable:
+    'For registrable-domain trust, enter the registrable domain itself (e.g. $1, not $2).',
+  trusted_error_duplicate: 'This entry already exists in the trusted list.',
+  match_type_exact: 'exact',
+  match_type_domain: 'domain',
 
   // ── Candidate list ────────────────────────────────────────────────────────
   candidates_none: 'No untrusted candidates seen yet.',
@@ -174,6 +207,7 @@ export const FALLBACK_EN = {
   action_classified_high_risk: 'Scored high-risk (no action)',
   action_moved_review: 'Moved to review folder',
   action_moved_junk: 'Moved to Junk',
+  action_moved_junk_mark_failed: 'Moved to Junk (marking as junk failed)',
   action_move_review_failed: 'Move to review failed',
   action_move_junk_failed: 'Move to Junk failed',
   action_no_review_folder: 'No review folder configured',
@@ -294,10 +328,76 @@ export function getMessage(name, substitutions) {
   if (substitutions) {
     const arr = Array.isArray(substitutions) ? substitutions : [substitutions];
     for (let i = 0; i < arr.length; i++) {
-      s = s.replace(`$${i + 1}`, String(arr[i] ?? ''));
+      s = s.split(`$${i + 1}`).join(String(arr[i] ?? ''));
     }
   }
   return s;
+}
+
+/**
+ * Look up a message via browser.i18n only; returns '' when unavailable or
+ * missing so callers can fall back to the English rule registry.
+ */
+function browserMessage(name, substitutions) {
+  if (typeof browser !== 'undefined' && browser?.i18n?.getMessage) {
+    return browser.i18n.getMessage(name, substitutions) || '';
+  }
+  return '';
+}
+
+const CLASSIFICATION_MSG_KEYS = {
+  normal: 'classification_normal',
+  review: 'classification_review',
+  'high-risk': 'classification_high_risk',
+};
+
+/**
+ * Localized label for a classification value ('normal' | 'review' | 'high-risk').
+ *
+ * @param {string|null|undefined} classification
+ * @returns {string}
+ */
+export function localizedClassification(classification) {
+  const msgKey = CLASSIFICATION_MSG_KEYS[classification];
+  if (msgKey) return getMessage(msgKey);
+  return classification ? String(classification) : getMessage('classification_unknown');
+}
+
+const ACTION_MSG_KEYS = {
+  'classified-normal': 'action_classified_normal',
+  'classified-review': 'action_classified_review',
+  'classified-high-risk': 'action_classified_high_risk',
+  'moved-review': 'action_moved_review',
+  'moved-junk': 'action_moved_junk',
+  'moved-junk-mark-failed': 'action_moved_junk_mark_failed',
+  'move-review-failed': 'action_move_review_failed',
+  'move-junk-failed': 'action_move_junk_failed',
+  'no-review-folder-configured': 'action_no_review_folder',
+};
+
+/**
+ * Localized label for a decision-log action value. Unknown actions are
+ * returned unchanged.
+ *
+ * @param {string|null|undefined} action
+ * @returns {string}
+ */
+export function localizedActionLabel(action) {
+  const msgKey = ACTION_MSG_KEYS[action];
+  return msgKey ? getMessage(msgKey) : (action ?? '');
+}
+
+/**
+ * Localized label for a rule/whitelist matchType ('exact' | 'domain').
+ * Unknown values are returned unchanged.
+ *
+ * @param {string|null|undefined} matchType
+ * @returns {string}
+ */
+export function localizedMatchType(matchType) {
+  if (matchType === 'exact') return getMessage('match_type_exact');
+  if (matchType === 'domain') return getMessage('match_type_domain');
+  return matchType ?? '';
 }
 
 /**
@@ -310,6 +410,11 @@ export function getMessage(name, substitutions) {
  * @param {ParentNode} root
  */
 export function localizeDocument(root = document) {
+  if (typeof browser !== 'undefined' && browser?.i18n?.getUILanguage) {
+    // Lets the engine pick locale-appropriate fonts and line breaking.
+    document.documentElement.lang = browser.i18n.getUILanguage();
+  }
+
   const replace = value => value.replace(/__MSG_([A-Za-z0-9_]+)__/g, (_, key) => getMessage(key));
 
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -342,6 +447,19 @@ function scoreKeyToMsgBase(key) {
 }
 
 /**
+ * Localized title for an 'auth.<method>.<result>' key, or '' when the key is
+ * not an auth key or no locale message is available.
+ *
+ * @param {string|null|undefined} key
+ * @returns {string}
+ */
+function localizedAuthTitle(key) {
+  const auth = key?.match(/^auth\.(\w+)\.(\w+)$/);
+  if (!auth) return '';
+  return browserMessage('rule_template_auth_title', [auth[1].toUpperCase(), auth[2]]);
+}
+
+/**
  * Return a localized title for a score-reason key.
  *
  * Tries browser.i18n first (rule_<key>_title), then falls back to the
@@ -352,12 +470,36 @@ function scoreKeyToMsgBase(key) {
  * @returns {string}
  */
 export function localizedTitleForKey(key) {
-  const msgName = scoreKeyToMsgBase(key) + '_title';
-  if (typeof browser !== 'undefined' && browser?.i18n?.getMessage) {
-    const result = browser.i18n.getMessage(msgName);
-    if (result) return result;
+  const result = browserMessage(scoreKeyToMsgBase(key) + '_title');
+  if (result) return result;
+  const authTitle = localizedAuthTitle(key);
+  if (authTitle) return authTitle;
+  const cf = key?.match(/^custom\.formula\.(.+)$/);
+  if (cf) {
+    const formulaTitle = browserMessage('rule_template_custom_formula_title', [cf[1]]);
+    if (formulaTitle) return formulaTitle;
   }
   return titleForKey(key);
+}
+
+/**
+ * Return the display label for a stored score reason.
+ *
+ * Reasons store an English label at scoring time; prefer the localized rule
+ * title (or the auth.<method>.<result> template) when one exists, otherwise
+ * keep the stored label.
+ *
+ * @param {{ key: string, label?: string }} reason
+ * @returns {string}
+ */
+export function localizedReasonLabel(reason) {
+  const key = reason?.key;
+  const result = browserMessage(scoreKeyToMsgBase(key ?? '') + '_title');
+  if (result) return result;
+  const authTitle = localizedAuthTitle(key);
+  if (authTitle) return authTitle;
+  if (reason?.label) return reason.label;
+  return key ? localizedTitleForKey(key) : '';
 }
 
 /**
@@ -370,10 +512,16 @@ export function localizedTitleForKey(key) {
  * @returns {string|null}
  */
 export function localizedSummaryForKey(key) {
-  const msgName = scoreKeyToMsgBase(key) + '_summary';
-  if (typeof browser !== 'undefined' && browser?.i18n?.getMessage) {
-    const result = browser.i18n.getMessage(msgName);
-    if (result) return result;
+  const result = browserMessage(scoreKeyToMsgBase(key) + '_summary');
+  if (result) return result;
+  const auth = key?.match(/^auth\.(\w+)\.(\w+)$/);
+  if (auth) {
+    const authSummary = browserMessage('rule_template_auth_summary', [auth[1].toUpperCase(), auth[2]]);
+    if (authSummary) return authSummary;
+  }
+  if (/^custom\.formula\./.test(key ?? '')) {
+    const formulaSummary = browserMessage('rule_template_custom_formula_summary');
+    if (formulaSummary) return formulaSummary;
   }
   return summaryForKey(key);
 }

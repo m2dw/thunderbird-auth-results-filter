@@ -148,6 +148,46 @@ button { cursor: pointer; }
   margin: 0.5rem 0;
 }
 .status-hint { font-size: 0.85rem; color: #666; margin: 0.35rem 0; }
+
+.protection-account-list { list-style: none; padding: 0; margin: 0.5rem 0; }
+.protection-account { border: 1px solid #ddd; border-left-width: 4px; border-radius: 4px; padding: 0.4rem 0.75rem; margin: 0.4rem 0; }
+.protection-account-head { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.protection-account-name { font-weight: 600; }
+.protection-state-badge { font-size: 0.8rem; border-radius: 3px; padding: 0.05rem 0.4rem; background: #eee; color: #444; }
+.protection-setup-btn { margin-left: auto; font-size: 0.8rem; }
+.protection-account-detail { font-size: 0.85rem; color: #444; margin: 0.25rem 0 0; }
+.protection-account-meta { font-size: 0.8rem; color: #777; margin: 0.15rem 0 0; }
+.protection-state-active { border-left-color: #2e9e5b; }
+.protection-state-active .protection-state-badge { background: #e6f4ec; color: #1a6b3c; }
+.protection-state-not_configured,
+.protection-state-needs_confirmation { border-left-color: #e0a800; }
+.protection-state-not_configured .protection-state-badge,
+.protection-state-needs_confirmation .protection-state-badge { background: #fff3cd; color: #7a5800; }
+.protection-state-awaiting_mail { border-left-color: #6c8ebf; }
+.protection-state-awaiting_mail .protection-state-badge { background: #eef3fc; color: #1a3c6b; }
+.protection-state-no_usable_ar { border-left-color: #c0392b; }
+.protection-state-no_usable_ar .protection-state-badge { background: #fdecea; color: #8e2a1f; }
+
+.authserv-explainer { margin: 0.5rem 0; font-size: 0.85rem; color: #444; }
+.authserv-explainer summary { cursor: pointer; user-select: none; }
+
+.guided-setup { margin: 0.75rem 0; border: 1px solid #a8c4f0; border-radius: 4px; padding: 0.5rem 0.9rem; background: #f7faff; }
+.guided-setup h3 { margin: 0.25rem 0 0.5rem; font-size: 1rem; }
+.guided-step { margin: 0.6rem 0; }
+.guided-step-title { font-weight: 600; margin: 0 0 0.3rem; font-size: 0.9rem; }
+.guided-setup-note { font-size: 0.8rem; color: #555; margin: 0.25rem 0; }
+.guided-setup-suggestion { display: block; font-size: 0.85rem; margin: 0.15rem 0; }
+.guided-setup-other-row { display: flex; align-items: center; gap: 0.5rem; margin: 0.25rem 0; font-size: 0.85rem; }
+.guided-setup-other-row input[type="text"] { font-family: monospace; width: 18rem; }
+.guided-setup-mx { margin-top: 0.4rem; }
+.guided-setup-check { margin: 0; padding-left: 1.2rem; font-size: 0.85rem; }
+.guided-check-ok { color: #1a6b3c; }
+.guided-check-warn { color: #7a5800; }
+.guided-check-info { color: #444; }
+.guided-setup-confirm-label { display: flex; gap: 0.4rem; align-items: flex-start; font-size: 0.85rem; }
+.guided-setup-actions { margin-top: 0.4rem; display: flex; gap: 0.5rem; }
+.guided-setup-error { color: #c0392b; font-size: 0.85rem; margin: 0.35rem 0; }
+.guided-setup-success { color: #1a6b3c; font-size: 0.85rem; margin: 0.35rem 0; }
 .firstrun-callout {
   background: #eef3fc;
   border: 1px solid #a8c4f0;

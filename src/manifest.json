@@ -3,7 +3,7 @@
   "name": "__MSG_page_title__",
   "description": "__MSG_manifest_description__",
   "default_locale": "en",
-  "version": "0.8.4",
+  "version": "0.9.0",
   "author": "Motoaki Kusakabe",
   "browser_specific_settings": {
     "gecko": {

@@ -1,0 +1,868 @@
+{
+  "tab_basic":                { "message": "Grundeinstellungen", "description": "Basic settings tab label" },
+  "tab_advanced":             { "message": "Erweitert",          "description": "Advanced settings tab label" },
+  "tab_custom_formulas":      { "message": "Eigene Formeln",     "description": "Custom Formulas tab label" },
+  "tab_diagnostics":          { "message": "Diagnose",           "description": "Diagnostics tab label" },
+
+  "page_title": { "message": "Auth Results Filter", "description": "Options page heading" },
+  "manifest_description": {
+    "message": "Filtert eingehende E-Mails anhand der Authentication-Results-Header.",
+    "description": "Add-on description shown by Thunderbird"
+  },
+
+  "section_protection_status":      { "message": "Schutzstatus",                                "description": "Section heading" },
+  "section_trusted_servers":        { "message": "Vertrauenswürdige Authentifizierungsserver", "description": "Section heading" },
+  "section_suggested_servers":      { "message": "Vorgeschlagene Server",                       "description": "Section heading" },
+  "section_mail_handling":          { "message": "E-Mail-Verarbeitung",                         "description": "Section heading" },
+  "section_recent_activity":        { "message": "Letzte Aktivität",                            "description": "Section heading" },
+  "section_score_settings":         { "message": "Punkteeinstellungen",                         "description": "Section heading" },
+  "section_sender_rules":           { "message": "Regeln für Absenderdomains",                  "description": "Section heading" },
+  "section_manual_whitelist":       { "message": "Manuelle Whitelist",                          "description": "Section heading" },
+  "section_address_book_whitelist": { "message": "Adressbuch-Whitelist",                        "description": "Section heading" },
+  "section_diagnostics":            { "message": "Diagnose",                                    "description": "Section heading (Advanced tab)" },
+  "section_decision_log":           { "message": "Entscheidungsprotokoll",                      "description": "Section heading" },
+
+  "status_no_trusted_servers": {
+    "message": "Keine vertrauenswürdigen Authentifizierungsserver konfiguriert. Die Bewertung von DMARC, SPF und DKIM ist deaktiviert, bis Sie einen vertrauenswürdigen Server bestätigen.",
+    "description": "Warning shown in Basic tab when no trusted servers are set up and account status is unavailable"
+  },
+  "firstrun_callout": {
+    "message": "Erster Einrichtungsschritt: Teilen Sie dem Add-on mit, welchen Server Ihr E-Mail-Anbieter zur Prüfung eingehender E-Mails verwendet. Bis Sie einen bestätigen, werden Absender-Authentifizierungsprüfungen (DMARC/SPF/DKIM) nicht für die Bewertung verwendet. Nutzen Sie die geführte Einrichtung unten – sie schlägt Namen anhand Ihres Kontos vor, aber nichts wird als vertrauenswürdig eingestuft, bevor Sie es bestätigen.",
+    "description": "First-run callout shown when no trusted servers are configured, explaining what to do next"
+  },
+  "status_accounts_unavailable": {
+    "message": "Konfigurierte vertrauenswürdige Server: $count$. Der Status pro Konto ist nicht verfügbar, da die Kontoinformationen nicht geladen werden konnten.",
+    "description": "Shown when accounts cannot be listed but trusted servers exist",
+    "placeholders": {
+      "count":  { "content": "$1", "example": "2" },
+      "plural": { "content": "$2", "example": "s" }
+    }
+  },
+  "status_overall_all_active": {
+    "message": "Die Authentifizierungsbewertung ist für alle Konten aktiv ($total$).",
+    "description": "Overall status when every account has active authentication scoring",
+    "placeholders": {
+      "total":  { "content": "$1", "example": "2" },
+      "plural": { "content": "$2", "example": "s" }
+    }
+  },
+  "status_overall_partial": {
+    "message": "Die Authentifizierungsbewertung ist für $inactive$ von $total$ Konten nicht aktiv. Der Schutz ist unvollständig, bis die Einrichtung abgeschlossen ist.",
+    "description": "Overall status when one or more accounts do not have active authentication scoring",
+    "placeholders": {
+      "inactive": { "content": "$1", "example": "1" },
+      "total":    { "content": "$2", "example": "2" },
+      "plural":   { "content": "$3", "example": "s" }
+    }
+  },
+  "status_state_active":             { "message": "Authentifizierungsbewertung aktiv",                            "description": "Per-account protection state label" },
+  "status_state_not_configured":     { "message": "Kein vertrauenswürdiger Authentifizierungsserver konfiguriert", "description": "Per-account protection state label" },
+  "status_state_awaiting_mail":      { "message": "Konfiguriert – Überprüfung erfolgt mit neuer E-Mail",          "description": "Per-account protection state label" },
+  "status_state_needs_confirmation": { "message": "Einrichtung muss bestätigt werden",                            "description": "Per-account protection state label" },
+  "status_state_no_usable_ar":       { "message": "Der Anbieter scheint keine verwertbaren Authentifizierungsergebnisse zu liefern", "description": "Per-account protection state label" },
+  "status_state_active_detail": {
+    "message": "Neuere E-Mails dieses Kontos wurden von einem Server geprüft, dem Sie vertrauen. Daher werden die Ergebnisse von DMARC, SPF und DKIM für die Bewertung verwendet.",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_not_configured_detail": {
+    "message": "Absender-Authentifizierungsprüfungen (DMARC, SPF, DKIM) werden für dieses Konto noch nicht verwendet. Bis Sie den Server Ihres Anbieters bestätigen, werden nur schwächere Signale bewertet.",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_awaiting_mail_detail": {
+    "message": "Ein vertrauenswürdiger Server ist konfiguriert, hat aber noch keine neueren E-Mails dieses Kontos geprüft. Die Authentifizierungsbewertung ist für dieses Konto noch nicht bestätigt.",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_needs_confirmation_detail": {
+    "message": "Neuere E-Mails dieses Kontos enthalten Authentifizierungsergebnisse eines Servers, den Sie nicht bestätigt haben. Diese Ergebnisse werden ignoriert, bis Sie den Server Ihres Anbieters bestätigen.",
+    "description": "Per-account protection state explanation"
+  },
+  "status_state_mismatch_detail": {
+    "message": "Ein vertrauenswürdiger Server ist konfiguriert, aber neuere E-Mails dieses Kontos wurden von einem anderen Server geprüft. Die Authentifizierungsbewertung funktioniert für dieses Konto nicht – überprüfen Sie die Einrichtung.",
+    "description": "Per-account explanation when trusted servers exist but do not match this account's mail"
+  },
+  "status_state_no_usable_ar_detail": {
+    "message": "Keine der letzten $count$ Nachrichten dieses Kontos hatte einen Authentication-Results-Header, daher kann die Authentifizierungsbewertung hier nicht funktionieren. Andere Signale werden weiterhin bewertet.",
+    "description": "Per-account protection state explanation",
+    "placeholders": { "count": { "content": "$1", "example": "5" } }
+  },
+  "status_confirmed_host": {
+    "message": "Bestätigter Server: $host$",
+    "description": "Per-account line showing the server confirmed in guided setup",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "status_mail_counts": {
+    "message": "Letzte $total$ Nachricht(en): $trusted$ von einem vertrauenswürdigen Server geprüft, $untrusted$ von einem nicht bestätigten Server, $none$ ohne Authentifizierungsergebnisse.",
+    "description": "Per-account recent mail summary",
+    "placeholders": {
+      "total":     { "content": "$1", "example": "20" },
+      "trusted":   { "content": "$2", "example": "18" },
+      "untrusted": { "content": "$3", "example": "1" },
+      "none":      { "content": "$4", "example": "1" }
+    }
+  },
+  "status_mail_unrecorded": {
+    "message": "$count$ Nachricht(en) führten mehr prüfende Server auf, als gespeichert werden, und werden daher in keiner Richtung gezählt.",
+    "description": "Per-account note for log entries whose authserv-id list was truncated",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "btn_setup_start":        { "message": "Einrichten",               "description": "Per-account button opening the guided setup" },
+  "btn_setup_change":       { "message": "Prüfen / ändern",          "description": "Per-account button reopening the guided setup" },
+  "btn_start_guided_setup": { "message": "Geführte Einrichtung starten", "description": "Button opening the guided setup" },
+
+  "authserv_explainer_summary": { "message": "Was ist ein vertrauenswürdiger Authentifizierungsserver?", "description": "Summary of the authserv-id explainer" },
+  "authserv_explainer_body": {
+    "message": "Wenn eine Nachricht eintrifft, prüft Ihr E-Mail-Anbieter, ob der Absender echt ist (SPF, DKIM, DMARC), und schreibt das Ergebnis in einen versteckten Header. Jedes Ergebnis ist mit dem Namen des Servers gekennzeichnet, der es erstellt hat. Da jeder einen solchen Header schreiben kann – auch Spammer –, verwendet dieses Add-on nur Ergebnisse, die mit einem von Ihnen bestätigten Servernamen gekennzeichnet sind. Nichts wird jemals automatisch als vertrauenswürdig eingestuft.",
+    "description": "Plain-language explanation of authserv-id"
+  },
+  "authserv_explainer_advanced": {
+    "message": "Technische Details: Der Header ist Authentication-Results (RFC 8601), und der Servername ist dessen authserv-id. Die Liste vertrauenswürdiger Server unten speichert authserv-id-Werte.",
+    "description": "Raw technical terms for advanced users"
+  },
+
+  "guided_setup_title":            { "message": "Geführte Einrichtung: vertrauenswürdiger Authentifizierungsserver", "description": "Guided setup heading" },
+  "guided_setup_step_account":     { "message": "1. Einzurichtendes Konto auswählen",                  "description": "Guided setup step" },
+  "guided_setup_step_server":      { "message": "2. Prüfserver Ihres Anbieters auswählen",            "description": "Guided setup step" },
+  "guided_setup_step_server_desc": {
+    "message": "Die Vorschläge stammen aus der E-Mail-Domain dieses Kontos (und aus DNS-MX-Einträgen, wenn Sie diese Option nutzen). Es sind nur Vermutungen – keiner wird als vertrauenswürdig eingestuft, bevor Sie ihn unten bestätigen. Die Hilfeseiten Ihres Anbieters nennen in der Regel den richtigen Namen.",
+    "description": "Guided setup step description"
+  },
+  "guided_setup_other":            { "message": "Anderer:",                                            "description": "Label for typed server name" },
+  "guided_setup_other_placeholder": { "message": "z. B. mx.example.com",                              "description": "Placeholder for the typed server name input" },
+  "guided_setup_mx_btn":           { "message": "MX-Hinweise abrufen (DNS)",                           "description": "Button that runs an opt-in MX lookup" },
+  "guided_setup_mx_disabled": {
+    "message": "DNS-basierte Hinweise sind ausgeschaltet. Sie können sie unten unter „Einrichtungshinweise aus Kontodomains“ einschalten; dabei werden die E-Mail-Domains Ihrer Konten an einen öffentlichen DNS-Resolver gesendet.",
+    "description": "Shown when opt-in DNS lookup is disabled"
+  },
+  "guided_setup_mx_hint": {
+    "message": "Ein Klick auf die Schaltfläche sendet $domains$ an den DNS-Resolver $resolver$.",
+    "description": "Privacy note before MX lookup",
+    "placeholders": {
+      "domains":  { "content": "$1", "example": "example.com" },
+      "resolver": { "content": "$2", "example": "8.8.8.8" }
+    }
+  },
+  "guided_setup_mx_running":       { "message": "MX-Einträge werden abgefragt…",                       "description": "Shown while the MX lookup runs" },
+  "guided_setup_step_check":       { "message": "3. Konfigurationsprüfung",                            "description": "Guided setup step" },
+  "guided_setup_step_confirm":     { "message": "4. Bestätigen",                                       "description": "Guided setup step" },
+  "guided_setup_confirm_label": {
+    "message": "Ich habe geprüft, dass $host$ der Servername ist, den mein E-Mail-Anbieter zur Prüfung eingehender E-Mails verwendet, und ich möchte seinen Ergebnissen vertrauen.",
+    "description": "Explicit confirmation checkbox label",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_setup_confirm_label_empty": { "message": "Wählen Sie zuerst einen Servernamen aus oder geben Sie einen ein.", "description": "Confirmation label when no host is selected" },
+  "guided_setup_confirm_btn":      { "message": "Bestätigen und vertrauen",                            "description": "Guided setup confirm button" },
+  "guided_setup_close_btn":        { "message": "Schließen",                                           "description": "Guided setup close button" },
+  "guided_setup_success": {
+    "message": "Gespeichert. $host$ ist jetzt vertrauenswürdig. Der Status oben wird aktualisiert, sobald neue E-Mails eintreffen; Sie können diese Einrichtung jederzeit erneut öffnen.",
+    "description": "Shown after a successful confirmation",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_setup_error_confirmation_required": { "message": "Aktivieren Sie das Bestätigungsfeld, um diesem Server zu vertrauen.", "description": "Guided setup error" },
+  "guided_setup_error_missing_account":       { "message": "Wählen Sie ein Konto aus.",                                    "description": "Guided setup error" },
+  "guided_setup_error_missing_host":          { "message": "Wählen Sie einen Servernamen aus oder geben Sie einen ein.",   "description": "Guided setup error" },
+  "guided_setup_error_invalid_host":          { "message": "Ungültiger Servername: Nur Buchstaben, Ziffern, Bindestriche und Punkte verwenden.", "description": "Guided setup error" },
+
+  "guided_check_account_domains": {
+    "message": "E-Mail-Domain des Kontos: $domains$",
+    "description": "Configuration check item",
+    "placeholders": { "domains": { "content": "$1", "example": "example.com" } }
+  },
+  "guided_check_account_domains_none": { "message": "Dieses Konto hat keine E-Mail-Adresse, daher sind keine Vorschläge möglich.", "description": "Configuration check item" },
+  "guided_check_mail_none_yet":        { "message": "Für dieses Konto wurden noch keine E-Mails bewertet. Der Status wird überprüft, sobald neue E-Mails eintreffen.", "description": "Configuration check item" },
+  "guided_check_mail_summary": {
+    "message": "Letzte $total$ Nachricht(en): $trusted$ von einem vertrauenswürdigen Server geprüft, $untrusted$ von einem nicht bestätigten Server, $none$ ohne Authentifizierungsergebnisse.",
+    "description": "Configuration check item",
+    "placeholders": {
+      "total":     { "content": "$1", "example": "20" },
+      "trusted":   { "content": "$2", "example": "0" },
+      "untrusted": { "content": "$3", "example": "19" },
+      "none":      { "content": "$4", "example": "1" }
+    }
+  },
+  "guided_check_mail_unrecorded": {
+    "message": "$count$ neuere Nachricht(en) führten mehr prüfende Server auf, als gespeichert werden, und werden daher in keiner Richtung gezählt.",
+    "description": "Configuration check item",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "guided_check_mail_no_ar": {
+    "message": "Neuere E-Mails dieses Kontos enthalten keine Authentifizierungsergebnisse. Ihr Anbieter liefert sie möglicherweise nicht; das Vertrauen in einen Server hat keine Wirkung, solange er das nicht tut.",
+    "description": "Configuration check item"
+  },
+  "guided_check_host_invalid": {
+    "message": "„$host$“ ist kein gültiger Servername.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "bad host" } }
+  },
+  "guided_check_host_already_trusted": {
+    "message": "$host$ ist bereits vertrauenswürdig. Durch die Bestätigung wird er für dieses Konto gespeichert.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_check_host_matches_mx": {
+    "message": "$host$ ist ein MX-Server (Eingangsserver) der Domain dieses Kontos.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mx.example.com" } }
+  },
+  "guided_check_host_matches_hint": {
+    "message": "$host$ entspricht einem Namen, der aus der Domain dieses Kontos vorgeschlagen wurde.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "guided_check_host_related_domain": {
+    "message": "Der Servername gehört zur selben Domain wie dieses Konto ($domain$).",
+    "description": "Configuration check item",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "guided_check_host_unrelated": {
+    "message": "$host$ steht in keinem Zusammenhang mit der Domain oder den MX-Hinweisen dieses Kontos. Bei gehosteten E-Mail-Diensten kann das korrekt sein, prüfen Sie es aber bei Ihrem Anbieter nach.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mx.other.example" } }
+  },
+  "guided_check_host_seen": {
+    "message": "Dieser Name kam in $seen$ der letzten $total$ Nachricht(en) dieses Kontos vor. Header können gefälscht werden, verwenden Sie dies daher nur zur Gegenprüfung.",
+    "description": "Configuration check item",
+    "placeholders": {
+      "seen":  { "content": "$1", "example": "18" },
+      "total": { "content": "$2", "example": "20" }
+    }
+  },
+  "guided_check_host_not_seen": {
+    "message": "$host$ kam in neueren E-Mails dieses Kontos nicht vor. Wenn Sie ihn bestätigen, bleibt die Authentifizierungsbewertung möglicherweise inaktiv.",
+    "description": "Configuration check item",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "guided_check_host_possibly_seen": {
+    "message": "$host$ ist nicht unter den gespeicherten Servernamen, aber $count$ neuere Nachricht(en) führten mehr Server auf, als gespeichert werden, daher kam er dort möglicherweise vor.",
+    "description": "Configuration check item",
+    "placeholders": {
+      "host":  { "content": "$1", "example": "mail.example.com" },
+      "count": { "content": "$2", "example": "2" }
+    }
+  },
+
+  "activity_no_messages":{ "message": "Noch keine Nachrichten bewertet.", "description": "Empty state for Recent Activity section" },
+  "activity_counts": {
+    "message": "Bewertete Nachrichten: $total$ – $normal$ normal, $review$ Prüfung, $highrisk$ hohes Risiko.",
+    "description": "Summary counts in Recent Activity section",
+    "placeholders": {
+      "total":    { "content": "$1", "example": "42" },
+      "plural":   { "content": "$2", "example": "s" },
+      "normal":   { "content": "$3", "example": "38" },
+      "review":   { "content": "$4", "example": "3" },
+      "highrisk": { "content": "$5", "example": "1" }
+    }
+  },
+  "activity_most_recent": { "message": "Zuletzt:", "description": "Heading above last 5 entries in Recent Activity" },
+  "activity_unknown_domain": { "message": "(unbekannt)", "description": "Recent Activity fallback when the From domain is unknown" },
+
+  "classification_normal":    { "message": "normal",       "description": "Classification label for scores 0-49" },
+  "classification_review":    { "message": "Prüfung",      "description": "Classification label for scores 50-99" },
+  "classification_high_risk": { "message": "hohes Risiko", "description": "Classification label for scores 100+" },
+  "classification_unknown":   { "message": "unbekannt",    "description": "Classification label when the log entry has no classification" },
+
+  "setup_hints_summary":         { "message": "Einrichtungshinweise aus Kontodomains",        "description": "Summary element for setup assistant <details>" },
+  "setup_use_dns":               { "message": "DNS-Abfrage für MX-Einrichtungshinweise verwenden", "description": "Checkbox label for DNS lookup option" },
+  "setup_dns_resolver_label":    { "message": "DNS-Resolver:",                                "description": "Label for DNS resolver select" },
+  "setup_no_accounts":           { "message": "Keine E-Mail-Domains von Konten gefunden.",   "description": "Shown when no accounts are available in setup assistant" },
+  "setup_unable_load_accounts":  { "message": "Kontoinformationen konnten nicht geladen werden.", "description": "Error when account list cannot be fetched" },
+  "setup_no_mx_records":         { "message": "Keine MX-Einträge gefunden.",                  "description": "Shown when DNS MX lookup returns no records" },
+  "setup_assistant_desc": {
+    "message": "Dies sind vorgeschlagene Servernamen, die aus den E-Mail-Domains Ihrer Konten abgeleitet wurden. Es sind nur Hinweise, keine vertrauenswürdigen Einträge. Klicken Sie auf „Verwenden“, um einen Vorschlag in das Formular unten zu übernehmen, prüfen Sie, ob er dem tatsächlichen Servernamen Ihres Anbieters entspricht, und klicken Sie dann auf „Hinzufügen“.",
+    "description": "Description inside the setup hints <details>"
+  },
+  "setup_assistant_guidance": {
+    "message": "Um den richtigen Servernamen zu bestätigen, sehen Sie in der Dokumentation Ihres E-Mail-Anbieters nach oder prüfen Sie den Authentication-Results-Header einer neueren Nachricht.",
+    "description": "Guidance inside the setup hints <details>"
+  },
+  "setup_dns_note": {
+    "message": "Die MX-Abfrage sendet die E-Mail-Domains Ihrer Konten an den konfigurierten DNS-Resolver. Die DNS-Abfrage dient nur zum Erzeugen von Einrichtungshinweisen. Vertrauenswürdige Einträge werden nicht automatisch hinzugefügt – Sie müssen sie ausdrücklich hinzufügen.",
+    "description": "Privacy note below the DNS lookup checkbox"
+  },
+  "setup_source_heuristic":      { "message": "heuristisch", "description": "Badge for a setup suggestion derived from the account domain" },
+  "setup_source_mx":             { "message": "MX",          "description": "Badge for a setup suggestion derived from DNS MX records" },
+
+  "no_trusted_msg":       { "message": "Keine vertrauenswürdigen Domains konfiguriert.", "description": "Shown when trusted domain list is empty" },
+  "trust_exact_match_label": {
+    "message": "$host$ (exakte Übereinstimmung)",
+    "description": "Label for an exact-host trusted entry",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+  "trust_domain_label": {
+    "message": "$domain$ (und Subdomains)",
+    "description": "Label for a registrable-domain trusted entry",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "trust_promote_btn": {
+    "message": "Domain vertrauen ($domain$ und Subdomains)",
+    "description": "Button to promote an exact entry to domain trust",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "trust_promote_title": {
+    "message": "$domain$ als Eintrag für eine registrierbare Domain hinzufügen. Damit wird allen Subdomains von $domain$ vertraut, nicht nur $host$.",
+    "description": "Tooltip for the promote-to-domain-trust button",
+    "placeholders": {
+      "domain": { "content": "$1", "example": "example.com" },
+      "host":   { "content": "$2", "example": "mail.example.com" }
+    }
+  },
+  "trusted_servers_intro": {
+    "message": "Ihr Server für eingehende E-Mails versieht jede Nachricht mit einem Authentication-Results-Header, in dem er sich mit einem Servernamen (der authserv-id) ausweist. Fügen Sie diesen Namen hier hinzu, damit dieses Add-on weiß, welche Authentifizierungsergebnisse es für die Bewertung verwenden soll. Ergebnisse von Servern, die nicht in dieser Liste stehen, werden ignoriert.",
+    "description": "Introductory paragraph of the Trusted Authentication Servers section"
+  },
+  "add_trusted_placeholder":       { "message": "z. B. mail.example.com", "description": "Placeholder for the add-trusted-server input" },
+  "match_type_exact_host":         { "message": "Exakter Host",           "description": "Option label for exact-host trust" },
+  "match_type_registrable_domain": { "message": "Registrierbare Domain",  "description": "Option label for registrable-domain trust" },
+  "add_trusted_hint_exact": {
+    "message": "Vertraut nur genau diesem Host. Subdomains werden nicht als vertrauenswürdig eingestuft.",
+    "description": "Hint below the add-trusted form for exact-host trust"
+  },
+  "add_trusted_hint_domain": {
+    "message": "Vertraut dieser Domain und allen ihren Subdomains. Mit Vorsicht verwenden – dies ist weiter gefasst als das Vertrauen in einen exakten Host.",
+    "description": "Hint below the add-trusted form for registrable-domain trust"
+  },
+  "trusted_error_empty":         { "message": "Der Wert darf nicht leer sein.",                                          "description": "Trusted entry validation error" },
+  "trusted_error_invalid_host":  { "message": "Ungültiger Hostname: Nur Buchstaben, Ziffern, Bindestriche und Punkte verwenden.", "description": "Trusted entry validation error" },
+  "trusted_error_public_suffix": { "message": "Dieser Wert ist ein öffentliches Suffix und kann nicht für Domain-Vertrauen verwendet werden.", "description": "Trusted entry validation error" },
+  "trusted_error_not_registrable": {
+    "message": "Geben Sie für Vertrauen in eine registrierbare Domain die registrierbare Domain selbst ein (z. B. $registrable$, nicht $value$).",
+    "description": "Trusted entry validation error",
+    "placeholders": {
+      "registrable": { "content": "$1", "example": "example.com" },
+      "value":       { "content": "$2", "example": "mail.example.com" }
+    }
+  },
+  "trusted_error_duplicate":     { "message": "Dieser Eintrag ist bereits in der Liste vertrauenswürdiger Server vorhanden.", "description": "Trusted entry validation error" },
+
+  "candidates_section_desc": {
+    "message": "Vom Einrichtungsassistenten ermittelte Namen von Authentifizierungsservern, denen Sie noch nicht vertrauen. Sie sind nicht aktiv – fügen Sie den richtigen Namen oben unter „Vertrauenswürdige Authentifizierungsserver“ hinzu, um die Bewertung zu aktivieren.",
+    "description": "Description paragraph for the Suggested Servers section"
+  },
+  "candidates_none": { "message": "Bisher keine nicht vertrauenswürdigen Kandidaten gefunden.", "description": "Empty state for Suggested Servers section" },
+  "candidate_trust_domain": {
+    "message": "$domain$ und allen Subdomains vertrauen",
+    "description": "Checkbox label for trusting a registrable domain and its subdomains",
+    "placeholders": { "domain": { "content": "$1", "example": "example.com" } }
+  },
+  "candidate_exact_match": {
+    "message": "$host$ (exakte Übereinstimmung)",
+    "description": "Checkbox label for an exact-host candidate",
+    "placeholders": { "host": { "content": "$1", "example": "mail.example.com" } }
+  },
+
+  "review_folder_no_accounts":       { "message": "Keine Konten gefunden.",                "description": "Shown when the account list is empty for review folder selection" },
+  "review_folder_unable_load":       { "message": "Konten konnten nicht geladen werden.",  "description": "Error when account list cannot be fetched for review folder selection" },
+  "review_folder_select_placeholder": { "message": "Ordner auswählen…",                    "description": "Default option in review folder select dropdown" },
+
+  "setting_move_to_review":     { "message": "Verdächtige E-Mails in den Prüfordner verschieben",                            "description": "Checkbox label for move-to-review setting" },
+  "setting_move_junk":          { "message": "E-Mails mit hohem Risiko direkt in den Junk-Ordner verschieben",               "description": "Checkbox label for move-to-junk setting" },
+  "setting_notify":             { "message": "Bei Nachrichten benachrichtigen, die die Bewertung bestehen (Punktzahl höchstens gleich dem Schwellenwert)", "description": "Checkbox label for notify-after-assessment setting" },
+  "setting_notify_caveat":      { "message": "Wenn die integrierte Benachrichtigung von Thunderbird für neue E-Mails ebenfalls aktiviert ist, erhalten Sie möglicherweise doppelte Benachrichtigungen. Deaktivieren Sie die Benachrichtigung von Thunderbird, wenn Sie nur die Benachrichtigung des Add-ons nach der Filterung wünschen.", "description": "Explanatory note shown below the notify-after-assessment checkbox" },
+  "setting_enable_diagnostics": { "message": "Diagnose-Tab aktivieren",                                                      "description": "Checkbox label for diagnostics mode setting" },
+  "setting_enable_address_book":{ "message": "Punktabzug über die Adressbuch-Whitelist aktivieren",                           "description": "Checkbox label for address-book whitelist" },
+  "setting_notification_max_score":    { "message": "Nur benachrichtigen, wenn die Punktzahl höchstens beträgt:", "description": "Label for the notification score limit input" },
+  "setting_notification_min_interval": { "message": "Mindestabstand zwischen Benachrichtigungen (ms):",           "description": "Label for the notification interval input" },
+
+  "score_col_result":          { "message": "Ergebnis",  "description": "Column header in auth score table" },
+  "score_col_signal":          { "message": "Signal",    "description": "Column header in Layer 2/3 score table" },
+  "score_col_rule":            { "message": "Regel",     "description": "Column header in Layer 4 score table" },
+  "score_col_score":           { "message": "Punkte",    "description": "Column header in score tables" },
+  "score_col_default":         { "message": "Standard",  "description": "Column header in score tables" },
+  "score_mitigation_badge":    { "message": "Entlastung","description": "Badge shown on mitigation rules in score settings" },
+  "score_layer3_cap_warning": {
+    "message": "Warnung: Die Obergrenze für Ebene 3 liegt auf oder über dem Prüfschwellenwert (50). Heuristiken der Ebene 3 allein könnten eine Nachricht in die Prüfung verschieben – das entspricht nicht dem vorgesehenen Design als schwaches Signal.",
+    "description": "Warning shown when Layer 3 cap is too high"
+  },
+  "score_settings_note": {
+    "message": "Die Schwellenwerte sind fest: 0–49 normal, 50–99 Prüfung, 100+ hohes Risiko. Die Eingaben unten legen fest, wie viel jedes Signal zur Gesamtpunktzahl einer Nachricht hinzufügt oder davon abzieht. Die Authentifizierungsbewertung (Ebene 1) verwendet nur Ergebnisse der vertrauenswürdigen Servernamen, die Sie im Tab „Grundeinstellungen“ konfigurieren; Ergebnisse unbekannter Server werden ignoriert.",
+    "description": "Note at the top of the Score Settings section"
+  },
+  "score_layer1_summary": { "message": "E-Mail-Authentifizierungsergebnisse (Ebene 1)", "description": "Score settings group heading" },
+  "score_layer1_desc": {
+    "message": "Punkte für die Ergebnisse von DMARC, SPF und DKIM. Es werden nur Ergebnisse Ihrer vertrauenswürdigen Authentifizierungsserver (Tab „Grundeinstellungen“) verwendet.",
+    "description": "Score settings group description"
+  },
+  "score_layer2_summary": { "message": "Übereinstimmung der Absenderidentität (Ebene 2)", "description": "Score settings group heading" },
+  "score_layer2_desc": {
+    "message": "Punkte für Abweichungen zwischen der sichtbaren Absenderadresse (From) und der authentifizierten Identität. Dies sind Indizien; ihr kombinierter Standardwert (25) liegt deutlich unter dem Prüfschwellenwert (50).",
+    "description": "Score settings group description"
+  },
+  "score_layer3_summary": { "message": "Heuristiken für Adressmuster (Ebene 3)", "description": "Score settings group heading" },
+  "score_layer3_desc": {
+    "message": "Schwache Signale, die darauf beruhen, ob die Absenderadresse (From) maschinell erzeugt wirkt. Sie dienen als Indizien für Regeln der Ebene 4. Halten Sie diese Werte niedrig – die Obergrenze begrenzt den Gesamtbeitrag der Ebene 3, damit sie eine Nachricht nicht allein in die Prüfung verschieben kann.",
+    "description": "Score settings group description"
+  },
+  "score_layer4_summary": { "message": "Kombinierte Signalregeln (Ebene 4)", "description": "Score settings group heading" },
+  "score_layer4_desc": {
+    "message": "Regeln, die nur greifen, wenn mehrere unabhängige Signale zusammentreffen. Sie sind die wichtigsten Auslöser für Prüfung/Junk. Entlastungsregeln (negative Punkte) verringern Fehlalarme bei bekannten, unbedenklichen Zustellungsmustern.",
+    "description": "Score settings group description"
+  },
+
+  "sender_rules_desc": {
+    "message": "Fügen Sie Punkteanpassungen für bestimmte Absenderdomains hinzu. Positive Werte erhöhen den Verdacht, negative Werte verringern ihn.",
+    "description": "Description of the Sender Domain Rules section"
+  },
+  "col_domain":        { "message": "Domain",        "description": "Table column header" },
+  "col_match":         { "message": "Abgleich",      "description": "Table column header for the match type" },
+  "col_address":       { "message": "Adresse",       "description": "Table column header" },
+  "match_type_exact":  { "message": "exakt",         "description": "Match type shown in rule and whitelist tables" },
+  "match_type_domain": { "message": "Domain",        "description": "Match type shown in rule and whitelist tables" },
+
+  "btn_add":              { "message": "Hinzufügen",                        "description": "Button label" },
+  "btn_remove":           { "message": "Entfernen",                         "description": "Button label" },
+  "btn_use":              { "message": "Verwenden",                         "description": "Use a setup suggestion" },
+  "btn_clear_log":        { "message": "Protokoll leeren",                  "description": "Button to clear the decision log" },
+  "btn_export_logs":      { "message": "Protokolle exportieren",            "description": "Button to export the decision log as JSON" },
+  "btn_exporting":        { "message": "Wird exportiert…",                  "description": "Button label while export is in progress" },
+  "btn_reset_all_scores": { "message": "Alle Punkte auf Standard zurücksetzen", "description": "Button to reset all score groups" },
+  "btn_reset_layer2":     { "message": "Ebene 2 auf Standard zurücksetzen", "description": "Button to reset Layer 2 scores" },
+  "btn_reset_layer3":     { "message": "Ebene 3 auf Standard zurücksetzen", "description": "Button to reset Layer 3 scores" },
+  "btn_reset_layer4":     { "message": "Ebene 4 auf Standard zurücksetzen", "description": "Button to reset Layer 4 scores" },
+  "btn_move_to_inbox":    { "message": "In den Posteingang",                "description": "Review action button in popup" },
+  "btn_whitelist_sender": { "message": "Absender auf Whitelist",            "description": "Review action button in popup" },
+  "btn_already_whitelisted": { "message": "Bereits auf Whitelist",          "description": "Disabled state of whitelist button when sender is already listed" },
+  "btn_open_options":     { "message": "Einstellungen / Protokolle öffnen", "description": "Button in popup to open the options page" },
+  "btn_confirm":          { "message": "Bestätigen",                        "description": "Confirmation button" },
+  "btn_cancel":           { "message": "Abbrechen",                         "description": "Cancel button" },
+  "btn_show_older": {
+    "message": "$count$ ältere Einträge anzeigen",
+    "description": "Button to load older log entries",
+    "placeholders": { "count": { "content": "$1", "example": "50" } }
+  },
+
+  "whitelist_none":          { "message": "Keine Whitelist-Einträge konfiguriert.",                                          "description": "Empty state for Manual Whitelist section" },
+  "whitelist_email_invalid": { "message": "Geben Sie eine gültige E-Mail-Adresse ein (z. B. user@example.com).",             "description": "Validation error for whitelist add form" },
+  "whitelist_already_exists":{ "message": "Diese Adresse ist bereits auf der Whitelist.",                                    "description": "Error when address is already whitelisted" },
+  "whitelist_full": {
+    "message": "Die Whitelist ist voll (max. $max$ Einträge). Entfernen Sie einen Eintrag, bevor Sie einen neuen hinzufügen.",
+    "description": "Error when whitelist is at capacity",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
+  "whitelist_ab_permission_note": {
+    "message": "Wenn Sie diese Funktion aktivieren, wird Zugriff auf Ihre Thunderbird-Adressbücher angefordert.",
+    "description": "Note shown when address book whitelist is about to be enabled"
+  },
+  "whitelist_desc": {
+    "message": "Whitelist-Einträge senken die Spam-Punktzahl dieses Add-ons für passende Absender. Sie authentifizieren die Nachricht nicht und beweisen nicht, dass sie echt ist – sie senken die Punktzahl, um Fehlalarme bei Absendern zu verringern, die Sie kennen.",
+    "description": "Description of the Manual Whitelist section"
+  },
+  "whitelist_mitigation_label": { "message": "Punktabzug, wenn ein Absender übereinstimmt:", "description": "Label for the manual whitelist score input" },
+  "whitelist_mitigation_note": {
+    "message": "Bereich: 0 bis −100. Standard: −50. Verwenden Sie −100, um Absender auf der Whitelist unter dem Prüfschwellenwert zu halten.",
+    "description": "Note below the manual whitelist score input"
+  },
+  "whitelist_email_placeholder": { "message": "z. B. user@example.com", "description": "Placeholder for the add-whitelist input" },
+  "address_book_desc": {
+    "message": "Wenn aktiviert, erhalten Absender aus Ihren Thunderbird-Adressbüchern einen Punktabzug. Dies authentifiziert die Nachricht nicht – es senkt die Punktzahl, um Fehlalarme bei bekannten Kontakten zu verringern.",
+    "description": "Description of the Address Book Whitelist section"
+  },
+  "address_book_mitigation_label": { "message": "Punktabzug, wenn der Absender in Ihren Adressbüchern steht:", "description": "Label for the address book score input" },
+  "address_book_mitigation_note":  { "message": "Bereich: 0 bis −100. Standard: −50.",                          "description": "Note below the address book score input" },
+  "diagnostics_desc": {
+    "message": "Der Diagnosemodus zeigt ein ausführliches Entscheidungsprotokoll mit Rohpunkten, Begründungen, heuristischen Metriken und Exportfunktionen. Er ist für Fehlersuche und Feinabstimmung gedacht – für die tägliche Nutzung nicht erforderlich.",
+    "description": "Description of the Diagnostics section in the Advanced tab"
+  },
+
+  "metrics_alignment_summary": { "message": "Ausrichtungsmetriken", "description": "Summary element for alignment metrics <details>" },
+  "metrics_heuristic_summary": { "message": "Heuristische Metriken", "description": "Summary element for heuristic metrics <details>" },
+
+  "log_count_all": {
+    "message": "Gespeicherte Einträge: $total$ / 1000",
+    "description": "Decision log entry count (all visible)",
+    "placeholders": { "total": { "content": "$1", "example": "42" } }
+  },
+  "log_count_showing": {
+    "message": "Gespeicherte Einträge: $total$ / 1000 – die $showing$ neuesten werden angezeigt",
+    "description": "Decision log entry count when not all are shown",
+    "placeholders": {
+      "total":   { "content": "$1", "example": "1000" },
+      "showing": { "content": "$2", "example": "50" }
+    }
+  },
+  "log_no_reasons":       { "message": "Keine Begründungen verfügbar.", "description": "Shown for log entries without scoreReasons" },
+  "log_no_reasons_label": { "message": "Keine Begründungen",            "description": "<summary> text when a log entry has zero reasons" },
+  "log_reasons_one": {
+    "message": "$count$ Begründung",
+    "description": "Singular reason count",
+    "placeholders": { "count": { "content": "$1", "example": "1" } }
+  },
+  "log_reasons_many": {
+    "message": "$count$ Begründungen",
+    "description": "Plural reason count",
+    "placeholders": { "count": { "content": "$1", "example": "5" } }
+  },
+  "decision_log_desc": {
+    "message": "Eine lokale Aufzeichnung darüber, wie jede kürzlich empfangene Nachricht bewertet und welche Aktion ausgeführt wurde. Alle Daten bleiben auf Ihrem Gerät.",
+    "description": "Description of the Decision Log section"
+  },
+  "log_col_time":        { "message": "Zeit",            "description": "Decision log column header" },
+  "log_col_from_domain": { "message": "Absenderdomain",  "description": "Decision log column header" },
+  "log_col_original":    { "message": "Ursprünglich",    "description": "Decision log column header: score when the message arrived" },
+  "log_col_current":     { "message": "Aktuell",         "description": "Decision log column header: score recalculated with current settings" },
+  "log_col_action":      { "message": "Aktion",          "description": "Decision log column header" },
+
+  "popup_no_message": {
+    "message": "Derzeit wird keine Nachricht angezeigt.",
+    "description": "Shown in popup when no message is open"
+  },
+  "popup_status_inactive": {
+    "message": "Die Authentifizierungsbewertung ist für dieses Konto nicht aktiv.",
+    "description": "Popup notice when the displayed message's account has no active authentication scoring"
+  },
+  "popup_btn_open_setup": { "message": "Einrichtung öffnen", "description": "Popup button opening the options page setup" },
+  "popup_loading":        { "message": "Wird geladen…",      "description": "Popup placeholder while score details load" },
+  "popup_protective_factors": { "message": "Entlastende Faktoren", "description": "Popup heading for factors that kept the score lower" },
+  "popup_fact_dkim_aligned":  { "message": "DKIM-Signatur passt zur Absenderdomain (From)", "description": "Popup protective factor" },
+  "popup_fact_no_trusted_auth": { "message": "Keine vertrauenswürdigen Authentication-Results-Header gefunden", "description": "Popup protective factor" },
+  "popup_fact_below_review": {
+    "message": "Punktzahl ($score$) liegt unter dem Prüfschwellenwert ($threshold$)",
+    "description": "Popup protective factor",
+    "placeholders": {
+      "score":     { "content": "$1", "example": "20" },
+      "threshold": { "content": "$2", "example": "50" }
+    }
+  },
+  "popup_fact_below_high_risk": {
+    "message": "Punktzahl ($score$) liegt unter dem Schwellenwert für hohes Risiko ($threshold$)",
+    "description": "Popup protective factor",
+    "placeholders": {
+      "score":     { "content": "$1", "example": "70" },
+      "threshold": { "content": "$2", "example": "100" }
+    }
+  },
+  "popup_identity_from":        { "message": "Von",            "description": "Popup identity table label" },
+  "popup_identity_subject":     { "message": "Betreff",        "description": "Popup identity table label" },
+  "popup_identity_from_domain": { "message": "Absenderdomain", "description": "Popup identity table label" },
+  "popup_identity_message_id":  { "message": "Message-ID",     "description": "Popup identity table label" },
+  "popup_no_entry": {
+    "message": "Für diese Nachricht wurden keine Bewertungsdetails gefunden. Das Add-on bewertet Nachrichten bei ihrem Eingang; diese Nachricht wurde möglicherweise vor der Installation des Add-ons empfangen, oder ihre Message-ID konnte nicht zugeordnet werden.",
+    "description": "Shown in popup when no log entry matches the displayed message"
+  },
+  "popup_score": {
+    "message": "Punktzahl: $score$",
+    "description": "Score badge in popup",
+    "placeholders": { "score": { "content": "$1", "example": "75" } }
+  },
+  "popup_score_details":  { "message": "Bewertungsdetails",         "description": "<summary> label for score details collapsible" },
+  "popup_all_reasons":    { "message": "Alle Begründungen",         "description": "Heading above full reason list in popup" },
+  "popup_inbox_not_found":{ "message": "Posteingang nicht gefunden.", "description": "Error when inbox cannot be found" },
+  "popup_moved_to_inbox": { "message": "In den Posteingang verschoben.", "description": "Success message after moving to inbox" },
+  "popup_move_failed":    { "message": "Verschieben fehlgeschlagen. Bitte versuchen Sie es erneut.", "description": "Error message when move fails" },
+  "popup_whitelist_confirm": {
+    "message": "„$address$“ zur manuellen Whitelist hinzufügen? Künftige Nachrichten von dieser Adresse erhalten einen Punktabzug.",
+    "description": "Confirmation text before adding to whitelist",
+    "placeholders": { "address": { "content": "$1", "example": "user@example.com" } }
+  },
+  "popup_whitelist_added": {
+    "message": "„$address$“ wurde zur manuellen Whitelist hinzugefügt.",
+    "description": "Success message after whitelist add",
+    "placeholders": { "address": { "content": "$1", "example": "user@example.com" } }
+  },
+  "popup_whitelist_full": {
+    "message": "Die Whitelist ist voll (max. $max$ Einträge). Entfernen Sie einen Eintrag, bevor Sie einen neuen hinzufügen.",
+    "description": "Error when whitelist is full in popup",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
+  "popup_whitelist_save_failed":     { "message": "Whitelist-Eintrag konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.", "description": "Generic whitelist save error" },
+  "popup_no_sender_address":         { "message": "Die Absenderadresse konnte nicht ermittelt werden.",  "description": "Whitelist button tooltip when sender is unknown" },
+  "popup_already_whitelisted_title": { "message": "Dieser Absender ist bereits auf der manuellen Whitelist.", "description": "Whitelist button tooltip when sender is already listed" },
+  "popup_error": {
+    "message": "Fehler beim Laden der Bewertungsdetails: $error$",
+    "description": "Error displayed when popup init throws",
+    "placeholders": { "error": { "content": "$1", "example": "NetworkError" } }
+  },
+
+  "action_classified_normal":   { "message": "Im Posteingang belassen",              "description": "Action label for classified-normal" },
+  "action_classified_review":   { "message": "Als Prüfung bewertet (keine Aktion)",  "description": "Action label for classified-review" },
+  "action_classified_high_risk":{ "message": "Als hohes Risiko bewertet (keine Aktion)", "description": "Action label for classified-high-risk" },
+  "action_moved_review":        { "message": "In den Prüfordner verschoben",         "description": "Action label for moved-review" },
+  "action_moved_junk":          { "message": "In Junk verschoben",                   "description": "Action label for moved-junk" },
+  "action_moved_junk_mark_failed": { "message": "In Junk verschoben (Markieren als Junk fehlgeschlagen)", "description": "Action label for moved-junk-mark-failed: the message was moved to Junk but setting the junk flag failed" },
+  "action_move_review_failed":  { "message": "Verschieben in den Prüfordner fehlgeschlagen", "description": "Action label for move-review-failed" },
+  "action_move_junk_failed":    { "message": "Verschieben in Junk fehlgeschlagen",   "description": "Action label for move-junk-failed" },
+  "action_no_review_folder":    { "message": "Kein Prüfordner konfiguriert",         "description": "Action label for no-review-folder-configured" },
+
+  "section_custom_formulas": { "message": "Eigene Bewertungsformeln (Ebene 5)", "description": "Section heading for custom formula management (Custom Formulas tab)" },
+  "section_key_reference": { "message": "Referenz der Begründungsschlüssel", "description": "Section heading for the key reference table in the Custom Formulas tab" },
+  "key_reference_intro": {
+    "message": "Schlüssel, die Sie in Formelausdrücken an has() und scoreOf() übergeben können. Klicken Sie auf eine Einfügen-Schaltfläche, um das Snippet an der Cursorposition im Formeleditor einzufügen. Bewegen Sie den Mauszeiger über einen Schlüssel, um eine kurze Beschreibung zu sehen.",
+    "description": "Introductory paragraph above the key reference table"
+  },
+  "key_reference_layer_auth":      { "message": "E1 Authentifizierung (auth.*)", "description": "Key reference group heading for Layer 1 authentication result keys" },
+  "key_reference_layer_identity":  { "message": "E2 Identität (identity.*)",     "description": "Key reference group heading for Layer 2 identity alignment keys" },
+  "key_reference_layer_heuristic": { "message": "E3 Heuristik (heuristic.*)",    "description": "Key reference group heading for Layer 3 heuristic keys" },
+  "key_reference_layer_composite": { "message": "E4 Kombiniert (composite.*)",   "description": "Key reference group heading for Layer 4 composite rule keys" },
+  "key_reference_layer_l5":        { "message": "E5 / Whitelist",                "description": "Key reference group heading for Layer 5 whitelist and sender rule keys" },
+  "key_reference_col_title":       { "message": "Titel",                         "description": "Column header in the key reference table" },
+  "key_reference_col_key":         { "message": "Schlüssel",                     "description": "Column header in the key reference table" },
+  "key_reference_col_default":     { "message": "Standard",                      "description": "Column header in the key reference table" },
+  "key_reference_btn_insert_has": {
+    "message": "has()",
+    "description": "Button to insert has(\"key\") snippet for a score reason key"
+  },
+  "key_reference_btn_insert_scoreof": {
+    "message": "scoreOf()",
+    "description": "Button to insert scoreOf(\"key\") snippet for a score reason key"
+  },
+  "custom_formula_intro": {
+    "message": "Erweiterte Funktion für fortgeschrittene Benutzer. Eigene Formeln werden als Ebene 5 ausgewertet, nachdem die Bewertung der Ebenen 1–4 abgeschlossen ist, und können die endgültige Punktzahl der Nachricht beobachten oder anpassen.",
+    "description": "Introductory note above custom formula list"
+  },
+  "custom_formula_safety": {
+    "message": "Formeln werden nur lokal verwendet und nie extern gesendet. Verwenden Sie den Modus „observe“, um eine Formel zu testen, ohne die Bewertung zu ändern. Der Modus „add“ addiert das begrenzte Ergebnis (−100 bis +100) zur Punktzahl der Nachricht. Regex-Abgleich über match() ist nur im Modus „observe“ verfügbar. Fehler in einzelnen Formeln werden pro Nachricht abgefangen und ignoriert.",
+    "description": "Safety copy for custom formula section"
+  },
+  "custom_formula_none":       { "message": "Keine eigenen Formeln konfiguriert.", "description": "Empty state for custom formula list" },
+  "custom_formula_add_title":  { "message": "Formel hinzufügen",                   "description": "Heading shown when adding a new formula" },
+  "custom_formula_edit_title": { "message": "Formel bearbeiten",                   "description": "Heading shown when editing an existing formula" },
+  "custom_formula_field_id":   { "message": "ID",                                  "description": "Label for formula ID input" },
+  "custom_formula_field_name": { "message": "Bezeichnung",                         "description": "Label for formula name input" },
+  "custom_formula_field_expression": { "message": "Ausdruck",                      "description": "Label for formula expression textarea" },
+  "custom_formula_field_mode": { "message": "Modus",                               "description": "Label for formula mode selector" },
+  "custom_formula_id_hint": {
+    "message": "Dauerhafte Kennung, die in Bewertungsschlüsseln verwendet wird (custom.formula.<id>). Nur Buchstaben, Ziffern, Bindestriche und Unterstriche. Kann nach dem Speichern nicht mehr geändert werden.",
+    "description": "Hint text below formula ID input"
+  },
+  "custom_formula_mode_hint": {
+    "message": "observe: auswerten und aufzeichnen, aber die Punktzahl nicht ändern. add: Ergebnis zur Punktzahl addieren. disabled: Formel vollständig überspringen.",
+    "description": "Hint text below formula mode selector"
+  },
+  "custom_formula_count_all": {
+    "message": "Formeln: $count$ / 20",
+    "description": "Shows how many custom formulas are stored",
+    "placeholders": { "count": { "content": "$1", "example": "3" } }
+  },
+  "btn_add_formula":    { "message": "Formel hinzufügen", "description": "Button to open the add-formula form" },
+  "btn_edit_formula":   { "message": "Bearbeiten",        "description": "Button to open the edit-formula form for a formula row" },
+  "btn_delete_formula": { "message": "Löschen",           "description": "Button to delete a formula" },
+  "btn_save_formula":   { "message": "Speichern",         "description": "Button to save the formula form" },
+  "custom_formula_error_id_required":         { "message": "Die ID ist erforderlich.",                                                  "description": "Validation error for empty formula ID" },
+  "custom_formula_error_id_too_long": {
+    "message": "Die ID ist zu lang (max. $max$ Zeichen).",
+    "description": "Validation error when formula ID exceeds length limit",
+    "placeholders": { "max": { "content": "$1", "example": "100" } }
+  },
+  "custom_formula_error_id_invalid":          { "message": "Die ID darf nur Buchstaben, Ziffern, Bindestriche und Unterstriche enthalten.", "description": "Validation error for invalid formula ID characters" },
+  "custom_formula_error_id_duplicate":        { "message": "Eine Formel mit dieser ID ist bereits vorhanden.",                            "description": "Validation error for duplicate formula ID" },
+  "custom_formula_error_name_too_long": {
+    "message": "Die Bezeichnung ist zu lang (max. $max$ Zeichen).",
+    "description": "Validation error when formula name exceeds length limit",
+    "placeholders": { "max": { "content": "$1", "example": "200" } }
+  },
+  "custom_formula_error_expression_required": { "message": "Der Ausdruck ist erforderlich.",                                            "description": "Validation error for empty formula expression" },
+  "custom_formula_error_expression_too_long": {
+    "message": "Der Ausdruck ist zu lang (max. $max$ Zeichen).",
+    "description": "Validation error when expression exceeds length limit",
+    "placeholders": { "max": { "content": "$1", "example": "1000" } }
+  },
+  "custom_formula_error_parse": {
+    "message": "Syntaxfehler: $error$",
+    "description": "Validation error when formula expression fails to parse",
+    "placeholders": { "error": { "content": "$1", "example": "Unexpected token" } }
+  },
+  "custom_formula_error_invalid_mode":  { "message": "Ungültiger Modus.",                "description": "Internal validation error for formula mode" },
+  "custom_formula_error_match_in_add_mode": { "message": "match() ist nur im Modus „observe“ verfügbar. Wechseln Sie zu „observe“ oder entfernen Sie den match()-Aufruf.", "description": "Validation error when match() is used in add-mode formula" },
+  "custom_formula_diag_summary":        { "message": "Diagnose der E5-Formeln",          "description": "Summary element for formula diagnostics <details> in log" },
+  "formula_diag_col_name":          { "message": "Bezeichnung",             "description": "Formula diagnostics column header" },
+  "formula_diag_col_mode":          { "message": "Modus",                   "description": "Formula diagnostics column header" },
+  "formula_diag_col_value":         { "message": "Wert",                    "description": "Formula diagnostics column header" },
+  "formula_diag_col_applied":       { "message": "Angewendet",              "description": "Formula diagnostics column header" },
+  "formula_diag_col_would_score":   { "message": "Würde Punktzahl ändern",  "description": "Formula diagnostics column header" },
+  "formula_diag_col_would_verdict": { "message": "Würde Einstufung ändern", "description": "Formula diagnostics column header" },
+  "formula_diag_col_error":         { "message": "Fehler",                  "description": "Formula diagnostics column header" },
+  "formula_last_result": {
+    "message": "Letztes Ergebnis: $value$",
+    "description": "Last diagnostic result shown under a formula",
+    "placeholders": { "value": { "content": "$1", "example": "30" } }
+  },
+  "formula_last_result_error": {
+    "message": "Letztes Ergebnis: Fehler – $error$",
+    "description": "Last diagnostic error shown under a formula",
+    "placeholders": { "error": { "content": "$1", "example": "ReferenceError" } }
+  },
+  "formula_last_result_applied": { "message": "angewendet", "description": "Marker shown when the last formula result was applied to the score" },
+  "custom_formula_list_full": {
+    "message": "Formellimit erreicht ($max$). Entfernen Sie eine Formel, bevor Sie eine neue hinzufügen.",
+    "description": "Error when the formula list is at capacity",
+    "placeholders": { "max": { "content": "$1", "example": "20" } }
+  },
+  "custom_formula_template_label":   { "message": "Vorlage",                     "description": "Label for the template picker row in the formula form" },
+  "custom_formula_template_choose":  { "message": "— Vorlage auswählen —",       "description": "Default empty option in the template picker select" },
+  "btn_insert_template":             { "message": "Einfügen",                    "description": "Button to insert the selected template into the formula form" },
+  "custom_formula_tpl_boost_rule":   { "message": "Verstärken, wenn eine Regel greift",   "description": "Template name: boost when an existing L4 rule fired" },
+  "custom_formula_tpl_deep_subdomain": { "message": "Tiefe zufällige Subdomain",          "description": "Template name: deep random-looking subdomain experiment" },
+  "custom_formula_tpl_msgid_mismatch": { "message": "Message-ID-Abweichung",             "description": "Template name: Message-ID mismatch experiment" },
+  "custom_formula_tpl_dkim_mitigate":  { "message": "Entlastung bei passender DKIM-Signatur", "description": "Template name: mitigate when DKIM is aligned" },
+  "custom_formula_expr_placeholder": { "message": "has(\"composite.authAlignedRandomDomain\") ? 30 : 0", "description": "Placeholder shown in the expression textarea when empty" },
+  "custom_formula_help_summary":     { "message": "Referenz für E5-Formeln",     "description": "Summary label for the collapsible formula help panel" },
+  "custom_formula_help_expression_only": {
+    "message": "Eine Formel ist ein einzelner Ausdruck – kein JavaScript-Programm. Anweisungen wie if, let, for und return werden nicht unterstützt.",
+    "description": "Help panel bullet: formulas are expressions not statements"
+  },
+  "custom_formula_help_ternary": {
+    "message": "Verwenden Sie für Bedingungen den ternären Operator: Bedingung ? 40 : 0",
+    "description": "Help panel bullet: use ternary for branching"
+  },
+  "custom_formula_help_readonly": {
+    "message": "Kontextfelder (from, auth, alignment, headers usw.) sind schreibgeschützt. Ihnen können keine Werte zugewiesen werden.",
+    "description": "Help panel bullet: context fields are read-only"
+  },
+  "custom_formula_help_returns":     { "message": "Formeln liefern eine Zahl; nicht numerische Ergebnisse werden ignoriert.", "description": "Help panel bullet: formulas return a number" },
+  "custom_formula_help_observe":     { "message": "Der Modus „observe“ zeichnet das Ergebnis auf, ändert aber die Punktzahl der Nachricht nicht. Testen Sie eine Formel mit „observe“ gefahrlos, bevor Sie zum Modus „add“ wechseln.", "description": "Help panel bullet: observe mode" },
+  "custom_formula_help_add":         { "message": "Der Modus „add“ addiert das begrenzte Ergebnis (−100 bis +100) zur Punktzahl der Nachricht.", "description": "Help panel bullet: add mode" },
+  "custom_formula_help_clamped":     { "message": "Das Ergebnis wird vor der Anwendung auf [−100, +100] begrenzt.", "description": "Help panel bullet: clamping" },
+  "custom_formula_help_errors":      { "message": "Fehler in einer Formel werden pro Nachricht abgefangen und in der Diagnosespalte angezeigt; eine fehlerhafte Formel blockiert die anderen nicht.", "description": "Help panel bullet: error handling" },
+  "custom_formula_help_no_regex":    { "message": "Regex-Abgleich über match() wird im Modus „add“ nicht unterstützt (v1). Verwenden Sie den Modus „observe“, um mit match() zu experimentieren.", "description": "Help panel bullet: no regex in add mode" },
+  "custom_formula_help_fields_title":{ "message": "Verfügbare Felder und Funktionen", "description": "Heading above the fields/functions reference in the formula help panel" },
+
+  "formula_chips_label":                { "message": "Feld / Funktion einfügen:",  "description": "Header above formula insertion chips" },
+  "formula_chip_insert_title":          { "message": "An der Cursorposition einfügen", "description": "Tooltip for formula chip buttons" },
+  "formula_chips_group_functions":      { "message": "Funktionen",                 "description": "Label for the Functions chip group" },
+  "formula_chips_group_from":           { "message": "From",                       "description": "Label for the From fields chip group" },
+  "formula_chips_group_alignment":      { "message": "Ausrichtung",                "description": "Label for the Alignment fields chip group" },
+  "formula_chips_group_message_id":     { "message": "Message-ID",                 "description": "Label for the Message-ID fields chip group" },
+  "formula_chips_group_headers":        { "message": "Header",                     "description": "Label for the Headers fields chip group" },
+  "formula_chips_group_general":        { "message": "Allgemein",                  "description": "Label for the General fields chip group" },
+  "formula_chips_ref_note":             { "message": "Dies sind die unterstützten Felder und Funktionen der Formelsprache v1. Klicken Sie auf einen Chip, um ihn an der Cursorposition einzufügen.", "description": "Reference note below formula insertion chips" },
+
+  "dns_error_invalid_resolver": { "message": "Die Adresse des DNS-Resolvers fehlt oder ist ungültig.", "description": "DNS error for invalid_resolver code" },
+  "dns_error_timeout":          { "message": "Zeitüberschreitung bei der DNS-Abfrage.",               "description": "DNS error for timeout code" },
+  "dns_error_network":          { "message": "DNS-Abfrage fehlgeschlagen (Netzwerkfehler).",          "description": "DNS error for network_error code" },
+  "dns_error_http":             { "message": "DNS-Abfrage fehlgeschlagen (Serverfehler).",            "description": "DNS error for http_error code" },
+  "dns_error_dns":              { "message": "Der DNS-Server hat einen Fehler zurückgegeben.",         "description": "DNS error for dns_error code" },
+  "dns_error_generic":          { "message": "DNS-Abfrage fehlgeschlagen.",                           "description": "Generic DNS error fallback" },
+
+  "rule_authserv_untrusted_title":   { "message": "Nicht vertrauenswürdige authserv-id",                                           "description": "Rule registry title" },
+  "rule_authserv_untrusted_summary": { "message": "Der Authentication-Results-Header stammt von einer Domain, der Sie nicht vertrauen.", "description": "Rule registry summary" },
+  "rule_sender_rule_title":          { "message": "Regel für Absenderdomain",                                                      "description": "Rule registry title" },
+  "rule_sender_rule_summary":        { "message": "Eine benutzerdefinierte Regel für Absenderdomains trifft auf diese Nachricht zu.", "description": "Rule registry summary" },
+  "rule_whitelist_manual_title":     { "message": "Manuelle Whitelist",                                                            "description": "Rule registry title" },
+  "rule_whitelist_manual_summary":   { "message": "Die Absenderadresse steht auf Ihrer manuellen Whitelist.",                      "description": "Rule registry summary" },
+  "rule_whitelist_addressBook_title":  { "message": "Adressbuchkontakt",                                                           "description": "Rule registry title" },
+  "rule_whitelist_addressBook_summary":{ "message": "Der Absender steht in Ihrem Thunderbird-Adressbuch.",                          "description": "Rule registry summary" },
+
+  "rule_identity_spfMailFromMismatch_title":          { "message": "SPF-MAIL-FROM weicht von From ab",                                     "description": "Rule registry title" },
+  "rule_identity_spfMailFromMismatch_summary":        { "message": "SPF war für eine andere Domain erfolgreich als die der sichtbaren Absenderadresse (From).", "description": "Rule registry summary" },
+  "rule_identity_dkimDomainMismatch_title":           { "message": "DKIM-Signaturdomain weicht von From ab",                               "description": "Rule registry title" },
+  "rule_identity_dkimDomainMismatch_summary":         { "message": "Alle gültigen DKIM-Signaturen stammen von einer Domain ohne Bezug zur Absenderadresse (From).", "description": "Rule registry summary" },
+  "rule_identity_dmarcNoneWithThirdPartyAuth_title":  { "message": "DMARC none mit ausschließlich Drittanbieter-Authentifizierung",         "description": "Rule registry title" },
+  "rule_identity_dmarcNoneWithThirdPartyAuth_summary":{ "message": "Keine DMARC-Richtlinie, und alle erfolgreichen SPF-/DKIM-Prüfungen stammen von Domains ohne Bezug.", "description": "Rule registry summary" },
+
+  "rule_heuristic_randomFromDomainLabel_title":   { "message": "Zufällig wirkendes Label in der Absenderdomain",                                     "description": "Rule registry title" },
+  "rule_heuristic_randomFromDomainLabel_summary": { "message": "Ein Label in der Absenderdomain (From) wirkt maschinell erzeugt (hohe Entropie, wenige Vokale).", "description": "Rule registry summary" },
+  "rule_heuristic_randomFromLocalPart_title":     { "message": "Zufällig wirkender lokaler Teil der Absenderadresse",                               "description": "Rule registry title" },
+  "rule_heuristic_randomFromLocalPart_summary":   { "message": "Der lokale Teil (vor dem @) der Absenderadresse (From) wirkt maschinell erzeugt.",  "description": "Rule registry summary" },
+
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_title":   { "message": "SPF ausgerichtet, DKIM nicht ausgerichtet, zufälliger lokaler Teil", "description": "Rule registry title" },
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_summary": { "message": "SPF ist ausgerichtet, DKIM jedoch nicht, und der lokale Teil wirkt zufällig.", "description": "Rule registry summary" },
+  "rule_composite_authAlignedRandomDomain_title":              { "message": "Authentifiziert ausgerichteter Absender mit zufällig wirkender Domain", "description": "Rule registry title" },
+  "rule_composite_authAlignedRandomDomain_summary":            { "message": "Die Authentifizierung ist ausgerichtet, aber die Absenderdomain selbst wirkt maschinell erzeugt.", "description": "Rule registry summary" },
+  "rule_composite_thirdPartyAuthRandomLocal_title":            { "message": "Drittanbieter-Authentifizierung erfolgreich, zufälliger lokaler Teil, keine Ausrichtung", "description": "Rule registry title" },
+  "rule_composite_thirdPartyAuthRandomLocal_summary":          { "message": "Nur die Authentifizierung eines Drittanbieters war erfolgreich, der lokale Teil wirkt zufällig und es gibt keine Ausrichtung.", "description": "Rule registry summary" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_title":   { "message": "Abweichende Message-ID-Domain bei nicht ausgerichteter Authentifizierung", "description": "Rule registry title" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_summary": { "message": "Die Message-ID-Domain weicht von der Absenderdomain ab, und die Authentifizierung ist nicht ausgerichtet.", "description": "Rule registry summary" },
+  "rule_composite_messageIdUnregistrableMismatch_title":       { "message": "Message-ID-Domain nicht registrierbar oder weicht von From ab", "description": "Rule registry title" },
+  "rule_composite_messageIdUnregistrableMismatch_summary":     { "message": "Die Message-ID-Domain ist nicht registrierbar (nur TLD) oder hat keine gültige registrierbare Domain.", "description": "Rule registry summary" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_title":  { "message": "From/Sender-Abweichung bei nicht ausgerichteter Authentifizierung", "description": "Rule registry title" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_summary":{ "message": "Die Header From und Sender verweisen auf unterschiedliche Domains, und die Authentifizierung ist nicht ausgerichtet.", "description": "Rule registry summary" },
+  "rule_composite_deepRandomFromSubdomain_title":              { "message": "Tiefe, zufällig wirkende Subdomain in From",                     "description": "Rule registry title" },
+  "rule_composite_deepRandomFromSubdomain_summary":            { "message": "Die Absenderadresse verwendet eine tiefe Subdomain mit einem zufällig wirkenden Label.", "description": "Rule registry summary" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_title":  { "message": "Delegierter Newsletter: DKIM ausgerichtet, Zustellweg konsistent", "description": "Rule registry title" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_summary":{ "message": "DKIM ist ausgerichtet, und der Zustellweg ist mit einem seriösen E-Mail-Dienstleister (ESP) vereinbar.", "description": "Rule registry summary" },
+  "rule_composite_spfPassDkimFailRandomLocal_title":           { "message": "SPF erfolgreich, DKIM fehlgeschlagen, zufälliger lokaler Teil", "description": "Rule registry title" },
+  "rule_composite_spfPassDkimFailRandomLocal_summary":         { "message": "SPF ist erfolgreich, DKIM schlägt fehl, und der lokale Teil wirkt zufällig.", "description": "Rule registry summary" },
+  "rule_composite_dkimAlignedLexicalMitigation_title":        { "message": "Entlastung bei ausgerichtetem DKIM gegen lexikalische Fehlalarme", "description": "Rule registry title" },
+  "rule_composite_dkimAlignedLexicalMitigation_summary":      { "message": "DKIM ist ausgerichtet; verringert den heuristischen Aufschlag für zufällig wirkende Namen.", "description": "Rule registry summary" },
+  "rule_composite_ownDomainAuthFail_title":                    { "message": "Eigene Kontodomain mit fehlgeschlagener Authentifizierung", "description": "Rule registry title" },
+  "rule_composite_ownDomainAuthFail_summary":                  { "message": "Die Nachricht gibt vor, von einer Ihrer Kontodomains zu stammen, aber die Authentifizierung ist fehlgeschlagen.", "description": "Rule registry summary" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_title":   { "message": "Nicht auswertbares From mit abweichender Infrastruktur", "description": "Rule registry title" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_summary": { "message": "Der From-Header konnte nicht als gültige Adresse ausgewertet werden, und die Infrastruktursignale weichen ab.", "description": "Rule registry summary" },
+  "rule_composite_geoTokenCompoundDomain_title":               { "message": "Zusammengesetzte registrierbare Domain mit Geo-/Schlüsselwort-Token", "description": "Rule registry title" },
+  "rule_composite_geoTokenCompoundDomain_summary":             { "message": "Die registrierbare Domain ist eine Bindestrich-Zusammensetzung mit einem bekannten Spam-Geo-/Schlüsselwort-Token, und die Authentifizierung ist nicht ausgerichtet.", "description": "Rule registry summary" },
+  "rule_composite_deepServiceWordSubdomain_title":             { "message": "Tiefe Subdomain mit Dienstbegriff",                         "description": "Rule registry title" },
+  "rule_composite_deepServiceWordSubdomain_summary":           { "message": "Eine tiefe Subdomain enthält einen dienstähnlichen Begriff (z. B. mail-01), der mit Spam über Wegwerfdomains in Verbindung steht.", "description": "Rule registry summary" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_title":   { "message": "DMARC-Fehler entlastet: DKIM ausgerichtet und Listen-Header vorhanden", "description": "Rule registry title" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_summary": { "message": "DMARC ist fehlgeschlagen, aber DKIM ist ausgerichtet und List-Header sind vorhanden – wahrscheinlich eine Mailingliste.", "description": "Rule registry summary" },
+  "rule_composite_dkimFailWithAlignedPass_title":              { "message": "DKIM-Fehler neben erfolgreicher ausgerichteter DKIM-Signatur", "description": "Rule registry title" },
+  "rule_composite_dkimFailWithAlignedPass_summary":            { "message": "Mindestens eine DKIM-Signatur ist fehlgeschlagen, aber eine andere, ausgerichtete Signatur war erfolgreich.", "description": "Rule registry summary" },
+  "rule_composite_brandDivergencePhishing_title":              { "message": "Phishing durch abweichende Marke im Anzeigenamen",           "description": "Rule registry title" },
+  "rule_composite_brandDivergencePhishing_summary":            { "message": "Der Anzeigename im From entspricht einer bekannten Marke, aber die Absenderdomain hat keinen Bezug zu dieser Marke.", "description": "Rule registry summary" },
+  "rule_composite_unsecuredDeepSubdomain_title":               { "message": "Tiefe Subdomain mit DMARC none",                            "description": "Rule registry title" },
+  "rule_composite_unsecuredDeepSubdomain_summary":             { "message": "Die Absenderadresse verwendet eine tiefe Subdomain einer Domain ohne durchgesetzte DMARC-Richtlinie und ohne ausgerichtete Authentifizierung.", "description": "Rule registry summary" },
+  "rule_composite_unauthenticatedFromSpoof_title":             { "message": "Nicht authentifiziertes From mit widersprüchlichen Absenderangaben", "description": "Rule registry title" },
+  "rule_composite_unauthenticatedFromSpoof_summary":           { "message": "Die sichtbare Absenderdomain hat keine ausgerichtete, vertrauenswürdige Authentifizierung, und eine andere Absenderkennung widerspricht ihr.", "description": "Rule registry summary" },
+  "rule_composite_authenticatedDisplayNameSpoof_title":        { "message": "Authentifizierter Absender mit gefälschter E-Mail-Adresse im Anzeigenamen", "description": "Rule registry title" },
+  "rule_composite_authenticatedDisplayNameSpoof_summary":      { "message": "Die Nachricht ist für ihre Absenderdomain authentifiziert, aber der Anzeigename enthält eine E-Mail-Adresse, die auf eine andere Domain verweist.", "description": "Rule registry summary" },
+  "rule_composite_alignedAuthenticationConfirmed_title":       { "message": "Ausgerichtete Authentifizierung bestätigt",                 "description": "Rule registry title" },
+  "rule_composite_alignedAuthenticationConfirmed_summary":     { "message": "Die sichtbare Absenderdomain hat eine ausgerichtete, vertrauenswürdige Authentifizierung ohne widersprechendes Signal.", "description": "Rule registry summary" },
+  "rule_composite_publicDomainSpoofing_title":                 { "message": "Domain eines öffentlichen E-Mail-Anbieters mit fehlgeschlagener Authentifizierung", "description": "Rule registry title" },
+  "rule_composite_publicDomainSpoofing_summary":               { "message": "Die sichtbare Absenderdomain gehört einem großen öffentlichen E-Mail-Anbieter, aber die Authentifizierung ist fehlgeschlagen und die Versandinfrastruktur ist uneinheitlich.", "description": "Rule registry summary" },
+
+  "rule_composite_spfAlignedDkimUnalignedRandomLocal_tooltip":   { "message": "Spam, der nur die MAIL-FROM-Domain kontrolliert, um SPF zu bestehen, und dabei Wegwerf-Localparts verwendet.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_authAlignedRandomDomain_tooltip":              { "message": "Der Angreifer besitzt eine Domain aus zufälligen Zeichen und nutzt einen echten E-Mail-Dienstleister (ESP), um eine ausgerichtete Authentifizierung zu erhalten.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_thirdPartyAuthRandomLocal_tooltip":            { "message": "Spam, der über einen Drittanbieter mit Wegwerf-Absenderadressen weitergeleitet wird.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_messageIdMismatchWithUnalignedAuth_tooltip":   { "message": "Gefälschte Nachrichten haben oft abweichende Message-ID-Domains, wenn die Authentifizierungsinfrastruktur keinen Bezug hat. Hinweis: Weitergeleitete oder über Aliasse zugestellte E-Mails können eine Message-ID der ursprünglichen Absenderdomain aufweisen.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_messageIdUnregistrableMismatch_tooltip":       { "message": "Ein starkes Fälschungsindiz; seriöse E-Mails haben immer eine gültige Message-ID-Domain.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_fromSenderMismatchWithUnalignedAuth_tooltip":  { "message": "Eine Abweichung zwischen From und Sender ist ein Muster für erneuten Versand oder Identitätsvortäuschung. Hinweis: Mailinglisten und Weiterleitungsdienste setzen Sender möglicherweise auf ihre eigene Domain.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_deepRandomFromSubdomain_tooltip":              { "message": "Spam-Kampagnen registrieren eine Domain und versenden über viele zufällige Unterpfade, um Sperren pro Domain zu umgehen.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_delegatedDkimAlignedRouteConsistent_tooltip":  { "message": "Verringert Fehlalarme bei Massen-E-Mails, die über E-Mail-Dienstleister (ESP) mit delegierter DKIM-Signatur versendet werden.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_spfPassDkimFailRandomLocal_tooltip":           { "message": "Deutet auf einen Massenversender hin, der sich nur auf SPF stützt und Wegwerf-Localparts verwendet.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_dkimAlignedLexicalMitigation_tooltip":         { "message": "Eine gültige ausgerichtete DKIM-Signatur bedeutet, dass die Absenderdomain die Nachricht signiert hat. Zufällige lokale Teile sind dadurch weniger verdächtig.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_ownDomainAuthFail_tooltip":                    { "message": "Ein Signal mit hoher Aussagekraft für Identitätsvortäuschung: Ihre eigene Domain sollte sich immer erfolgreich authentifizieren.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_unparseableFromWithInfrastructureMismatch_tooltip": { "message": "Fehlerhafte From-Header mit abweichender Infrastruktur sind ein starkes Fälschungsindiz.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_geoTokenCompoundDomain_tooltip":               { "message": "Ein verbreitetes Spam-Muster mit Wegwerfdomains, die geografische Begriffe oder Schlüsselwörter enthalten.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_deepServiceWordSubdomain_tooltip":             { "message": "Spammer verwenden Muster wie mail-01.random-domain.tld wieder, um die Reputation pro Domain zu umgehen.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_dmarcFailDkimAlignedListMitigation_tooltip":   { "message": "Mailinglisten brechen oft DMARC, erhalten aber DKIM; dies als hohes Risiko einzustufen, führt zu Fehlalarmen.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_dkimFailWithAlignedPass_tooltip":              { "message": "Sowohl eine erfolgreiche als auch eine fehlgeschlagene ausgerichtete DKIM-Signatur ist ungewöhnlich und wird mit Manipulation der Nachricht in Verbindung gebracht.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_brandDivergencePhishing_tooltip":              { "message": "Ein Phishing-Absender kontrolliert eine fremde Domain und authentifiziert sie korrekt, verwendet aber im sichtbaren From-Feld einen bekannten Markennamen, um den Empfänger zu täuschen. Hinweis: Offizielle Marken-Aliasdomains (z. B. aexp.com für American Express) und regionale Markendomains, die nicht in der Liste der Top-Domains stehen, können als Abweichung erscheinen.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_unsecuredDeepSubdomain_tooltip":               { "message": "Wegwerfdomains richten oft tiefe, dienstähnliche Subdomains ein (z. B. sivakeso.support.sn5799.com) und lassen DMARC ungesetzt, um Prüfungen pro Label und der Authentifizierungsdurchsetzung zu umgehen.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_unauthenticatedFromSpoof_tooltip":             { "message": "Gefälschten Nachrichten fehlt typischerweise eine ausgerichtete Authentifizierung, während sie abweichende Infrastruktur-Header (Message-ID, Return-Path, Reply-To) enthalten, die die tatsächliche Versandinfrastruktur verraten. Hinweis: Wird unterdrückt, wenn die PSL-basierte Ausrichtungsprüfung des Add-ons die Authentifizierung als ausgerichtet ansieht (z. B. SPF pass für example.com, wenn From news.example.com ist).", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_authenticatedDisplayNameSpoof_tooltip":        { "message": "Angreifer gestalten Anzeigenamen wie „user@victim.com“, während sie von einer authentifizierten, aber fremden Domain senden, und täuschen so Benutzer, die nur den Anzeigenamen sehen. Hinweis: Seriöse E-Mail-Programme und Mailinglisten betten selten E-Mail-Adressen in Anzeigenamen ein; dieses Muster ist fast ausschließlich eine Phishing-Technik.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_alignedAuthenticationConfirmed_tooltip":       { "message": "Positive Bestätigung, dass die Absenderdomain ordnungsgemäß authentifiziert ist; wird als Diagnosesignal im Entscheidungsprotokoll aufgezeichnet.", "description": "Rule registry tooltip (why + caveat)" },
+  "rule_composite_publicDomainSpoofing_tooltip":                 { "message": "Seriöse Nachrichten von Anbietern wie Outlook, iCloud und Yahoo sind immer authentifiziert; eine Nachricht mit fehlgeschlagener Authentifizierung, die vorgibt, von diesen Domains zu stammen, hat fast sicher ein gefälschtes From. Hinweis: Wird unterdrückt, wenn die PSL-basierte Ausrichtungsprüfung des Add-ons den Absender als authentifiziert ansieht (z. B. SPF pass von einer Subdomain der Anbieterdomain wie bounce.mail.outlook.com).", "description": "Rule registry tooltip (why + caveat)" },
+
+  "rule_template_auth_title": {
+    "message": "$method$ $result$",
+    "description": "Title for auth.<method>.<result> score keys",
+    "placeholders": {
+      "method": { "content": "$1", "example": "DMARC" },
+      "result": { "content": "$2", "example": "fail" }
+    }
+  },
+  "rule_template_auth_summary": {
+    "message": "$method$-Authentifizierungsergebnis: $result$.",
+    "description": "Summary for auth.<method>.<result> score keys",
+    "placeholders": {
+      "method": { "content": "$1", "example": "DMARC" },
+      "result": { "content": "$2", "example": "fail" }
+    }
+  },
+  "rule_template_custom_formula_title": {
+    "message": "Eigene Formel: $id$",
+    "description": "Title for custom.formula.<id> score keys",
+    "placeholders": { "id": { "content": "$1", "example": "my-formula" } }
+  },
+  "rule_template_custom_formula_summary": { "message": "Benutzerdefinierte Bewertungsformel (erweiterte Funktion der Ebene 5).", "description": "Summary for custom.formula.<id> score keys" },
+
+  "notification_single_account": {
+    "message": "$account$: 1 neue Nachricht",
+    "description": "Notification title for a single new message; $account$ is the receiving account email address",
+    "placeholders": { "account": { "content": "$1", "example": "user@example.com" } }
+  },
+  "notification_single_fallback": {
+    "message": "$name$: 1 neue Nachricht",
+    "description": "Notification title for a single new message when account email is unavailable; $name$ is the account display name or folder name",
+    "placeholders": { "name": { "content": "$1", "example": "Work" } }
+  },
+  "notification_multi_title":   { "message": "Neue Nachrichten",          "description": "Notification title when multiple new messages are coalesced into one notification" },
+  "notification_multi_body": {
+    "message": "Es gibt $count$ neue Nachrichten.",
+    "description": "First line of the notification body for multiple new messages",
+    "placeholders": { "count": { "content": "$1", "example": "3" } }
+  },
+  "notification_more_messages": {
+    "message": "+$count$ weitere Nachrichten",
+    "description": "Line appended to the notification body showing how many additional messages are queued",
+    "placeholders": { "count": { "content": "$1", "example": "2" } }
+  },
+  "notification_no_subject":    { "message": "(kein Betreff)",            "description": "Fallback shown in the notification body when the message subject is empty" }
+}

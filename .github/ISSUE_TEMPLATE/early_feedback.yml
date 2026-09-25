@@ -1,0 +1,99 @@
+name: "Early-user feedback / 早期利用フィードバック"
+description: >-
+  Share setup issues, false positives/negatives, notification behavior, or
+  performance impact. Please redact anything private before submitting — see
+  the checklist below.
+  設定の分かりにくさ、誤検知・見逃し、通知の挙動、パフォーマンスへの影響などをお知らせください。
+  送信前に個人情報を必ず伏せてください（下記チェックリスト参照）。
+title: "[Feedback] "
+labels:
+  - feedback
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying this add-on. This issue tracker is public — anyone
+        can read what you post here, including search engines. Please do not
+        paste raw private mail content.
+
+        このIssueトラッカーは公開されており、投稿内容は検索エンジンにも
+        表示されます。実際のメール本文などの個人情報はそのまま貼り付けない
+        でください。
+
+        ## Before you submit — redact these / 送信前に伏せてください
+
+        - Email addresses (yours and any sender's) — use placeholders like
+          `sender@example.com` / メールアドレス（自分・相手とも）はプレース
+          ホルダーに置き換えてください（例: `sender@example.com`）。
+        - Message subjects and bodies — describe them in general terms
+          instead of pasting the real text / 件名や本文は実際のテキストでは
+          なく、一般的な説明に置き換えてください。
+        - Local file paths and folder names that contain your name or
+          account info / 氏名やアカウント情報を含むローカルのファイルパス・
+          フォルダー名は書かないでください。
+        - Account identifiers, server hostnames, and `authserv-id` values
+          specific to your mail provider, unless already public / 利用中の
+          メールプロバイダーに固有のアカウントID、サーバー名、
+          `authserv-id` の値（すでに公開情報でない限り）は書かないでください。
+        - Screenshots — crop or blur any of the above before attaching them
+          / スクリーンショットは、添付前に上記の情報を切り取るかぼかして
+          ください。
+
+        If a bug genuinely requires sharing a real header or message sample,
+        redact everything above and keep only the minimum needed to
+        reproduce the issue (e.g. the `Authentication-Results` header with
+        the domain replaced by `example.com`).
+        実際のヘッダーやメッセージのサンプルが必要な場合でも、上記の情報は
+        すべて伏せ、再現に必要な最小限の情報のみ（例: ドメイン名を
+        `example.com` に置き換えた `Authentication-Results` ヘッダー）に
+        してください。
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feedback category / フィードバックの種類
+      options:
+        - Setup clarity / 設定の分かりやすさ
+        - False positive (legitimate mail flagged) / 誤検知（正常なメールが振り分けられた）
+        - False negative (suspicious mail not flagged) / 見逃し（怪しいメールが振り分けられなかった）
+        - Notification behavior / 通知の挙動
+        - Performance impact / パフォーマンスへの影響
+        - Other / その他
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Add-on version / 拡張機能のバージョン
+      description: Options page → About, or the filename of the installed XPI.
+      placeholder: e.g. 0.8.4
+    validations:
+      required: true
+  - type: input
+    id: thunderbird-version
+    attributes:
+      label: Thunderbird version / Thunderbird のバージョン
+      placeholder: e.g. 128.2.1
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened / 内容
+      description: >-
+        Describe what you expected and what you observed, in general terms.
+        Do not paste real email addresses, subjects, or message bodies.
+        期待した動作と実際の動作を、一般的な言葉で説明してください。
+        実際のメールアドレス・件名・本文は貼り付けないでください。
+    validations:
+      required: true
+  - type: textarea
+    id: reasons
+    attributes:
+      label: Score reasons shown by the add-on (if applicable) / 拡張機能が表示した判定理由（該当する場合）
+      description: >-
+        If a message was flagged, copy the rule names/labels from the
+        message popup (e.g. "SPF MAIL FROM differs from From"), not the
+        message content itself.
+        メールが振り分けられた場合、ポップアップに表示されたルール名・
+        ラベル（例:「SPF MAIL FROMがFromと異なる」）のみを記載し、
+        メールの内容自体は含めないでください。
