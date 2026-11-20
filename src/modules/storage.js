@@ -86,6 +86,24 @@ export const DEFAULTS = {
 };
 
 export async function getStorage() {
+  const { data, needsSave } = await loadStorage();
+  if (needsSave) await saveStorage(data);
+  return data;
+}
+
+/**
+ * Read-only storage snapshot. Applies the same merge and score-default
+ * migration as getStorage() in memory only and never writes storage, so
+ * advisory callers (e.g. the rule match report) cannot change settings.
+ *
+ * @returns {Promise<object>}
+ */
+export async function readStorageSnapshot() {
+  const { data } = await loadStorage();
+  return data;
+}
+
+async function loadStorage() {
   const result = await browser.storage.local.get(STORAGE_KEY);
   const stored = result[STORAGE_KEY] ?? {};
   // Migrate any legacy plain-string trusted entries to typed exact entries.
@@ -122,14 +140,12 @@ export async function getStorage() {
   };
   // Migrate score defaults if stored values match a known old profile.
   const { settings: migratedSettings, migrated } = migrateScoreDefaults(data.settings ?? {});
-  if (migrated) {
+  let needsSave = false;
+  if (migrated || data.settings?.scoreDefaultsVersion !== SCORE_DEFAULTS_VERSION) {
     data.settings = migratedSettings;
-    await saveStorage(data);
-  } else if (data.settings?.scoreDefaultsVersion !== SCORE_DEFAULTS_VERSION) {
-    data.settings = migratedSettings;
-    await saveStorage(data);
+    needsSave = true;
   }
-  return data;
+  return { data, needsSave };
 }
 
 export async function saveStorage(data) {

@@ -167,10 +167,11 @@ These constraints keep the zones clean without changing scoring behaviour.
 
 ## `mail-auth-signal` Integration Boundary
 
-The add-on depends on the [`mail-auth-signal`][mas] npm package (`^0.4.0`) for
-core `Authentication-Results` parsing and metric extraction. The package is
-vendored into `src/vendor/mail-auth-signal.esm.js` at build time and is licensed
-under the Apache License 2.0 (see `src/vendor/mail-auth-signal.LICENSE`).
+The add-on depends on the [`mail-auth-signal`][mas] npm package (pinned to `0.6.1`) for
+core `Authentication-Results` parsing and metric extraction. The package's
+browser ESM bundle is vendored byte-for-byte into
+`src/vendor/mail-auth-signal.esm.js` at build time and is licensed under the
+Apache License 2.0 (see the packaged attribution in `src/THIRD_PARTY_LICENSES.md`).
 
 ### What lives in `mail-auth-signal`
 

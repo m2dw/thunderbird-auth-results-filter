@@ -36,7 +36,7 @@ await copyFile(
 
 console.log('Vendored: src/vendor/jsep.esm.min.js');
 
-// mail-auth-signal@0.5.3 publishes dist/browser/mail-auth-signal.esm.js as an
+// mail-auth-signal@0.6.1 publishes dist/browser/mail-auth-signal.esm.js as an
 // unmodified, browser-compatible ESM artifact (m2dw/mail-auth-signal#93) — it
 // inlines its "tldts" dependency, unlike dist/index.js (the "import"
 // condition), which imports "tldts" as a bare specifier and cannot resolve

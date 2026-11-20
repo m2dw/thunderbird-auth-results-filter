@@ -2,8 +2,10 @@
 
 This document reproduces the licenses and attribution notices for the
 third-party software bundled with Auth Results Filter. See
-[VENDOR.md](VENDOR.md) for the exact packaged file, version, and source URL
-of each library.
+[VENDOR.md](VENDOR.md) for the packaged file, version, and source URL of the
+minified libraries (jsep, tldts). mail-auth-signal 0.6.1 is bundled as readable,
+non-minified code at `vendor/mail-auth-signal.esm.js` and is not listed in
+VENDOR.md, but its license attribution below still applies.
 
 ## jsep (MIT)
 

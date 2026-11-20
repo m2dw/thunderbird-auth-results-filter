@@ -198,6 +198,17 @@ allowlist.
 - **Release artifacts are stored as public GitHub Release assets.**
 - The release script does **not** depend on a README badge updating.
 
+## Thunderbird Add-ons submission (XPI-only)
+
+Upload **only the XPI** to addons.thunderbird.net. Do not attach a separate
+source-code archive: the authored code is not minified and is readable in the
+XPI, and the XPI-only path is the faster review route. The packaged root
+`VENDOR.md` declares only `vendor/jsep.esm.min.js` (1.4.0) and
+`vendor/tldts.esm.min.js` (7.4.0); `vendor/mail-auth-signal.esm.js` ships as
+readable non-minified code and stays out of `VENDOR.md`, while its Apache-2.0
+attribution stays in `THIRD_PARTY_LICENSES.md`. The already-submitted 0.9.0
+XPI is not rebuilt for this.
+
 ## Verifying the XPI matches the public source (for reviewers)
 
 You can rebuild the XPI **contents** from the public source at the release tag:

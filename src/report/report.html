@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>__MSG_report_page_title__</title>
+  <link rel="stylesheet" href="report.css">
+</head>
+<body>
+  <main>
+    <h1>__MSG_report_page_title__</h1>
+    <p class="note">__MSG_report_snapshot_note__</p>
+
+    <section id="scope-section" aria-labelledby="scope-heading">
+      <h2 id="scope-heading">__MSG_report_scope_heading__</h2>
+      <p id="scope-label"></p>
+      <div id="folder-options" hidden>
+        <fieldset class="row">
+          <legend>__MSG_report_sent_date_label__</legend>
+          <label for="sent-from">__MSG_report_sent_date_from__</label>
+          <input type="date" id="sent-from">
+          <label for="sent-through">__MSG_report_sent_date_through__</label>
+          <input type="date" id="sent-through">
+        </fieldset>
+        <p class="note">__MSG_report_sent_date_note__</p>
+        <div class="row">
+          <label for="limit-input">__MSG_report_limit_label__</label>
+          <input type="number" id="limit-input" min="1" step="1" inputmode="numeric">
+          <label class="checkbox"><input type="checkbox" id="no-limit-toggle"> __MSG_report_no_user_limit__</label>
+        </div>
+        <p class="note">__MSG_report_limit_order_note__</p>
+      </div>
+      <p id="limit-note" class="note" aria-live="polite"></p>
+      <div class="row">
+        <button id="run-btn" type="button" disabled>__MSG_report_run__</button>
+      </div>
+      <p id="scope-message" class="status" role="status" hidden></p>
+    </section>
+
+    <section id="progress-section" class="row" hidden>
+      <progress id="progress-bar" max="1" value="0"></progress>
+      <span id="progress-text" role="status" aria-live="polite"></span>
+      <button id="cancel-btn" type="button">__MSG_btn_cancel__</button>
+    </section>
+
+    <section id="result-section" aria-labelledby="result-heading" hidden>
+      <h2 id="result-heading">__MSG_report_results_heading__</h2>
+      <p id="result-scope"></p>
+      <p id="result-status" class="status" role="status"></p>
+      <p id="result-limit" class="note" hidden></p>
+      <dl id="result-counts" class="counts">
+        <div><dt>__MSG_report_count_requested__</dt><dd id="count-requested"></dd></div>
+        <div><dt>__MSG_report_count_analyzed__</dt><dd id="count-analyzed"></dd></div>
+        <div><dt>__MSG_report_count_failed__</dt><dd id="count-failed"></dd></div>
+        <div><dt>__MSG_report_count_skipped__</dt><dd id="count-skipped"></dd></div>
+        <div><dt>__MSG_report_count_over_limit__</dt><dd id="count-over-limit"></dd></div>
+      </dl>
+      <p id="result-generated" class="note"></p>
+
+      <div class="row filters">
+        <label for="layer-filter">__MSG_report_filter_layer__</label>
+        <select id="layer-filter"></select>
+        <label class="checkbox"><input type="checkbox" id="diagnostic-toggle" checked> __MSG_report_show_diagnostic__</label>
+      </div>
+      <p id="sort-state" class="note" aria-live="polite"></p>
+      <table id="rule-table">
+        <thead>
+          <tr>
+            <th scope="col" id="th-rule"><button type="button" class="sort-btn" data-sort-key="rule">__MSG_report_col_rule__<span class="sort-indicator" aria-hidden="true"></span></button></th>
+            <th scope="col">__MSG_report_col_layer__</th>
+            <th scope="col" id="th-matches"><button type="button" class="sort-btn" data-sort-key="matches">__MSG_report_col_matches__<span class="sort-indicator" aria-hidden="true"></span></button></th>
+            <th scope="col">__MSG_report_col_share__</th>
+          </tr>
+        </thead>
+        <tbody id="rule-rows"></tbody>
+      </table>
+      <p id="rule-empty" class="note" hidden></p>
+    </section>
+
+    <section id="drilldown-section" aria-labelledby="drilldown-heading" hidden>
+      <h2 id="drilldown-heading"></h2>
+      <p id="drilldown-count"></p>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">__MSG_report_col_date__</th>
+            <th scope="col">__MSG_report_col_from__</th>
+            <th scope="col">__MSG_report_col_subject__</th>
+            <th scope="col">__MSG_report_col_delta__</th>
+            <th scope="col">__MSG_report_col_score__</th>
+            <th scope="col">__MSG_report_col_classification__</th>
+          </tr>
+        </thead>
+        <tbody id="drilldown-rows"></tbody>
+      </table>
+      <div id="drilldown-pager" class="row" hidden>
+        <button id="drilldown-prev" type="button">__MSG_report_page_prev__</button>
+        <span id="drilldown-page-status" aria-live="polite"></span>
+        <button id="drilldown-next" type="button">__MSG_report_page_next__</button>
+      </div>
+      <div class="row">
+        <button id="drilldown-close" type="button">__MSG_report_drilldown_close__</button>
+      </div>
+    </section>
+  </main>
+  <script src="report.js" type="module"></script>
+</body>
+</html>

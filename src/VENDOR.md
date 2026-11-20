@@ -3,9 +3,9 @@
 Auth Results Filter is packaged without a bundler: the third-party runtime
 dependencies below are copied verbatim into `vendor/` at build time (see
 `scripts/vendor.mjs`) and loaded directly as ES modules. This file declares
-every executable third-party file bundled in the XPI, in the packaged-path /
-Version / URL block format required by
-https://webextension-api.thunderbird.net/en/mv3/guides/vendoring.html.
+the minified third-party files bundled in the XPI, in the packaged-path /
+Version / URL block format described in the
+[Thunderbird vendoring guide](https://webextension-api.thunderbird.net/en/mv3/guides/vendoring.html).
 
 Each vendored file below is copied byte-for-byte from the corresponding npm
 package's published build output — no banners, import rewrites, or other
@@ -15,8 +15,14 @@ these libraries are collected in
 `node_modules/` path each file is copied from) is documented in
 `scripts/vendor.mjs`, not here, so it cannot be mistaken for a packaged path.
 
-The authored source in this XPI is not minified and is reviewable directly;
-no separate source archive is provided.
+`vendor/mail-auth-signal.esm.js` (mail-auth-signal 0.6.1, Apache-2.0) is also
+bundled but intentionally not declared here: it is readable, non-minified code
+shipped as-is in the XPI, as agreed with the Thunderbird Add-ons reviewer. It
+remains a pinned runtime dependency in `package.json` and `package-lock.json`.
+
+The authored source in this XPI, including `vendor/mail-auth-signal.esm.js`,
+is not minified and is reviewable directly. Submissions are XPI-only; no
+separate source archive is needed or uploaded.
 
 vendor/jsep.esm.min.js:
  - Version: 1.4.0
@@ -25,7 +31,3 @@ vendor/jsep.esm.min.js:
 vendor/tldts.esm.min.js:
  - Version: 7.4.0
  - URL: https://cdn.jsdelivr.net/npm/tldts@7.4.0/dist/index.esm.min.js
-
-vendor/mail-auth-signal.esm.js:
- - Version: 0.5.3
- - URL: https://cdn.jsdelivr.net/npm/mail-auth-signal@0.5.3/dist/browser/mail-auth-signal.esm.js

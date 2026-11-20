@@ -1,19 +1,25 @@
 import { isTrustedAuthservId } from '../core/trust.js';
-import { extractRegistrableDomain } from '../core/psl.js';
 import { getDomainParts } from '../core/domainParts.js';
-import { scoreMessage } from '../core/scoring.js';
 import { computeHeuristicMetrics } from '../core/heuristics.js';
-import { computeDisplayNameMetrics } from '../core/displayNameMetrics.js';
-import { computeAlignmentMetrics, computePassAlignmentSummary } from '../core/alignment.js';
-import { extractMessageIdentity, parseMailboxAddress, parseFromHeader, parseMessageIdDomain } from '../core/messageIdentity.js';
-import { analyzeMailAuthSignals, adaptAuthResults, adaptCompositeSignals } from '../modules/mailAuthSignalAdapter.js';
-import { computeMessageIdMetrics } from '../core/compositeRules.js';
+import { computeAlignmentMetrics } from '../core/alignment.js';
+import { extractMessageIdentity } from '../core/messageIdentity.js';
+import { assessMessage } from '../modules/messageAssessment.js';
+import { runRuleMatchAnalysis, serveRuleMatchReportPort, RULE_MATCH_REPORT_PORT } from '../modules/ruleMatchAnalysis.js';
+import {
+  ANALYZE_FOLDER_MENU_ID,
+  ANALYZE_SELECTION_MENU_ID,
+  RULE_MATCH_SCOPE_CANCEL_MESSAGE,
+  RULE_MATCH_SCOPE_MESSAGE,
+  collectSelectedMessageIds,
+  createScopeRegistry,
+  folderFromMenuInfo,
+} from '../modules/ruleMatchScope.js';
+import { getMessage } from '../modules/i18n.js';
 import { extractBodySnippet } from '../modules/bodySnippet.js';
 import { buildNotificationContent } from '../modules/notificationContent.js';
-import { computeHeaderMetrics } from '../core/headerMetrics.js';
 import { prunedCandidates } from '../modules/candidates.js';
 import { extractAuthservIds, authservIdsTruncated } from '../modules/protectionStatus.js';
-import { getStorage, saveStorage } from '../modules/storage.js';
+import { getStorage, saveStorage, readStorageSnapshot } from '../modules/storage.js';
 import {
   shouldNotifyAfterAssessment,
   shouldShowImmediately,
@@ -160,98 +166,146 @@ browser.messages.onNewMailReceived.addListener(async (folder, messages) => {
   }
 });
 
+// Rule match report: read-only, on-demand reassessment of explicit message IDs.
+// Uses the same assessMessage() pipeline as new mail but never moves, flags,
+// notifies, or writes the decision log. The settings snapshot is read without
+// persisting any score-default migration, so the report never writes storage.
+browser.runtime.onConnect.addListener(port => {
+  if (port.name !== RULE_MATCH_REPORT_PORT) return;
+  serveRuleMatchReportPort(port, (messageIds, { accountIds, maxMessages, signal, onProgress }) =>
+    runRuleMatchAnalysis(messageIds, {
+      browserApi: browser,
+      accountIds,
+      maxMessages,
+      loadSnapshot: readStorageSnapshot,
+      lookups: { isEmailInAddressBook, getAccountDomains },
+      signal,
+      onProgress,
+    }));
+});
+
+// Rule match report entry points: folder pane and message list context menus.
+// Both open the same report tab. The targeted scope is resolved here, kept in a
+// bounded in-memory registry, and handed to the tab by an opaque token.
+const reportScopes = createScopeRegistry();
+
+function createMenu(props) {
+  try {
+    browser.menus.create(props, () => void browser.runtime.lastError);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+createMenu({
+  id: ANALYZE_FOLDER_MENU_ID,
+  title: getMessage('menu_analyze_folder'),
+  contexts: ['folder_pane'],
+});
+createMenu({
+  id: ANALYZE_SELECTION_MENU_ID,
+  title: getMessage('menu_analyze_selection'),
+  contexts: ['message_list'],
+});
+
+browser.menus.onClicked.addListener(info => {
+  handleReportMenuClick(info).catch(console.error);
+});
+
+// Abort controllers for selections still being collected, keyed by scope token.
+// Entries are removed as soon as collection settles.
+const selectionCollections = new Map();
+
+async function handleReportMenuClick(info) {
+  if (info.menuItemId === ANALYZE_FOLDER_MENU_ID) {
+    const folder = folderFromMenuInfo(info);
+    if (!folder) return;
+    await openReportTab(reportScopes.add({ kind: 'folder', folder, createdAt: Date.now() }));
+  } else if (info.menuItemId === ANALYZE_SELECTION_MENU_ID) {
+    // Open the tab right away and resolve the (possibly paginated) selection
+    // in the background, while the MessageList returned for this click is still
+    // valid. The tab shows collection progress and can cancel it.
+    const scope = {
+      kind: 'selection',
+      collecting: true,
+      collected: 0,
+      cancelled: false,
+      messageIds: [],
+      accountIds: [],
+      excluded: 0,
+      truncated: false,
+      folders: [],
+      createdAt: Date.now(),
+    };
+    const token = reportScopes.add(scope);
+    const controller = new AbortController();
+    selectionCollections.set(token, controller);
+    const collection = collectSelection(scope, info, controller.signal)
+      .finally(() => selectionCollections.delete(token));
+    await openReportTab(token);
+    await collection;
+  }
+}
+
+async function collectSelection(scope, info, signal) {
+  // Selection enumeration happens here, not in the report tab, so its
+  // duration is measured here and handed to the tab's timing log.
+  const startedAt = performance.now();
+  try {
+    const { messageIds, accountIds, excluded, truncated, cancelled, folders } = await collectSelectedMessageIds(browser, info, {
+      signal,
+      onProgress: ({ collected }) => { scope.collected = collected; },
+    });
+    Object.assign(scope, {
+      messageIds, accountIds, excluded, truncated, cancelled, folders, collected: messageIds.length + excluded,
+    });
+  } catch (e) {
+    // A collection failure leaves the report tab in an error state, so the
+    // click is never silently lost.
+    console.error(e);
+    Object.assign(scope, { kind: 'error', error: String(e?.message ?? e) });
+  } finally {
+    scope.collectMs = performance.now() - startedAt;
+    scope.collecting = false;
+  }
+}
+
+async function openReportTab(token) {
+  await browser.tabs.create({
+    url: browser.runtime.getURL(`report/report.html?scope=${encodeURIComponent(token)}`),
+  });
+}
+
+browser.runtime.onMessage.addListener(msg => {
+  if (msg?.type === RULE_MATCH_SCOPE_CANCEL_MESSAGE) {
+    selectionCollections.get(msg.token)?.abort();
+    return Promise.resolve(true);
+  }
+  if (msg?.type !== RULE_MATCH_SCOPE_MESSAGE) return undefined;
+  return Promise.resolve(reportScopes.get(msg.token));
+});
+
 async function handleNewMessage(message) {
   const full = await browser.messages.getFull(message.id);
 
   const data = await getStorage();
-  const { trustedDomains, senderDomainRules, manualWhitelist, settings } = data;
+  const { trustedDomains, settings } = data;
 
-  // Build trustedAuthservIds by extracting authserv-ids that actually appear in
-  // Authentication-Results headers and testing each against the add-on's full trust
-  // semantics. This covers matchType:'domain' entries (e.g. { value:'example.com',
-  // matchType:'domain' }) whose subdomain authserv-ids (e.g. mx.example.com) would
-  // otherwise fail the exact-only match used by mail-auth-signal internally.
-  const rawAuthResultHeaders = [].concat(full.headers['authentication-results'] ?? []);
-  const trustedAuthservIds = [...new Set(
-    rawAuthResultHeaders
-      .map(h => h.split(/[\s;]/)[0]?.toLowerCase())
-      .filter(Boolean)
-      .filter(id => isTrustedAuthservId(id, trustedDomains))
-  )];
-
-  const { metrics, signals } = analyzeMailAuthSignals({
-    headers: full.headers,
-    trustedAuthservIds,
-    getRegistrableDomain: extractRegistrableDomain,
-  });
-  const parsed = adaptAuthResults(metrics.authenticationResults);
-
-  const fromHeader = full.headers['from']?.[0] ?? '';
-  const fromDomain = metrics.fromDomain ?? extractFromDomainFallback(fromHeader);
-  // Use senderIdentity.localPart (populated by the package when fromDomain is extractable);
-  // fall back to the local helper only when the package returned null (no domain path).
-  // Lowercase to match the add-on's parseMailboxAddress convention used by the fallback.
-  const fromLocalPart = (metrics.senderIdentity.localPart?.toLowerCase()) ?? extractFromLocalPart(fromHeader);
-  const messageIdDomain = parseMessageIdDomain(full.headers['message-id']?.[0] ?? null);
-
-  const headerMetrics = computeHeaderMetrics({
-    headers: full.headers,
+  const {
+    result,
+    parsed,
+    metrics,
     fromDomain,
-  });
-
-  const senderAddress = fromLocalPart && fromDomain
-    ? `${fromLocalPart.toLowerCase()}@${fromDomain.toLowerCase()}`
-    : '';
-
-  const isInAddressBook = settings.addressBookWhitelistEnabled && senderAddress
-    ? await isEmailInAddressBook(senderAddress)
-    : false;
-
-  const accountDomains = await getAccountDomains(message.folder?.accountId);
-
-  const fromParseMetrics = parseFromHeader(full.headers['from']?.[0] ?? null);
-
-  const displayNameMetrics = computeDisplayNameMetrics({
-    fromHeader: full.headers['from']?.[0] ?? null,
-    fromDomain,
-    fromAddress: fromParseMetrics.mailboxAddress ?? null,
-  });
-
-  const passAlignmentSummary = computePassAlignmentSummary({ parsedAuthResults: parsed, trustedDomains, fromDomain });
-
-  const messageIdMetrics = computeMessageIdMetrics({
-    messageIdDomain,
-    fromDomain,
-    anyAuthAligned: passAlignmentSummary.anyAuthAligned,
-  });
-
-  const mailAuthSignalReasons = adaptCompositeSignals(signals, settings.compositeScores, {
-    addonAnyAuthAligned: passAlignmentSummary.anyAuthAligned,
-    anyTrustedDmarcPass: passAlignmentSummary.anyTrustedDmarcPass,
-  });
-
-  const result = scoreMessage({
-    parsedAuthResults: parsed,
-    trustedDomains,
-    senderDomain: fromDomain,
-    senderLocalPart: fromLocalPart,
-    messageIdDomain,
-    senderDomainRules,
-    authScores: settings.authScores,
-    heuristicScores: settings.heuristicScores,
-    layer2Scores: settings.layer2Scores,
-    compositeScores: settings.compositeScores,
-    alignmentSummary: passAlignmentSummary,
-    whitelistEntries: manualWhitelist ?? [],
-    whitelistMitigationScore: settings.whitelistMitigationScore,
-    isInAddressBook,
-    addressBookMitigationScore: settings.addressBookMitigationScore,
+    fromLocalPart,
     headerMetrics,
-    accountDomains,
-    customFormulas: data.customFormulas ?? [],
     displayNameMetrics,
+    fromParseMetrics,
     messageIdMetrics,
-    mailAuthSignalReasons,
+  } = await assessMessage({
+    headers: full.headers,
+    accountId: message.folder?.accountId,
+    data,
+    lookups: { isEmailInAddressBook, getAccountDomains },
   });
 
   const now = Date.now();
@@ -500,18 +554,6 @@ async function checkMessageEligibilityAfterDelay(tbMessageId) {
   } catch {
     return false;
   }
-}
-
-// Used when mail-auth-signal cannot extract a domain (e.g. single-label hosts such
-// as 'user@localhost' where normalizeDomain requires a dot).
-function extractFromDomainFallback(fromHeader) {
-  const addr = parseMailboxAddress(fromHeader);
-  return addr.split('@')[1] ?? '';
-}
-
-function extractFromLocalPart(fromHeader) {
-  const addr = parseMailboxAddress(fromHeader);
-  return addr.split('@')[0] ?? '';
 }
 
 /**

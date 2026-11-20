@@ -129,6 +129,9 @@ Before submitting to the Thunderbird Add-ons store, confirm that:
 3. The downloaded XPI installs and functions correctly in a manual Thunderbird test
    (CI does not cover runtime Thunderbird checks).
 
+Upload the XPI only; no separate source-code archive is needed (see
+[docs/public-release.md](docs/public-release.md#thunderbird-add-ons-submission-xpi-only)).
+
 ### Releases
 
 Releases are published to this repository by the maintainer's release tooling and

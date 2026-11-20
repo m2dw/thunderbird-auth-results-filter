@@ -56,12 +56,11 @@ describe('npm run package — XPI vendoring regression checks', () => {
     expect(entries.has('vendor/mail-auth-signal.esm.js')).toBe(true);
   });
 
-  test('VENDOR.md declares every packaged vendor path with its Version and URL, in the canonical Thunderbird format', () => {
+  test('VENDOR.md declares exactly the two minified vendor paths (jsep, tldts) with its Version and URL, in the canonical Thunderbird format', () => {
     const vendorMd = entries.get('VENDOR.md').toString('utf8');
     const declarations = [
       ['jsep', 'vendor/jsep.esm.min.js'],
       ['tldts', 'vendor/tldts.esm.min.js'],
-      ['mail-auth-signal', 'vendor/mail-auth-signal.esm.js'],
     ];
     for (const [name, path] of declarations) {
       const version = pkg.dependencies[name];
@@ -79,7 +78,27 @@ describe('npm run package — XPI vendoring regression checks', () => {
       );
       expect(vendorMd).toMatch(block);
     }
+    const declared = [...vendorMd.matchAll(/^(vendor\/\S+):$/gm)].map((m) => m[1]);
+    expect(declared).toEqual(declarations.map(([, path]) => path));
+    expect(pkg.dependencies['mail-auth-signal']).toMatch(/^\d+\.\d+\.\d+$/);
     expect(vendorMd).not.toMatch(/Packaged from:\s*`?node_modules\//);
+  });
+
+  test('mail-auth-signal stays readable (non-minified) and keeps its license attribution', () => {
+    const src = entries.get('vendor/mail-auth-signal.esm.js').toString('utf8');
+    const lines = src.split('\n');
+    expect(lines.length).toBeGreaterThan(100);
+    // The pinned package embeds Public Suffix List data as a few very long
+    // data lines; everything else must be ordinary line-wrapped source.
+    const longLines = lines.filter((l) => l.length >= 1000);
+    expect(longLines.length).toBeLessThanOrEqual(3);
+    expect(longLines.length / lines.length).toBeLessThan(0.01);
+    const codeLines = lines.filter((l) => l.length < 1000);
+    expect(codeLines.length).toBeGreaterThan(100);
+    expect(codeLines.reduce((sum, l) => sum + l.length, 0) / codeLines.length).toBeLessThan(120);
+    const licenses = entries.get('THIRD_PARTY_LICENSES.md').toString('utf8');
+    expect(licenses).toMatch(/mail-auth-signal/);
+    expect(licenses).toMatch(/Apache License/);
   });
 
   test('every declared vendor path exists in the XPI at exactly that path', () => {

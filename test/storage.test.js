@@ -1,4 +1,5 @@
-import { DEFAULTS, getStorage, saveStorage } from '../src/modules/storage.js';
+import { jest } from '@jest/globals';
+import { DEFAULTS, getStorage, saveStorage, readStorageSnapshot } from '../src/modules/storage.js';
 
 function makeBrowserMock(stored) {
   return {
@@ -117,6 +118,50 @@ describe('getStorage — settings deep merge', () => {
     expect(data.settings.layer2Scores).toEqual(DEFAULTS.settings.layer2Scores);
     expect(data.settings.authScores).toEqual(DEFAULTS.settings.authScores);
     expect(data.settings.scoreDefaultsVersion).toBe('v3');
+  });
+});
+
+describe('readStorageSnapshot — read-only', () => {
+  afterEach(() => {
+    delete globalThis.browser;
+  });
+
+  const LEGACY = {
+    settings: {
+      heuristicScores: { randomFromDomainLabel: 30, randomFromLocalPart: 10, layer3Cap: 40 },
+      layer2Scores: { spfMailFromMismatch: 15, dkimDomainMismatch: 10, dmarcNoneWithThirdPartyAuth: 20 },
+      authScores: {
+        dmarc: { pass: 0, fail: 20, none: 15, policy: 0 },
+        spf: { pass: 0, fail: 60, none: 5, softfail: 15, neutral: 5, temperror: 10, permerror: 20 },
+        dkim: { pass: 0, fail: 25, none: 5, temperror: 10, permerror: 20 },
+      },
+    },
+  };
+
+  test('applies legacy score migration in memory without writing storage', async () => {
+    const set = jest.fn(async () => {});
+    globalThis.browser = { storage: { local: { get: async () => ({ authResultsFilter: structuredClone(LEGACY) }), set } } };
+    const snapshot = await readStorageSnapshot();
+    expect(snapshot.settings.heuristicScores).toEqual(DEFAULTS.settings.heuristicScores);
+    expect(snapshot.settings.authScores).toEqual(DEFAULTS.settings.authScores);
+    expect(snapshot.settings.scoreDefaultsVersion).toBe(DEFAULTS.settings.scoreDefaultsVersion);
+    expect(set).not.toHaveBeenCalled();
+  });
+
+  test('missing scoreDefaultsVersion is not persisted', async () => {
+    const set = jest.fn(async () => {});
+    globalThis.browser = { storage: { local: { get: async () => ({ authResultsFilter: {} }), set } } };
+    await readStorageSnapshot();
+    expect(set).not.toHaveBeenCalled();
+  });
+
+  test('matches getStorage() result for the same stored data', async () => {
+    const set = jest.fn(async () => {});
+    globalThis.browser = { storage: { local: { get: async () => ({ authResultsFilter: structuredClone(LEGACY) }), set } } };
+    const snapshot = await readStorageSnapshot();
+    const full = await getStorage();
+    expect(snapshot).toEqual(full);
+    expect(set).toHaveBeenCalledTimes(1);
   });
 });
 

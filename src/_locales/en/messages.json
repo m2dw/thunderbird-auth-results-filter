@@ -864,5 +864,179 @@
     "description": "Line appended to the notification body showing how many additional messages are queued",
     "placeholders": { "count": { "content": "$1", "example": "2" } }
   },
-  "notification_no_subject":    { "message": "(no subject)",              "description": "Fallback shown in the notification body when the message subject is empty" }
+  "notification_no_subject":    { "message": "(no subject)",              "description": "Fallback shown in the notification body when the message subject is empty" },
+
+  "menu_analyze_folder":    { "message": "Analyze this folder",       "description": "Folder pane context menu item that opens the rule match report for the clicked folder" },
+  "menu_analyze_selection": { "message": "Analyze selected messages", "description": "Message list context menu item that opens the rule match report for the targeted messages" },
+  "report_page_title":      { "message": "Rule Match Report",         "description": "Rule match report tab title and heading" },
+  "report_snapshot_note":   { "message": "This report is a local snapshot computed with the current settings. It is not saved or sent anywhere, and messages are left in place.", "description": "Explains that the report is a local, unsaved snapshot" },
+  "report_scope_heading":   { "message": "Scope",                     "description": "Heading of the scope section" },
+  "report_scope_folder": {
+    "message": "Folder “$folder$” ($account$)",
+    "description": "Scope label for folder analysis",
+    "placeholders": { "folder": { "content": "$1", "example": "Inbox" }, "account": { "content": "$2", "example": "user@example.com" } }
+  },
+  "report_scope_selection_one_folder": {
+    "message": "$count$ selected messages in “$folder$”",
+    "description": "Scope label for selected messages from one folder",
+    "placeholders": { "count": { "content": "$1", "example": "12" }, "folder": { "content": "$2", "example": "Inbox" } }
+  },
+  "report_scope_selection_many_folders": {
+    "message": "$count$ selected messages in $folders$ folders",
+    "description": "Scope label for selected messages from several folders",
+    "placeholders": { "count": { "content": "$1", "example": "12" }, "folders": { "content": "$2", "example": "3" } }
+  },
+  "report_scope_missing":   { "message": "This report has expired. Start a new analysis from the folder pane or message list context menu.", "description": "Shown when the report tab no longer has a scope" },
+  "report_sent_date_label":   { "message": "Sent date",               "description": "Legend of the sent-date range inputs for folder analysis" },
+  "report_sent_date_from":    { "message": "From",                    "description": "Label of the optional start date of the sent-date range" },
+  "report_sent_date_through": { "message": "Through",                 "description": "Label of the optional end date of the sent-date range" },
+  "report_sent_date_note": {
+    "message": "Uses the sender’s Date header as indexed by Thunderbird, not the time the message was received. Both days are included in full (local time). Leave a side blank for no bound; future dates are allowed.",
+    "description": "Explains which date the sent-date range uses"
+  },
+  "report_limit_label":       { "message": "Maximum messages",        "description": "Label of the per-run maximum number of messages for folder analysis" },
+  "report_no_user_limit":     { "message": "No user limit",           "description": "Checkbox: analyze up to the product maximum instead of a user-chosen count" },
+  "report_limit_order_note": {
+    "message": "When the limit is reached, the first messages in Thunderbird’s folder listing order are analyzed. This is not necessarily date or receipt order. Messages that cannot be read still count toward the limit.",
+    "description": "Explains which messages are analyzed when the limit is reached"
+  },
+  "report_limit_note_no_user_limit": {
+    "message": "No user limit: up to $limit$ messages (the product maximum) are analyzed per run.",
+    "description": "Effective limit shown when No user limit is selected",
+    "placeholders": { "limit": { "content": "$1", "example": "10000" } }
+  },
+  "report_limit_short": {
+    "message": "up to $limit$ messages",
+    "description": "Effective limit in the result scope line",
+    "placeholders": { "limit": { "content": "$1", "example": "1000" } }
+  },
+  "report_error_invalid_from":    { "message": "The From date is not a valid date.", "description": "Validation error: the start date is invalid" },
+  "report_error_invalid_through": { "message": "The Through date is not a valid date.", "description": "Validation error: the end date is invalid" },
+  "report_error_inverted_range":  { "message": "The From date is after the Through date.", "description": "Validation error: the start date is after the end date" },
+  "report_error_invalid_limit": {
+    "message": "Enter a whole number of messages from 1 to $limit$, or choose No user limit.",
+    "description": "Validation error: the maximum number of messages is invalid",
+    "placeholders": { "limit": { "content": "$1", "example": "10000" } }
+  },
+  "report_range_between": {
+    "message": "Sent date $from$ – $through$",
+    "description": "Result scope: sent-date range with both bounds",
+    "placeholders": { "from": { "content": "$1", "example": "11/1/2026" }, "through": { "content": "$2", "example": "11/18/2026" } }
+  },
+  "report_range_from": {
+    "message": "Sent date from $from$",
+    "description": "Result scope: sent-date range with only a start date",
+    "placeholders": { "from": { "content": "$1", "example": "11/1/2026" } }
+  },
+  "report_range_through": {
+    "message": "Sent date through $through$",
+    "description": "Result scope: sent-date range with only an end date",
+    "placeholders": { "through": { "content": "$1", "example": "11/18/2026" } }
+  },
+  "report_range_any":         { "message": "Any sent date",           "description": "Result scope: no sent-date range" },
+  "report_run":             { "message": "Analyze",                   "description": "Button that starts the analysis" },
+  "report_run_again":       { "message": "Analyze again",             "description": "Button that runs the analysis again with the current settings" },
+  "report_limit_note": {
+    "message": "Up to $limit$ messages are analyzed per run.",
+    "description": "Processing limit shown before running",
+    "placeholders": { "limit": { "content": "$1", "example": "1000" } }
+  },
+  "report_limit_reached": {
+    "message": "The scope contains more than $limit$ messages; only the first $limit$ were included.",
+    "description": "Shown when the scope exceeded the processing limit",
+    "placeholders": { "limit": { "content": "$1", "example": "1000" } }
+  },
+  "report_collecting":      { "message": "Collecting messages…",      "description": "Progress text while message IDs are collected" },
+  "report_collecting_count": {
+    "message": "Collecting selected messages… $count$ so far",
+    "description": "Progress text while a paginated message selection is collected",
+    "placeholders": { "count": { "content": "$1", "example": "2500" } }
+  },
+  "report_collecting_folder_count": {
+    "message": "Collecting messages… $count$ eligible so far",
+    "description": "Progress text while folder messages are collected",
+    "placeholders": { "count": { "content": "$1", "example": "2500" } }
+  },
+  "report_progress": {
+    "message": "Processed $completed$ of $total$ messages",
+    "description": "Progress text during analysis",
+    "placeholders": { "completed": { "content": "$1", "example": "250" }, "total": { "content": "$2", "example": "1000" } }
+  },
+  "report_results_heading": { "message": "Results",                   "description": "Heading of the results section" },
+  "report_status_complete": {
+    "message": "Complete: all $count$ requested messages were analyzed.",
+    "description": "Status when every requested message was analyzed",
+    "placeholders": { "count": { "content": "$1", "example": "120" } }
+  },
+  "report_status_partial": {
+    "message": "Partial result: $analyzed$ of $requested$ requested messages were analyzed.",
+    "description": "Status when some messages were not analyzed",
+    "placeholders": { "analyzed": { "content": "$1", "example": "118" }, "requested": { "content": "$2", "example": "120" } }
+  },
+  "report_status_cancelled": {
+    "message": "Cancelled: $analyzed$ of $requested$ requested messages were analyzed before cancellation.",
+    "description": "Status when the user cancelled the analysis",
+    "placeholders": { "analyzed": { "content": "$1", "example": "40" }, "requested": { "content": "$2", "example": "120" } }
+  },
+  "report_status_cancelled_before_start": { "message": "Cancelled before the analysis started.", "description": "Status when the user cancelled while messages were still being collected" },
+  "report_status_empty":    { "message": "No messages were found in this scope.", "description": "Status when the scope contains no messages" },
+  "report_status_error": {
+    "message": "Analysis failed: $error$",
+    "description": "Status when the analysis failed",
+    "placeholders": { "error": { "content": "$1", "example": "port closed" } }
+  },
+  "report_count_requested": { "message": "Requested",                 "description": "Count label: requested messages" },
+  "report_count_analyzed":  { "message": "Analyzed",                  "description": "Count label: analyzed messages" },
+  "report_count_failed":    { "message": "Failed",                    "description": "Count label: messages whose headers could not be read or assessed" },
+  "report_count_skipped":   { "message": "Skipped",                   "description": "Count label: skipped messages (invalid, duplicate, or cancelled); messages over the limit are counted separately" },
+  "report_count_over_limit": { "message": "Over limit",               "description": "Count label: messages in scope left out by the analysis limit" },
+  "report_generated_at": {
+    "message": "Snapshot taken $time$ with the current settings.",
+    "description": "When the snapshot was taken",
+    "placeholders": { "time": { "content": "$1", "example": "11/18/2026, 10:00:00 AM" } }
+  },
+  "report_filter_layer":      { "message": "Layer filter",            "description": "Label of the layer filter" },
+  "report_filter_all_layers": { "message": "All layers",              "description": "Layer filter option showing every layer" },
+  "report_show_diagnostic":   { "message": "Include diagnostic-only entries", "description": "Checkbox that shows diagnostic-only rule entries" },
+  "report_col_rule":        { "message": "Rule",                      "description": "Rule table column header: rule" },
+  "report_col_layer":       { "message": "Layer",                     "description": "Rule table column header: layer" },
+  "report_col_matches":     { "message": "Matches",                   "description": "Rule table column header: match count" },
+  "report_col_share":       { "message": "Share of analyzed messages", "description": "Rule table column header: share of analyzed messages" },
+  "report_matches_of": {
+    "message": "$count$ of $total$ analyzed messages",
+    "description": "Match count with denominator",
+    "placeholders": { "count": { "content": "$1", "example": "10" }, "total": { "content": "$2", "example": "120" } }
+  },
+  "report_sorted_by": {
+    "message": "Sorted by $column$, $direction$",
+    "description": "Describes the active sort",
+    "placeholders": { "column": { "content": "$1", "example": "match count" }, "direction": { "content": "$2", "example": "descending" } }
+  },
+  "report_sort_by_rule":    { "message": "rule order (L1–L5)",        "description": "Sort column name: canonical rule order" },
+  "report_sort_by_matches": { "message": "match count",               "description": "Sort column name: match count" },
+  "report_sort_ascending":  { "message": "ascending",                 "description": "Sort direction: ascending" },
+  "report_sort_descending": { "message": "descending",                "description": "Sort direction: descending" },
+  "report_no_matches":      { "message": "No rule matched the analyzed messages.", "description": "Shown when no rule matched any analyzed message" },
+  "report_no_rows_for_filter": { "message": "No rules match the current filter.", "description": "Shown when the filter hides every rule" },
+  "report_diagnostic_tag":  { "message": "diagnostic only",           "description": "Tag on diagnostic-only rule rows" },
+  "report_drilldown_heading": {
+    "message": "Messages matching “$rule$”",
+    "description": "Heading of the matching-message list for a rule",
+    "placeholders": { "rule": { "content": "$1", "example": "SPF fail" } }
+  },
+  "report_drilldown_close": { "message": "Close",                     "description": "Button that closes the matching-message list" },
+  "report_page_prev":       { "message": "Previous",                  "description": "Button: previous page of matching messages" },
+  "report_page_next":       { "message": "Next",                      "description": "Button: next page of matching messages" },
+  "report_page_status": {
+    "message": "$start$–$end$ of $total$",
+    "description": "Range of matching messages shown on the current page",
+    "placeholders": { "start": { "content": "$1", "example": "101" }, "end": { "content": "$2", "example": "200" }, "total": { "content": "$3", "example": "950" } }
+  },
+  "report_col_date":        { "message": "Date",                      "description": "Matching-message column header: date" },
+  "report_col_from":        { "message": "From",                      "description": "Matching-message column header: sender" },
+  "report_col_subject":     { "message": "Subject",                   "description": "Matching-message column header: subject" },
+  "report_col_delta":       { "message": "Score change",              "description": "Matching-message column header: score change from this rule" },
+  "report_col_score":       { "message": "Score",                     "description": "Matching-message column header: message score" },
+  "report_col_classification": { "message": "Classification",         "description": "Matching-message column header: classification" },
+  "report_message_unavailable": { "message": "(message unavailable)", "description": "Shown when a matching message can no longer be read" }
 }

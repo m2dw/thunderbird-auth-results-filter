@@ -6,6 +6,8 @@ Thunderbird Auth Results Filter is designed to process mail locally.
 
 The add-on needs access to message headers and selected message metadata to evaluate authentication results and sender domains.
 
+The `menus` permission adds "Analyze this folder" to the folder pane context menu and "Analyze selected messages" to the message list context menu. These open the rule match report, which reassesses the chosen messages locally with the current settings. The report is held in memory in its tab only: it is not stored, not sent anywhere, and the analyzed messages are not moved or modified.
+
 ## Local Storage
 
 The add-on may store:
